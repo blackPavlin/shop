@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:alpine
+    container_name: mongo
+    restart: unless-stopped
+    ports: 
+      - 27017:27017
+      
