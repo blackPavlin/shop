@@ -9,12 +9,16 @@ import (
 	"syscall"
 	"time"
 
-	authHttp "github.com/blackPavlin/shop/app/internal/auth/delivery"
-	authUC "github.com/blackPavlin/shop/app/internal/auth/usecase"
+	"github.com/blackPavlin/shop/app/internal/adapters/mongodb"
 	"github.com/blackPavlin/shop/app/internal/config"
-	userHttp "github.com/blackPavlin/shop/app/internal/user/delivery"
-	userRepo "github.com/blackPavlin/shop/app/internal/user/repository"
-	userUC "github.com/blackPavlin/shop/app/internal/user/usecase"
+	v1 "github.com/blackPavlin/shop/app/internal/controllers/http/v1"
+	"github.com/blackPavlin/shop/app/internal/controllers/http/v1/middlewares"
+	"github.com/blackPavlin/shop/app/internal/domain/services"
+	"github.com/blackPavlin/shop/app/internal/domain/usecase/auth"
+	"github.com/blackPavlin/shop/app/internal/domain/usecase/cart"
+	"github.com/blackPavlin/shop/app/internal/domain/usecase/order"
+	"github.com/blackPavlin/shop/app/internal/domain/usecase/product"
+	"github.com/blackPavlin/shop/app/internal/domain/usecase/user"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,25 +38,45 @@ func Start(config *config.Config, mongo *mongo.Database) error {
 		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
 	}))
 
-	// User
-	userRepo := userRepo.NewUserRepository(mongo)
-	userUseCase := userUC.NewUserUseCase(userRepo)
-	userHandler := userHttp.NewHandler(userUseCase)
+	// Repository
+	userRepository := mongodb.NewUserRepository(mongo)
+	cartRepository := mongodb.NewCartRepository(mongo)
+	orderPerository := mongodb.NewOrderRepository(mongo)
+	productRepository := mongodb.NewProductRepository(mongo)
 
-	// Auth
-	authUseCase := authUC.NewAuthUseCase(userUseCase, config)
-	authHandler := authHttp.NewHandler(authUseCase)
+	// Services
+	userService := services.NewUserService(userRepository)
+	cartService := services.NewCartService(cartRepository)
+	orderService := services.NewOrderService(orderPerository)
+	productService := services.NewProductService(productRepository)
+
+	// UseCases
+	userUseCase := user.NewUserUseCase(userService)
+	cartUseCase := cart.NewCartUseCase(cartService)
+	authUseCase := auth.NewAuthUseCase(userService, cartService, config.Auth)
+	orderUseCase := order.NewOrderUseCase(orderService, cartService)
+	productUseCase := product.NewProductUseCase(productService)
+
+	// Middlewares
+	authMiddleware := middlewares.NewAuthMiddleware(authUseCase)
+
+	// Controllers
+	authController := v1.NewAuthHandler(authUseCase)
+	userController := v1.NewUserHandler(userUseCase, authMiddleware)
+	cartController := v1.NewCartHandler(cartUseCase, authMiddleware)
+	orderController := v1.NewOrderHandler(orderUseCase)
+	productController := v1.NewProductHandler(productUseCase)
+
+	api := router.Group("/api")
 
 	{
-		api := router.Group("/api")
+		v1 := api.Group("/v1")
 
-		authHandler.Register(api)
-
-		{
-			app := api.Group("/app")
-
-			userHandler.Register(app)
-		}
+		authController.Register(v1)
+		userController.Register(v1)
+		cartController.Register(v1)
+		orderController.Register(v1)
+		productController.Register(v1)
 	}
 
 	server := &http.Server{

@@ -3,18 +3,24 @@ package config
 import "github.com/ilyakaznacheev/cleanenv"
 
 type Config struct {
-	Http struct {
-		Port string `yaml:"port" env-required:"true"`
-		Mode string `yaml:"mode" env-required:"true"`
-	}
-	Mongo struct {
-		URL  string `yaml:"url" env-required:"true"`
-		Name string `yaml:"name" env-required:"true"`
-	}
-	Auth struct {
-		SigningKey string `yaml:"signing_key" env-required:"true"`
-		ExpiresIn  int    `yaml:"expires_in" env-required:"true"`
-	}
+	Http  HttpConfig  `yaml:"http" env-required:"true"`
+	Mongo MongoConfig `yaml:"mongo" env-required:"true"`
+	Auth  AuthConfig  `yaml:"auth" env-required:"true"`
+}
+
+type HttpConfig struct {
+	Port string `yaml:"port" env-required:"true"`
+	Mode string `yaml:"mode" env-required:"true"`
+}
+
+type MongoConfig struct {
+	URL  string `yaml:"url" env-required:"true"`
+	Name string `yaml:"name" env-required:"true"`
+}
+
+type AuthConfig struct {
+	SigningKey string `yaml:"signing_key" env-required:"true"`
+	ExpiresIn  int    `yaml:"expires_in" env-required:"true"`
 }
 
 func NewConfig(path string) (*Config, error) {
