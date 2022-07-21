@@ -29,4 +29,4 @@ func (p *ProductService) GetProductByID(ctx context.Context, id string) (*entiti
 	return p.productRepo.FindByID(ctx, id)
 }
 
-func (p *ProductService) GetProductsByCategory(ctx context.Context) {}
+func (p *ProductService) GetProductsByCategory(ctx context.Context, category string, offset, limit int32) {}

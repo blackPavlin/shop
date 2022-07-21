@@ -18,6 +18,11 @@ type AuthUseCase interface {
 	Registration(ctx context.Context, dto *usecase_dto.RegistartionDTO) error
 }
 
+type AuthMiddleware interface {
+	AuthGuard(c *gin.Context)
+	RoleGuard(c *gin.Context)
+}
+
 func NewAuthHandler(authUseCase AuthUseCase) *AuthHandler {
 	return &AuthHandler{
 		authUseCase: authUseCase,

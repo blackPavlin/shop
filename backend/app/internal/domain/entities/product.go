@@ -7,4 +7,5 @@ type Product struct {
 	Name        string             `json:"name" bson:"name"`
 	Description string             `json:"description" bson:"description"`
 	Category    string             `json:"category" bson:"category"`
+	Count       int32              `json:"count" bson:"count"`
 }

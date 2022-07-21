@@ -52,7 +52,7 @@ func Start(config *config.Config, mongo *mongo.Database) error {
 
 	// UseCases
 	userUseCase := user.NewUserUseCase(userService)
-	cartUseCase := cart.NewCartUseCase(cartService)
+	cartUseCase := cart.NewCartUseCase(cartService, productService)
 	authUseCase := auth.NewAuthUseCase(userService, cartService, config.Auth)
 	orderUseCase := order.NewOrderUseCase(orderService, cartService)
 	productUseCase := product.NewProductUseCase(productService)
@@ -65,7 +65,7 @@ func Start(config *config.Config, mongo *mongo.Database) error {
 	userController := v1.NewUserHandler(userUseCase, authMiddleware)
 	cartController := v1.NewCartHandler(cartUseCase, authMiddleware)
 	orderController := v1.NewOrderHandler(orderUseCase)
-	productController := v1.NewProductHandler(productUseCase)
+	productController := v1.NewProductHandler(productUseCase, authMiddleware)
 
 	api := router.Group("/api")
 

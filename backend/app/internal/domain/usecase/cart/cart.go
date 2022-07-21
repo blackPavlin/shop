@@ -8,11 +8,14 @@ import (
 )
 
 var (
-	ErrCartNotFound = errors.New("Cart not found")
+	ErrCartNotFound    = errors.New("Cart not found")
+	ErrProductNotFound = errors.New("Product not found")
+	Err                = errors.New("")
 )
 
 type CartUseCase struct {
-	cartService CartService
+	cartService    CartService
+	productService ProductService
 }
 
 type CartService interface {
@@ -20,9 +23,14 @@ type CartService interface {
 	AddProductToCart(ctx context.Context, userID string, product *entities.CartProduct) error
 }
 
-func NewCartUseCase(cartService CartService) *CartUseCase {
+type ProductService interface {
+	GetProductByID(ctx context.Context, id string) (*entities.Product, error)
+}
+
+func NewCartUseCase(cartService CartService, productService ProductService) *CartUseCase {
 	return &CartUseCase{
-		cartService: cartService,
+		cartService:    cartService,
+		productService: productService,
 	}
 }
 
@@ -37,4 +45,30 @@ func (c *CartUseCase) GetCart(ctx context.Context, userID string) (*entities.Car
 	}
 
 	return cart, nil
+}
+
+func (c *CartUseCase) AddProductToCart(ctx context.Context, userID string, productID string, productsCount int32) error {
+	product, err := c.productService.GetProductByID(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	if product == nil {
+		return ErrProductNotFound
+	}
+
+	if product.Count < productsCount {
+		return Err
+	}
+
+	if _, err := c.GetCart(ctx, userID); err != nil {
+		return err
+	}
+
+	cartProduct := &entities.CartProduct{
+		ProductID: product.ID,
+		Count:     productsCount,
+	}
+
+	return c.cartService.AddProductToCart(ctx, userID, cartProduct)
 }

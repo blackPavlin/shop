@@ -9,29 +9,25 @@ import (
 )
 
 type UserHandler struct {
-	userUseCase     UserUseCase
-	authMiddlewarre AuthMiddleware
+	userUseCase    UserUseCase
+	authMiddleware AuthMiddleware
 }
 
 type UserUseCase interface {
 	GetUser(ctx context.Context, id string) (*entities.User, error)
 }
 
-type AuthMiddleware interface {
-	AuthGuard(c *gin.Context)
-}
-
-func NewUserHandler(userUseCase UserUseCase, authMiddlewarre AuthMiddleware) *UserHandler {
+func NewUserHandler(userUseCase UserUseCase, authMiddleware AuthMiddleware) *UserHandler {
 	return &UserHandler{
-		userUseCase:     userUseCase,
-		authMiddlewarre: authMiddlewarre,
+		userUseCase:    userUseCase,
+		authMiddleware: authMiddleware,
 	}
 }
 
 func (h *UserHandler) Register(router *gin.RouterGroup) {
 	group := router.Group("user")
 	{
-		group.Use(h.authMiddlewarre.AuthGuard).GET("", h.GetUser)
+		group.Use(h.authMiddleware.AuthGuard).GET("", h.GetUser)
 	}
 }
 
