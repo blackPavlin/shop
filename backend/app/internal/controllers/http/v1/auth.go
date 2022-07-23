@@ -37,6 +37,7 @@ func (h *AuthHandler) Register(router *gin.RouterGroup) {
 	}
 }
 
+// Login - Авторизация пользователя
 func (h *AuthHandler) Login(c *gin.Context) {
 	r := &dto.LoginDTO{}
 
@@ -59,6 +60,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
+// Registration - Регистрация пользователя
 func (h *AuthHandler) Registration(c *gin.Context) {
 	r := &dto.RegistartionDTO{}
 

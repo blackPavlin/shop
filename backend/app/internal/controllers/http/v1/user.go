@@ -25,12 +25,13 @@ func NewUserHandler(userUseCase UserUseCase, authMiddleware AuthMiddleware) *Use
 }
 
 func (h *UserHandler) Register(router *gin.RouterGroup) {
-	group := router.Group("user")
+	group := router.Group("/user")
 	{
 		group.Use(h.authMiddleware.AuthGuard).GET("", h.GetUser)
 	}
 }
 
+// GetUser - Получить пользователя
 func (h *UserHandler) GetUser(c *gin.Context) {
 	userID := c.GetString("UserID")
 

@@ -10,9 +10,10 @@ type ProductService struct {
 	productRepo ProductRepository
 }
 
-type ProductRepository interface{
+type ProductRepository interface {
 	Create(ctx context.Context, product *entities.Product) error
 	FindByID(ctx context.Context, id string) (*entities.Product, error)
+	FindByCategoryID(ctx context.Context, categoryID string, offset, limit int64) ([]*entities.Product, error)
 }
 
 func NewProductService(productRepo ProductRepository) *ProductService {
@@ -29,4 +30,6 @@ func (p *ProductService) GetProductByID(ctx context.Context, id string) (*entiti
 	return p.productRepo.FindByID(ctx, id)
 }
 
-func (p *ProductService) GetProductsByCategory(ctx context.Context, category string, offset, limit int32) {}
+func (p *ProductService) GetProductsByCategory(ctx context.Context, categoryID string, offset, limit int64) ([]*entities.Product, error) {
+	return p.productRepo.FindByCategoryID(ctx, categoryID, offset, limit)
+}

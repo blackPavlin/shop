@@ -25,7 +25,7 @@ func NewCartHandler(cartUseCase CartUseCase, authMiddlewarre AuthMiddleware) *Ca
 }
 
 func (h *CartHandler) Register(router *gin.RouterGroup) {
-	group := router.Group("catr")
+	group := router.Group("/catr")
 	{
 		group.Use(h.authMiddlewarre.AuthGuard).GET("", h.GetCart)
 		group.Use(h.authMiddlewarre.AuthGuard).POST("", h.AddProduct)
@@ -34,6 +34,7 @@ func (h *CartHandler) Register(router *gin.RouterGroup) {
 	}
 }
 
+// GetCart - Получить корзину пользователя
 func (h *CartHandler) GetCart(c *gin.Context) {
 	userID := c.GetString("UserID")
 

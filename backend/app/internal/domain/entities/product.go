@@ -6,6 +6,6 @@ type Product struct {
 	ID          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Name        string             `json:"name" bson:"name"`
 	Description string             `json:"description" bson:"description"`
-	Category    string             `json:"category" bson:"category"`
-	Count       int32              `json:"count" bson:"count"`
+	CategoryID  primitive.ObjectID `json:"category_id" bson:"category_id"`
+	Quantity    int64              `json:"quantity" bson:"quantity"`
 }

@@ -47,7 +47,7 @@ func (c *CartUseCase) GetCart(ctx context.Context, userID string) (*entities.Car
 	return cart, nil
 }
 
-func (c *CartUseCase) AddProductToCart(ctx context.Context, userID string, productID string, productsCount int32) error {
+func (c *CartUseCase) AddProductToCart(ctx context.Context, userID string, productID string, productsCount int64) error {
 	product, err := c.productService.GetProductByID(ctx, productID)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (c *CartUseCase) AddProductToCart(ctx context.Context, userID string, produ
 		return ErrProductNotFound
 	}
 
-	if product.Count < productsCount {
+	if product.Quantity < productsCount {
 		return Err
 	}
 

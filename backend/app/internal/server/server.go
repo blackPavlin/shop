@@ -16,6 +16,7 @@ import (
 	"github.com/blackPavlin/shop/app/internal/domain/services"
 	"github.com/blackPavlin/shop/app/internal/domain/usecase/auth"
 	"github.com/blackPavlin/shop/app/internal/domain/usecase/cart"
+	"github.com/blackPavlin/shop/app/internal/domain/usecase/category"
 	"github.com/blackPavlin/shop/app/internal/domain/usecase/order"
 	"github.com/blackPavlin/shop/app/internal/domain/usecase/product"
 	"github.com/blackPavlin/shop/app/internal/domain/usecase/user"
@@ -43,19 +44,22 @@ func Start(config *config.Config, mongo *mongo.Database) error {
 	cartRepository := mongodb.NewCartRepository(mongo)
 	orderPerository := mongodb.NewOrderRepository(mongo)
 	productRepository := mongodb.NewProductRepository(mongo)
+	categoryRepository := mongodb.NewCategoryRepository(mongo)
 
 	// Services
 	userService := services.NewUserService(userRepository)
 	cartService := services.NewCartService(cartRepository)
 	orderService := services.NewOrderService(orderPerository)
 	productService := services.NewProductService(productRepository)
+	categoryService := services.NewCategoryService(categoryRepository)
 
 	// UseCases
 	userUseCase := user.NewUserUseCase(userService)
 	cartUseCase := cart.NewCartUseCase(cartService, productService)
 	authUseCase := auth.NewAuthUseCase(userService, cartService, config.Auth)
 	orderUseCase := order.NewOrderUseCase(orderService, cartService)
-	productUseCase := product.NewProductUseCase(productService)
+	productUseCase := product.NewProductUseCase(productService, categoryService)
+	categoryUseCase := category.NewCategoryUseCase(categoryService)
 
 	// Middlewares
 	authMiddleware := middlewares.NewAuthMiddleware(authUseCase)
@@ -64,8 +68,9 @@ func Start(config *config.Config, mongo *mongo.Database) error {
 	authController := v1.NewAuthHandler(authUseCase)
 	userController := v1.NewUserHandler(userUseCase, authMiddleware)
 	cartController := v1.NewCartHandler(cartUseCase, authMiddleware)
-	orderController := v1.NewOrderHandler(orderUseCase)
+	orderController := v1.NewOrderHandler(orderUseCase, authMiddleware)
 	productController := v1.NewProductHandler(productUseCase, authMiddleware)
+	categoryController := v1.NewCategoryHandler(categoryUseCase, authMiddleware)
 
 	api := router.Group("/api")
 
@@ -77,6 +82,7 @@ func Start(config *config.Config, mongo *mongo.Database) error {
 		cartController.Register(v1)
 		orderController.Register(v1)
 		productController.Register(v1)
+		categoryController.Register(v1)
 	}
 
 	server := &http.Server{

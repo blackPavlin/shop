@@ -6,7 +6,9 @@ import (
 
 	"github.com/blackPavlin/shop/app/internal/domain/entities"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ProductRepository struct {
@@ -41,4 +43,36 @@ func (p *ProductRepository) FindByID(ctx context.Context, id string) (*entities.
 	}
 
 	return product, nil
+}
+
+func (p *ProductRepository) FindByCategoryID(ctx context.Context, categoryID string, offset, limit int64) ([]*entities.Product, error) {
+	uid, err := primitive.ObjectIDFromHex(categoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	options := &options.FindOptions{
+		Skip:  &offset,
+		Limit: &limit,
+	}
+
+	cursor, err := p.collection.Find(ctx, bson.M{"category_id": uid}, options)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	products := []*entities.Product{}
+
+	for cursor.Next(ctx) {
+		product := &entities.Product{}
+
+		if err := cursor.Decode(product); err != nil {
+			return nil, err
+		}
+
+		products = append(products, product)
+	}
+
+	return products, nil
 }

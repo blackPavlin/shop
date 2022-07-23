@@ -10,5 +10,5 @@ type Cart struct {
 
 type CartProduct struct {
 	ProductID primitive.ObjectID `json:"-" bson:"product_id"`
-	Count     int32              `json:"-" bson:"count"`
+	Count     int64              `json:"-" bson:"count"`
 }
