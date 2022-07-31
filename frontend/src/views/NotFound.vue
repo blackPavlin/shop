@@ -1,5 +1,5 @@
 <template>
-  <div class="not-found">NOT FOUND</div>
+  <el-main class="not-found">NOT FOUND</el-main>
 </template>
 
 <script lang="ts">

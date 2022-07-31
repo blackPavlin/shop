@@ -86,8 +86,10 @@ func Start(config *config.Config, mongo *mongo.Database) error {
 	}
 
 	server := &http.Server{
-		Addr:    config.Http.Port,
-		Handler: router,
+		Handler:      router,
+		Addr:         config.Http.Port,
+		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  10 * time.Second,
 	}
 
 	go func() {

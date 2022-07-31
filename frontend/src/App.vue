@@ -3,9 +3,7 @@
     <el-header>
       <nav-bar />
     </el-header>
-    <el-main>
-      <router-view />
-    </el-main>
+    <router-view />
   </el-container>
 </template>
 

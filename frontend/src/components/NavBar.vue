@@ -1,23 +1,28 @@
 <template>
   <el-menu mode="horizontal" :router="true" :default-active="$route.path">
+    <el-menu-item index="/products" route="/products">
+      <el-icon><goods /></el-icon>
+      <template #title>Товары</template>
+    </el-menu-item>
+
+    <el-menu-item index="/registration" route="/registration" v-if="!isAuth">
+      <el-icon><user /></el-icon>
+      <template #title>Регистрация</template>
+    </el-menu-item>
+
     <el-menu-item index="/login" route="/login" v-if="!isAuth">
       <el-icon><arrow-left /></el-icon>
       <template #title>Вход</template>
     </el-menu-item>
 
-    <el-menu-item index="/products" route="/products" v-if="isAuth">
-      <el-icon><goods /></el-icon>
-      <template #title>Товары</template>
-    </el-menu-item>
-
-    <el-menu-item index="/card" route="/card" v-if="isAuth">
+    <el-menu-item index="/cart" route="/cart" v-if="isAuth">
       <el-icon><shopping-cart /></el-icon>
       <template #title>Корзина</template>
     </el-menu-item>
 
-    <el-menu-item index="/options" route="/options" v-if="isAuth">
-      <el-icon><operation /></el-icon>
-      <template #title>Настройки</template>
+    <el-menu-item index="/orders" route="/orders" v-if="isAuth">
+      <el-icon><sold-out /></el-icon>
+      <template #title>Заказы</template>
     </el-menu-item>
 
     <el-menu-item index="/logout" route="/logout" v-if="isAuth">
@@ -33,25 +38,27 @@ import {
   ArrowLeft,
   ArrowRight,
   ShoppingCart,
-  Operation,
+  SoldOut,
   Goods,
+  User,
 } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/store/auth.store";
 
 export default defineComponent({
-  name: "AdminNavBar",
+  name: "NavBar",
   components: {
     ArrowLeft,
     ArrowRight,
     ShoppingCart,
-    Operation,
+    SoldOut,
     Goods,
+    User,
   },
   setup() {
-    // const store = useAuthStore();
-    // const isAuth = computed(() => store.isAuth);
+    const store = useAuthStore();
+    const isAuth = computed(() => store.isAuth);
 
-    return { isAuth: true };
+    return { isAuth };
   },
 });
 </script>

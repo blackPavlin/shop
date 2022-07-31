@@ -22,14 +22,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/views/Registration.vue"),
   },
   {
-    path: "/card",
+    path: "/cart",
     name: "CardView",
-    component: () => import("@/views/Card.vue"),
+    component: () => import("@/views/Cart.vue"),
   },
   {
-    path: "/options",
-    name: "OptionsView",
-    component: () => import("@/views/Options.vue"),
+    path: "/orders",
+    name: "OrdersView",
+    component: () => import("@/views/Orders.vue"),
   },
   {
     path: "/products",
