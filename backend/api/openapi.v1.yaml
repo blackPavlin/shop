@@ -1,0 +1,629 @@
+openapi: 3.0.0
+info:
+  title: Shop
+  description: The shop API.
+  contact:
+    name: Boykiv Bogdan
+    email: boikiv.bogdan@gmail.com
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:3000/api'
+tags:
+  - name: Authorization
+    description: Авторизация
+  - name: User
+    description: Пользователь
+  - name: Address
+    description: Адреса доставки
+  - name: Cart
+    description: Корзина покупок
+  - name: Order
+    description: Заказ
+  - name: Category
+    description: Категория товара
+  - name: Product
+    description: Товар
+paths:
+  /auth/login:
+    post:
+      summary: Авторизация пользователя
+      tags:
+        - Authorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'        
+
+  /auth/signup:
+    post:
+      summary: Регистрация пользователя
+      tags:
+        - Authorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /user:
+    get:
+      summary: Получить информацию о пользователе
+      tags:
+        - User
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      security:
+        - BearerAuth: []
+  
+  /address:
+    get:
+      summary: Получить список адресов доставки
+      tags:
+        - Address
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressList'
+      security:
+        - BearerAuth: []
+    post:
+      summary: Добавить адрес доставки
+      tags:
+        - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddressRequest'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+      security:
+        - BearerAuth: []
+        
+  /cart:
+    get:
+      summary: Получить корзину пользователя
+      tags:
+        - Cart
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+      security:
+        - BearerAuth: []
+    post:
+      summary: Добавить товар в корзину
+      tags:
+        - Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddProductToCartRequest'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'    
+      security:
+        - BearerAuth: []    
+    patch:
+      summary: Изменить количество товара в корзине
+      tags:
+        - Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductCountRequest'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+      security:
+        - BearerAuth: []    
+    delete:
+      summary: Очистить корзину
+      tags:
+        - Cart
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'  
+      security:
+        - BearerAuth: []
+        
+  /order:
+    get:
+      summary: Получить список заказов пользователя
+      tags:
+        - Order
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderList'  
+      security:
+        - BearerAuth: []  
+    post:
+      summary: Создать заказ
+      tags:
+        - Order
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailed'
+      security:
+        - BearerAuth: []  
+        
+  /order/{orderId}:
+    get:
+      summary: Получить детальную информацию о заказе
+      tags:
+        - Order
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailed'
+      security:
+        - BearerAuth: []
+    parameters:
+      - schema:
+          type: string
+        name: orderId
+        in: path
+        required: true
+        description: ID заказа    
+  
+  /category:
+    get:
+      summary: Получить список категорий товаров
+      tags:
+        - Category
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryList'
+    post:
+      summary: Создать категорию
+      tags:
+        - Category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+      security:
+        - BearerAuth: []
+    patch:
+      summary: Изменить категорию
+      tags:
+        - Category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+      security:
+        - BearerAuth: []    
+  
+  /product:
+    get:
+      summary: Получить список товаров
+      tags:
+        - Product
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:  
+    post:
+      summary: Создать товар
+      tags:
+        - Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'  
+      security:
+        - BearerAuth: []  
+
+  /product/{productId}:
+    get:
+      summary: Получить детальную карточку товара
+      tags:
+        - Product
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+    patch:
+      summary: Изменить товар
+      tags:
+        - Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'      
+      security:
+        - BearerAuth: []  
+    parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        description: ID заказа    
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      
+  schemas:
+    User:
+      title: Пользователь
+      type: object
+      required:
+        - id 
+        - name
+        - email
+        - phone
+        - role
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+    
+    Address:
+      title: Адрес доставки
+      type: object
+      required:
+        - id
+        - country
+        - city
+        - street
+        - house
+        - postcode
+      properties:
+        id:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+        street:
+          type: string
+        house:
+          type: integer
+        letter:
+          type: string
+        flat:
+          type: integer
+        postcode:
+          type: integer
+  
+    AddressList:
+      title: Список адресов доставки
+      type: array
+      items:
+        $ref: '#/components/schemas/Address'
+  
+    Cart:
+      title: Корзина покупок
+      type: object
+      required:
+        - id
+        - userId
+        - products
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        products:
+          $ref: '#/components/schemas/CartProductList'
+ 
+    CartProduct:
+      title: Товар в корзине пользователя
+      type: object
+      required:
+        - id
+        - amount
+      properties:
+        id:
+          type: string
+        amount:
+          type: integer
+ 
+    CartProductList:
+      title: Список товаров в корзине пользователя
+      type: array
+      items:
+        $ref: '#/components/schemas/CartProduct'
+        
+    Order:
+      title: Заказ
+      type: object
+      required:
+        - id
+        - userId
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+      
+    OrderList:
+      title: Список заказов пользователя
+      type: array
+      items:
+        $ref: '#/components/schemas/Order'
+ 
+    OrderDetailed:
+      title: Детальная карточка заказа
+      type: object
+      required:
+        - id
+        - userId
+        - products
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        products:
+            $ref: '#/components/schemas/OrderProductList'
+ 
+    OrderProductList:
+      title: Список товаров в заказе
+      type: array
+      items:
+        $ref: '#/components/schemas/OrderProduct'
+ 
+    OrderProduct:
+      title: Товар в заказе
+      type: object
+      required:
+        - productId
+        - amount
+      properties:
+        productId:
+          type: string
+        amount:
+          type: integer
+ 
+    Category:
+      title: Категория товара
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    CategoryList:
+      title: Список категорий товаров
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
+        
+    Product:
+      title: Товар
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    LoginRequest:
+      title: Тело запроса для авторизации пользователя
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required,email 
+        password:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+
+    LoginResponse:
+      title: Токен авторизации
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+
+    SignupRequest:
+      title: Тело запроса для регистрации пользователя
+      type: object
+      required:
+        - name
+        - email
+        - phone
+        - password
+      properties:
+        name:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        email:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required,email
+        phone:
+          type: string
+        password:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+ 
+    CreateAddressRequest: 
+      title: Тело запроса для создания адреса доставки
+      type: object
+      required:
+        - country
+        - city
+        - street
+        - house
+        - postcode
+      properties:
+        country:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        city:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        street:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        house:
+          type: integer
+          x-oapi-codegen-extra-tags:
+            binding: required
+        letter:
+          type: string
+        flat:
+          type: integer
+        postcode:
+          type: integer
+          x-oapi-codegen-extra-tags:
+            binding: required
+
+    AddProductToCartRequest:
+      title: Тело запроса для добавления товара в корзину
+      type: object
+      required:
+        - productId
+        - amount
+      properties:
+        productId:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
+        amount:
+          type: integer
+          x-oapi-codegen-extra-tags:
+            binding: required
+      
+    UpdateProductCountRequest:
+      title: Тело запроса для изменения количества товара в корзине
+      type: object
+
+    CreateCategoryRequest:
+      title: Тело запроса для создания категории
+      type: object
+
+    UpdateCategoryRequest:
+      title: Тело запроса для изменения категории
+      type: object

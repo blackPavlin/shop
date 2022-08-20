@@ -23,7 +23,7 @@ func main() {
 	}
 
 	// Start server
-	if err := server.Start(config, mongo); err != nil {
+	if err := server.NewServer(config, mongo).Start(); err != nil {
 		log.Fatalf("Failed to shutdown server: %+v", err)
 	}
 }
