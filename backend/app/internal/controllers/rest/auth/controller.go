@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/blackPavlin/shop/app/internal/core/entities"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest"
+	"github.com/blackPavlin/shop/app/internal/core/entities"
 	"github.com/blackPavlin/shop/app/internal/core/usecases/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -46,18 +46,18 @@ func (ctrl AuthController) login(c *gin.Context) {
 		return
 	}
 
-	dto := &auth.LoginUserDTO{
+	loginDTO := &auth.LoginUserDTO{
 		Email:    req.Email,
 		Password: req.Password,
 	}
 
-	token, err := ctrl.authUseCase.Login(c, dto)
+	token, err := ctrl.authUseCase.Login(c, loginDTO)
 	if err != nil {
 		rest.HandleError(c, err)
 		return
 	}
 
-	res := &rest.LoginResponse{
+	res := rest.LoginResponse{
 		Token: token,
 	}
 
@@ -72,4 +72,33 @@ func (ctrl AuthController) signup(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	signupDTO := &auth.SignupUserDTO{
+		Name:     req.Name,
+		Phone:    req.Phone,
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	if _, err := ctrl.authUseCase.Signup(c, signupDTO); err != nil {
+		rest.HandleError(c, err)
+		return
+	}
+
+	loginDTO := &auth.LoginUserDTO{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	token, err := ctrl.authUseCase.Login(c, loginDTO)
+	if err != nil {
+		rest.HandleError(c, err)
+		return
+	}
+
+	res := rest.LoginResponse{
+		Token: token,
+	}
+
+	c.JSON(http.StatusOK, res)
 }

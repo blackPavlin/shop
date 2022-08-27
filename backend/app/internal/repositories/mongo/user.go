@@ -47,7 +47,7 @@ func (u UserRepository) Create(ctx context.Context, user *entities.User) (entiti
 func (u UserRepository) FindByID(ctx context.Context, id entities.UserID) (*entities.User, error) {
 	user := &entities.User{}
 
-	if err := u.collection.FindOne(ctx, bson.M{"_id": id}).Decode(user); err != nil {
+	if err := u.collection.FindOne(ctx, bson.M{"_id": primitive.ObjectID(id)}).Decode(user); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, errs.ErrUserNotFound
 		}

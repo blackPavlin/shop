@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    networks:
+      - shop-network
+    ports: 
+      - 27017:27017
+    expose:
+      - 27017  
+    command: ["mongod", "--replSet", "rsmongo"]
+
+networks:
+  shop-network:
+    driver: bridge

@@ -14,15 +14,13 @@ const (
 	UserRoleUSER UserRole = "USER"
 )
 
-// AddProductToCartRequest defines model for AddProductToCartRequest.
-type AddProductToCartRequest map[string]interface{}
-
 // Address defines model for Address.
 type Address struct {
 	City     string  `json:"city"`
 	Country  string  `json:"country"`
 	Flat     *int    `json:"flat,omitempty"`
 	House    int     `json:"house"`
+	Id       string  `json:"id"`
 	Letter   *string `json:"letter,omitempty"`
 	Postcode int     `json:"postcode"`
 	Street   string  `json:"street"`
@@ -33,36 +31,45 @@ type AddressList []Address
 
 // Cart defines model for Cart.
 type Cart struct {
+	Id       string          `json:"id"`
 	Products CartProductList `json:"products"`
+	UserId   string          `json:"userId"`
 }
 
 // CartProduct defines model for CartProduct.
 type CartProduct struct {
-	Id int64 `json:"id"`
+	Amount    int    `binding:"required" json:"amount"`
+	ProductId string `binding:"required" json:"productId"`
 }
 
 // CartProductList defines model for CartProductList.
 type CartProductList []CartProduct
 
 // Category defines model for Category.
-type Category map[string]interface{}
+type Category struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
 
 // CategoryList defines model for CategoryList.
 type CategoryList []Category
 
 // CreateAddressRequest defines model for CreateAddressRequest.
 type CreateAddressRequest struct {
-	City     string  `json:"city"`
-	Country  string  `json:"country"`
+	City     string  `binding:"required" json:"city"`
+	Country  string  `binding:"required" json:"country"`
 	Flat     *int    `json:"flat,omitempty"`
-	House    int     `json:"house"`
+	House    int     `binding:"required" json:"house"`
 	Letter   *string `json:"letter,omitempty"`
-	Postcode int     `json:"postcode"`
-	Street   string  `json:"street"`
+	Postcode int     `binding:"required" json:"postcode"`
+	Street   string  `binding:"required" json:"street"`
 }
 
 // CreateCategoryRequest defines model for CreateCategoryRequest.
 type CreateCategoryRequest map[string]interface{}
+
+// CreateProductRequest defines model for CreateProductRequest.
+type CreateProductRequest map[string]interface{}
 
 // LoginRequest defines model for LoginRequest.
 type LoginRequest struct {
@@ -76,42 +83,60 @@ type LoginResponse struct {
 }
 
 // Order defines model for Order.
-type Order map[string]interface{}
+type Order struct {
+	Id     string `json:"id"`
+	UserId string `json:"userId"`
+}
 
 // OrderDetailed defines model for OrderDetailed.
 type OrderDetailed struct {
+	Id       string           `json:"id"`
 	Products OrderProductList `json:"products"`
+	UserId   string           `json:"userId"`
 }
 
 // OrderList defines model for OrderList.
 type OrderList []Order
 
 // OrderProduct defines model for OrderProduct.
-type OrderProduct map[string]interface{}
+type OrderProduct struct {
+	Amount    int    `json:"amount"`
+	ProductId string `json:"productId"`
+}
 
 // OrderProductList defines model for OrderProductList.
 type OrderProductList []OrderProduct
 
+// Product defines model for Product.
+type Product struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// ProductList defines model for ProductList.
+type ProductList []Product
+
 // SignupRequest defines model for SignupRequest.
 type SignupRequest struct {
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
-	Phone    string `json:"phone"`
+	Email    string `binding:"required,email" json:"email"`
+	Name     string `binding:"required" json:"name"`
+	Password string `binding:"required" json:"password"`
+	Phone    string `binding:"required,e164" json:"phone"`
 }
 
 // UpdateCategoryRequest defines model for UpdateCategoryRequest.
 type UpdateCategoryRequest map[string]interface{}
 
-// UpdateProductCountRequest defines model for UpdateProductCountRequest.
-type UpdateProductCountRequest map[string]interface{}
+// UpdateProductRequest defines model for UpdateProductRequest.
+type UpdateProductRequest map[string]interface{}
 
 // User defines model for User.
 type User struct {
-	Email    string   `json:"email"`
-	Name     string   `json:"name"`
-	Phone    string   `json:"phone"`
-	Role     UserRole `json:"role"`
+	Email string   `json:"email"`
+	Id    string   `json:"id"`
+	Name  string   `json:"name"`
+	Phone string   `json:"phone"`
+	Role  UserRole `json:"role"`
 }
 
 // UserRole defines model for User.Role.
@@ -127,16 +152,22 @@ type PostAuthLoginJSONBody LoginRequest
 type PostAuthSignupJSONBody SignupRequest
 
 // PatchCartJSONBody defines parameters for PatchCart.
-type PatchCartJSONBody UpdateProductCountRequest
+type PatchCartJSONBody CartProduct
 
 // PostCartJSONBody defines parameters for PostCart.
-type PostCartJSONBody AddProductToCartRequest
+type PostCartJSONBody CartProduct
 
 // PatchCategoryJSONBody defines parameters for PatchCategory.
 type PatchCategoryJSONBody UpdateCategoryRequest
 
 // PostCategoryJSONBody defines parameters for PostCategory.
 type PostCategoryJSONBody CreateCategoryRequest
+
+// PostProductJSONBody defines parameters for PostProduct.
+type PostProductJSONBody CreateProductRequest
+
+// PatchProductProductIdJSONBody defines parameters for PatchProductProductId.
+type PatchProductProductIdJSONBody UpdateProductRequest
 
 // PostAddressJSONRequestBody defines body for PostAddress for application/json ContentType.
 type PostAddressJSONRequestBody PostAddressJSONBody
@@ -158,3 +189,9 @@ type PatchCategoryJSONRequestBody PatchCategoryJSONBody
 
 // PostCategoryJSONRequestBody defines body for PostCategory for application/json ContentType.
 type PostCategoryJSONRequestBody PostCategoryJSONBody
+
+// PostProductJSONRequestBody defines body for PostProduct for application/json ContentType.
+type PostProductJSONRequestBody PostProductJSONBody
+
+// PatchProductProductIdJSONRequestBody defines body for PatchProductProductId for application/json ContentType.
+type PatchProductProductIdJSONRequestBody PatchProductProductIdJSONBody

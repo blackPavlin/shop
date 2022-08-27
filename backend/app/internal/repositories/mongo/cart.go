@@ -43,7 +43,7 @@ func (c CartRepository) Create(ctx context.Context, cart *entities.Cart) (entiti
 func (c CartRepository) FindByUserID(ctx context.Context, userID entities.UserID) (*entities.Cart, error) {
 	cart := &entities.Cart{}
 
-	if err := c.collection.FindOne(ctx, bson.M{"user_id": userID}).Decode(cart); err != nil {
+	if err := c.collection.FindOne(ctx, bson.M{"user_id": primitive.ObjectID(userID)}).Decode(cart); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, errs.ErrCartNotFound
 		}
@@ -60,7 +60,7 @@ func (c CartRepository) DeleteProducts(ctx context.Context, userID entities.User
 			"products": []entities.CartProduct{},
 		},
 	}
-	if _, err := c.collection.UpdateOne(ctx, bson.M{"user_id": userID}, updates); err != nil {
+	if _, err := c.collection.UpdateOne(ctx, bson.M{"user_id": primitive.ObjectID(userID)}, updates); err != nil {
 		return nil, err
 	}
 
@@ -76,7 +76,7 @@ func (c CartRepository) DeleteProductByID(ctx context.Context, userID entities.U
 			},
 		},
 	}
-	if _, err := c.collection.UpdateOne(ctx, bson.M{"user_id": userID}, updates); err != nil {
+	if _, err := c.collection.UpdateOne(ctx, bson.M{"user_id": primitive.ObjectID(userID)}, updates); err != nil {
 		return nil, err
 	}
 
@@ -90,7 +90,7 @@ func (c CartRepository) AppendProduct(ctx context.Context, userID entities.UserI
 			"product": product,
 		},
 	}
-	if _, err := c.collection.UpdateOne(ctx, bson.M{"user_id": userID}, updates); err != nil {
+	if _, err := c.collection.UpdateOne(ctx, bson.M{"user_id": primitive.ObjectID(userID)}, updates); err != nil {
 		return nil, err
 	}
 
@@ -99,12 +99,18 @@ func (c CartRepository) AppendProduct(ctx context.Context, userID entities.UserI
 
 // UpdateProduct
 func (c CartRepository) UpdateProduct(ctx context.Context, userID entities.UserID, product *entities.CartProduct) (*entities.Cart, error) {
+	filter := bson.M{
+		"user_id": primitive.ObjectID(userID),
+		"products": bson.M{
+			"product_id": primitive.ObjectID(product.ProductID),
+		},
+	}
 	updates := bson.M{
 		"$set": bson.M{
 			"amount": product.Amount,
 		},
 	}
-	if _, err := c.collection.UpdateOne(ctx, bson.M{"user_id": userID, "products": bson.M{"product_id": product.ProductID}}, updates); err != nil {
+	if _, err := c.collection.UpdateOne(ctx, filter, updates); err != nil {
 		return nil, err
 	}
 

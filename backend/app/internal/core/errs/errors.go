@@ -38,5 +38,9 @@ var (
 	ErrUserAllreadyExists = NewError(http.StatusConflict, "user allready exists")
 
 	// Cart
-	ErrCartNotFound = NewError(http.StatusNotFound, "cart not found")
+	ErrCartNotFound    = NewError(http.StatusNotFound, "cart not found")
+	ErrTooManyProducts = NewError(http.StatusConflict, "too many products")
+
+	// Product
+	ErrProductNotFound = NewError(http.StatusNotFound, "product not found")
 )

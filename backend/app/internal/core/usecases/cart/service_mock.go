@@ -35,6 +35,51 @@ func (m *MockCartService) EXPECT() *MockCartServiceMockRecorder {
 	return m.recorder
 }
 
+// AppendProduct mocks base method.
+func (m *MockCartService) AppendProduct(ctx context.Context, userID entities.UserID, product *entities.CartProduct) (*entities.Cart, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AppendProduct", ctx, userID, product)
+	ret0, _ := ret[0].(*entities.Cart)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AppendProduct indicates an expected call of AppendProduct.
+func (mr *MockCartServiceMockRecorder) AppendProduct(ctx, userID, product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AppendProduct", reflect.TypeOf((*MockCartService)(nil).AppendProduct), ctx, userID, product)
+}
+
+// DeleteProductByID mocks base method.
+func (m *MockCartService) DeleteProductByID(ctx context.Context, userID entities.UserID, id entities.ProductID) (*entities.Cart, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteProductByID", ctx, userID, id)
+	ret0, _ := ret[0].(*entities.Cart)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteProductByID indicates an expected call of DeleteProductByID.
+func (mr *MockCartServiceMockRecorder) DeleteProductByID(ctx, userID, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProductByID", reflect.TypeOf((*MockCartService)(nil).DeleteProductByID), ctx, userID, id)
+}
+
+// DeleteProducts mocks base method.
+func (m *MockCartService) DeleteProducts(ctx context.Context, userID entities.UserID) (*entities.Cart, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteProducts", ctx, userID)
+	ret0, _ := ret[0].(*entities.Cart)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteProducts indicates an expected call of DeleteProducts.
+func (mr *MockCartServiceMockRecorder) DeleteProducts(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProducts", reflect.TypeOf((*MockCartService)(nil).DeleteProducts), ctx, userID)
+}
+
 // FindByUserID mocks base method.
 func (m *MockCartService) FindByUserID(ctx context.Context, userID entities.UserID) (*entities.Cart, error) {
 	m.ctrl.T.Helper()
@@ -48,4 +93,57 @@ func (m *MockCartService) FindByUserID(ctx context.Context, userID entities.User
 func (mr *MockCartServiceMockRecorder) FindByUserID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByUserID", reflect.TypeOf((*MockCartService)(nil).FindByUserID), ctx, userID)
+}
+
+// UpdateProduct mocks base method.
+func (m *MockCartService) UpdateProduct(ctx context.Context, userID entities.UserID, product *entities.CartProduct) (*entities.Cart, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProduct", ctx, userID, product)
+	ret0, _ := ret[0].(*entities.Cart)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateProduct indicates an expected call of UpdateProduct.
+func (mr *MockCartServiceMockRecorder) UpdateProduct(ctx, userID, product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProduct", reflect.TypeOf((*MockCartService)(nil).UpdateProduct), ctx, userID, product)
+}
+
+// MockProductService is a mock of ProductService interface.
+type MockProductService struct {
+	ctrl     *gomock.Controller
+	recorder *MockProductServiceMockRecorder
+}
+
+// MockProductServiceMockRecorder is the mock recorder for MockProductService.
+type MockProductServiceMockRecorder struct {
+	mock *MockProductService
+}
+
+// NewMockProductService creates a new mock instance.
+func NewMockProductService(ctrl *gomock.Controller) *MockProductService {
+	mock := &MockProductService{ctrl: ctrl}
+	mock.recorder = &MockProductServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockProductService) EXPECT() *MockProductServiceMockRecorder {
+	return m.recorder
+}
+
+// FindByID mocks base method.
+func (m *MockProductService) FindByID(ctx context.Context, id entities.ProductID) (*entities.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByID", ctx, id)
+	ret0, _ := ret[0].(*entities.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByID indicates an expected call of FindByID.
+func (mr *MockProductServiceMockRecorder) FindByID(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockProductService)(nil).FindByID), ctx, id)
 }

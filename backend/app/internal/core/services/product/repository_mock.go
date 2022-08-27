@@ -36,10 +36,10 @@ func (m *MockProductRepository) EXPECT() *MockProductRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockProductRepository) Create(ctx context.Context, product *entities.Product) (*entities.Product, error) {
+func (m *MockProductRepository) Create(ctx context.Context, product *entities.Product) (entities.ProductID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, product)
-	ret0, _ := ret[0].(*entities.Product)
+	ret0, _ := ret[0].(entities.ProductID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -48,4 +48,19 @@ func (m *MockProductRepository) Create(ctx context.Context, product *entities.Pr
 func (mr *MockProductRepositoryMockRecorder) Create(ctx, product interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProductRepository)(nil).Create), ctx, product)
+}
+
+// FindByID mocks base method.
+func (m *MockProductRepository) FindByID(ctx context.Context, id entities.ProductID) (*entities.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByID", ctx, id)
+	ret0, _ := ret[0].(*entities.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByID indicates an expected call of FindByID.
+func (mr *MockProductRepositoryMockRecorder) FindByID(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockProductRepository)(nil).FindByID), ctx, id)
 }

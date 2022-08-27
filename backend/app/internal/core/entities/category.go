@@ -1,8 +1,10 @@
 package entities
 
-type CategoryID [12]byte
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
+type CategoryID primitive.ObjectID
 
 type Category struct {
-	ID   CategoryID `json:"id" bson:"_id,omitempty"`
-	Name string     `json:"name" bson:"name"`
+	ID   primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Name string             `json:"name" bson:"name"`
 }

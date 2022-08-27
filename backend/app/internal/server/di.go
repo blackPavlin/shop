@@ -4,6 +4,7 @@ import (
 	"github.com/blackPavlin/shop/app/internal/core/services"
 	"github.com/blackPavlin/shop/app/internal/core/usecases"
 	"github.com/blackPavlin/shop/app/internal/core/usecases/auth"
+	"github.com/blackPavlin/shop/app/internal/core/usecases/cart"
 	"github.com/blackPavlin/shop/app/internal/core/usecases/user"
 	"github.com/blackPavlin/shop/app/internal/repositories"
 )
@@ -37,6 +38,11 @@ func (s *Server) initUseCases() usecases.UseCases {
 		// UserUseCase
 		UserUseCase: user.NewUserUseCase(
 			s.services.UserService,
+		),
+		// CartUseCas
+		CartUseCase: cart.NewCartUseCase(
+			s.services.CartService,
+			s.services.ProductService,
 		),
 	}
 }

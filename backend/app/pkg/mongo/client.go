@@ -8,7 +8,7 @@ import (
 )
 
 func NewMongoDB(ctx context.Context, databaseURL string, databaseName string) (*mongo.Database, error) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(databaseURL))
+	client, err := mongo.NewClient(options.Client().ApplyURI(databaseURL).SetDirect(true))
 	if err != nil {
 		return nil, err
 	}

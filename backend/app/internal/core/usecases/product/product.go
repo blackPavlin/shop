@@ -1,7 +1,17 @@
 package product
 
+import (
+	"context"
+
+	"github.com/blackPavlin/shop/app/internal/core/entities"
+)
+
+//go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "product"
+
 // ProductService
-type ProductService interface{}
+type ProductService interface {
+	Create(ctx context.Context, product *entities.Product) (entities.ProductID, error)
+}
 
 // ProductUseCase
 type ProductUseCase struct {

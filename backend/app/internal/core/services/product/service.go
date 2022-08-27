@@ -19,6 +19,11 @@ func NewProductService(productRepository ProductRepository) ProductService {
 }
 
 // Create
-func (s ProductService) Create(ctx context.Context, product *entities.Product) (*entities.Product, error) {
+func (s ProductService) Create(ctx context.Context, product *entities.Product) (entities.ProductID, error) {
 	return s.productRepository.Create(ctx, product)
+}
+
+// FindByID
+func (s ProductService) FindByID(ctx context.Context, id entities.ProductID) (*entities.Product, error) {
+	return s.productRepository.FindByID(ctx, id)
 }

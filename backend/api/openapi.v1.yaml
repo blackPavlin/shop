@@ -58,7 +58,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/LoginResponse'
 
   /user:
     get:
@@ -130,7 +130,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddProductToCartRequest'
+              $ref: '#/components/schemas/CartProduct'
       responses:
         '201':
           description: successful operation
@@ -148,7 +148,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateProductCountRequest'
+              $ref: '#/components/schemas/CartProduct'
       responses:
         '200':
           description: successful operation
@@ -281,7 +281,8 @@ paths:
           description: successful operation
           content:
             application/json:
-              schema:  
+              schema:
+                $ref: '#/components/schemas/ProductList'
     post:
       summary: Создать товар
       tags:
@@ -290,6 +291,7 @@ paths:
         content:
           application/json:
             schema:
+              $ref: '#/components/schemas/CreateProductRequest'
       responses:
         '201':
           description: successful operation
@@ -320,6 +322,7 @@ paths:
         content:
           application/json:
             schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
       responses:
         '200':
           description: successful operation
@@ -419,15 +422,18 @@ components:
  
     CartProduct:
       title: Товар в корзине пользователя
-      type: object
       required:
-        - id
+        - productId
         - amount
       properties:
-        id:
+        productId:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
         amount:
           type: integer
+          x-oapi-codegen-extra-tags:
+            binding: required
  
     CartProductList:
       title: Список товаров в корзине пользователя
@@ -515,6 +521,12 @@ components:
           type: string
         name:
           type: string
+          
+    ProductList:
+      title: Список товаров
+      type: array
+      items:
+        $ref: '#/components/schemas/Product'
 
     LoginRequest:
       title: Тело запроса для авторизации пользователя
@@ -560,6 +572,8 @@ components:
             binding: required,email
         phone:
           type: string
+          x-oapi-codegen-extra-tags:
+            binding: required,e164
         password:
           type: string
           x-oapi-codegen-extra-tags:
@@ -600,30 +614,18 @@ components:
           x-oapi-codegen-extra-tags:
             binding: required
 
-    AddProductToCartRequest:
-      title: Тело запроса для добавления товара в корзину
-      type: object
-      required:
-        - productId
-        - amount
-      properties:
-        productId:
-          type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
-        amount:
-          type: integer
-          x-oapi-codegen-extra-tags:
-            binding: required
-      
-    UpdateProductCountRequest:
-      title: Тело запроса для изменения количества товара в корзине
-      type: object
-
     CreateCategoryRequest:
       title: Тело запроса для создания категории
       type: object
 
     UpdateCategoryRequest:
       title: Тело запроса для изменения категории
+      type: object
+
+    CreateProductRequest:
+      title: Запрос для создания товара
+      type: object
+
+    UpdateProductRequest:
+      title:  Запрос для изменения полей товара
       type: object

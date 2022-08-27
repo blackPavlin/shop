@@ -10,6 +10,7 @@ import (
 	"github.com/blackPavlin/shop/app/internal/core/entities"
 	"github.com/blackPavlin/shop/app/internal/core/errs"
 	"github.com/golang-jwt/jwt/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -43,7 +44,7 @@ type AuthUseCase struct {
 // UserClaims
 type UserClaims struct {
 	jwt.StandardClaims
-	UserID   entities.UserID   `json:"userId"`
+	UserID   string            `json:"userId"`
 	UserRole entities.UserRole `json:"userRole"`
 }
 
@@ -82,7 +83,7 @@ func (a AuthUseCase) Login(ctx context.Context, dto *LoginUserDTO) (string, erro
 			ExpiresAt: time.Now().Add(time.Duration(a.authConfig.ExpiresIn) * time.Second).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		UserID:   user.ID,
+		UserID:   user.ID.Hex(),
 		UserRole: user.Role,
 	}
 
@@ -128,7 +129,7 @@ func (a AuthUseCase) Signup(ctx context.Context, dto *SignupUserDTO) (entities.U
 		}
 
 		cart := &entities.Cart{
-			UserID:   userID,
+			UserID:   primitive.ObjectID(userID),
 			Products: []entities.CartProduct{},
 		}
 

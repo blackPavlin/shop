@@ -45,10 +45,6 @@ func (s CartService) DeleteProductByID(ctx context.Context, userID entities.User
 
 // AppendProduct
 func (s CartService) AppendProduct(ctx context.Context, userID entities.UserID, product *entities.CartProduct) (*entities.Cart, error) {
-	if product.Amount <= 0 {
-		return nil, ErrAmountMustBePositive
-	}
-
 	return s.cartRepository.AppendProduct(ctx, userID, product)
 }
 
