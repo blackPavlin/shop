@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/auth"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/cart"
+	"github.com/blackPavlin/shop/app/internal/controllers/rest/category"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/middlewares"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/user"
 	"github.com/gin-contrib/cors"
@@ -32,6 +33,7 @@ func (s Server) initRoutes() *gin.Engine {
 		auth.NewAuthController(s.usecases.AuthUseCase).RegisterRoutes(v1)
 		user.NewUserController(s.usecases.UserUseCase, authMiddleware).RegisterRoutes(v1)
 		cart.NewCartController(s.usecases.CartUseCase, authMiddleware).RegisterRoutes(v1)
+		category.NewCategoryController(s.usecases.CategoryUseCase, authMiddleware).RegisterRoutes(v1)
 	}
 
 	return router

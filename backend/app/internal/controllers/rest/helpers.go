@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/blackPavlin/shop/app/internal/core/errs"
+	"github.com/blackPavlin/shop/app/internal/errs"
 	"github.com/gin-gonic/gin"
 )
 

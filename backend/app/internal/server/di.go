@@ -1,11 +1,12 @@
 package server
 
 import (
-	"github.com/blackPavlin/shop/app/internal/core/services"
-	"github.com/blackPavlin/shop/app/internal/core/usecases"
-	"github.com/blackPavlin/shop/app/internal/core/usecases/auth"
-	"github.com/blackPavlin/shop/app/internal/core/usecases/cart"
-	"github.com/blackPavlin/shop/app/internal/core/usecases/user"
+	"github.com/blackPavlin/shop/app/internal/services"
+	"github.com/blackPavlin/shop/app/internal/usecases"
+	"github.com/blackPavlin/shop/app/internal/usecases/auth"
+	"github.com/blackPavlin/shop/app/internal/usecases/cart"
+	"github.com/blackPavlin/shop/app/internal/usecases/category"
+	"github.com/blackPavlin/shop/app/internal/usecases/user"
 	"github.com/blackPavlin/shop/app/internal/repositories"
 )
 
@@ -22,6 +23,7 @@ func (s *Server) initServices() services.Services {
 		s.repositories.AddressRepository,
 		s.repositories.ProductRepository,
 		s.repositories.TransactionRepository,
+		s.repositories.CategoryRepository,
 	)
 }
 
@@ -43,6 +45,10 @@ func (s *Server) initUseCases() usecases.UseCases {
 		CartUseCase: cart.NewCartUseCase(
 			s.services.CartService,
 			s.services.ProductService,
+		),
+		// CategoryUseCase
+		CategoryUseCase: category.NewCategoryUseCase(
+			s.services.CategoryService,
 		),
 	}
 }

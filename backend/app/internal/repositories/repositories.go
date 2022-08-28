@@ -12,6 +12,7 @@ type Repositories struct {
 	AddressRepository     mongor.AddressRepository
 	ProductRepository     mongor.ProductRepository
 	TransactionRepository mongor.TransactionRepository
+	CategoryRepository    mongor.CategoryRepository
 }
 
 // NewRepositories
@@ -23,5 +24,6 @@ func NewRepositories(mongoDB *mongo.Database) Repositories {
 		AddressRepository:     mongor.NewAddressRepository(mongoDB),
 		ProductRepository:     mongor.NewProductRepository(mongoDB),
 		TransactionRepository: mongor.NewTransactionRepository(mongoDB),
+		CategoryRepository:    mongor.NewCategoryRepository(mongoDB),
 	}
 }

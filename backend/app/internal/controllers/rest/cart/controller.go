@@ -6,7 +6,7 @@ import (
 
 	"github.com/blackPavlin/shop/app/internal/controllers/rest"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/middlewares"
-	"github.com/blackPavlin/shop/app/internal/core/entities"
+	"github.com/blackPavlin/shop/app/internal/entities"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

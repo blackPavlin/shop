@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/blackPavlin/shop/app/internal/config"
-	"github.com/blackPavlin/shop/app/internal/core/services"
-	"github.com/blackPavlin/shop/app/internal/core/usecases"
+	"github.com/blackPavlin/shop/app/internal/services"
+	"github.com/blackPavlin/shop/app/internal/usecases"
 	"github.com/blackPavlin/shop/app/internal/repositories"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"

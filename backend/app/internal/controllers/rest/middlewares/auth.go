@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/blackPavlin/shop/app/internal/controllers/rest"
-	"github.com/blackPavlin/shop/app/internal/core/entities"
-	"github.com/blackPavlin/shop/app/internal/core/usecases/auth"
+	"github.com/blackPavlin/shop/app/internal/entities"
+	"github.com/blackPavlin/shop/app/internal/usecases/auth"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

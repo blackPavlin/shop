@@ -1,6 +1,6 @@
 package rest
 
-import "github.com/blackPavlin/shop/app/internal/core/entities"
+import "github.com/blackPavlin/shop/app/internal/entities"
 
 // DomainUserToResponse
 func DomainUserToResponse(user *entities.User) User {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/blackPavlin/shop/app/internal/core/entities"
+	"github.com/blackPavlin/shop/app/internal/entities"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
