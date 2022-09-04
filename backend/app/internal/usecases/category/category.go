@@ -29,3 +29,23 @@ func NewCategoryUseCase(categoryService CategoryService) CategoryUseCase {
 		categoryService: categoryService,
 	}
 }
+
+// Create
+func (c CategoryUseCase) Create(ctx context.Context, category *entities.Category) (*entities.Category, error) {
+	categoryID, err := c.categoryService.Create(ctx, category)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.categoryService.FindByID(ctx, categoryID)
+}
+
+// Update
+func (c CategoryUseCase) Update(ctx context.Context, category *entities.Category) (*entities.Category, error) {
+	return c.categoryService.Update(ctx, category)
+}
+
+// Find
+func (c CategoryUseCase) Find(ctx context.Context) ([]*entities.Category, error) {
+	return c.categoryService.Find(ctx)
+}

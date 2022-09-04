@@ -9,7 +9,7 @@ func DomainUserToResponse(user *entities.User) User {
 		Email: user.Email,
 		Name:  user.Name,
 		Phone: user.Phone,
-		// Role: ,
+		Role:  UserRole(user.Role),
 	}
 }
 
@@ -34,4 +34,48 @@ func DomainCartProductsToResponse(cartProducts []entities.CartProduct) CartProdu
 	}
 
 	return products
+}
+
+// DomainCategoryToResponse
+func DomainCategoryToResponse(category *entities.Category) Category {
+	return Category{
+		Id:   category.ID.Hex(),
+		Name: category.Name,
+	}
+}
+
+// DomainCategoriesToResponse
+func DomainCategoriesToResponse(categories []*entities.Category) CategoryList {
+	result := make(CategoryList, 0, len(categories))
+
+	for _, category := range categories {
+		result = append(result, DomainCategoryToResponse(category))
+	}
+
+	return result
+}
+
+// DomainAddressToResponse
+func DomainAddressToResponse(address *entities.Address) Address {
+	return Address{
+		Id:       address.ID.Hex(),
+		City:     address.City,
+		Country:  address.Country,
+		Flat:     address.Flat,
+		House:    address.House,
+		Letter:   address.Letter,
+		Postcode: address.Postcode,
+		Street:   address.Street,
+	}
+}
+
+// DomainAddressesToResponse
+func DomainAddressesToResponse(addresses []*entities.Address) AddressList {
+	result := make(AddressList, 0, len(addresses))
+
+	for _, address := range addresses {
+		result = append(result, DomainAddressToResponse(address))
+	}
+
+	return result
 }

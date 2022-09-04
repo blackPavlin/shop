@@ -29,6 +29,9 @@ func NewError(code int, message string) *Error {
 }
 
 var (
+	// Internal
+	ErrFailidTypecastObjectID = NewError(http.StatusInternalServerError, "failid typecast ObjectID")
+
 	// Auth
 	ErrUnauthorized           = NewError(http.StatusUnauthorized, "unautorized")
 	ErrInvalidLoginOrPassword = NewError(http.StatusUnauthorized, "invalid login or password")
@@ -46,4 +49,7 @@ var (
 
 	// Category
 	ErrCategoryNotFound = NewError(http.StatusNotFound, "category not found")
+
+	// Address
+	ErrAddressNotFound = NewError(http.StatusNotFound, "address not found")
 )

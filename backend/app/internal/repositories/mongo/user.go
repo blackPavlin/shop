@@ -11,10 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var (
-	ErrFailidTypecastObjectID = errors.New("Failid typecast ObjectID")
-)
-
 // UserRepository
 type UserRepository struct {
 	collection *mongo.Collection
@@ -40,7 +36,7 @@ func (u UserRepository) Create(ctx context.Context, user *entities.User) (entiti
 		return entities.UserID(oid), nil
 	}
 
-	return entities.UserID{}, ErrFailidTypecastObjectID
+	return entities.UserID{}, errs.ErrFailidTypecastObjectID
 }
 
 // FindByID

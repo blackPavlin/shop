@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"github.com/blackPavlin/shop/app/internal/usecases/address"
 	"github.com/blackPavlin/shop/app/internal/usecases/auth"
 	"github.com/blackPavlin/shop/app/internal/usecases/cart"
 	"github.com/blackPavlin/shop/app/internal/usecases/category"
@@ -12,4 +13,5 @@ type UseCases struct {
 	UserUseCase     user.UserUseCase
 	CartUseCase     cart.CartUseCase
 	CategoryUseCase category.CategoryUseCase
+	AddressUseCase  address.AddressUseCase
 }

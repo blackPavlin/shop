@@ -36,7 +36,7 @@ func (c CartRepository) Create(ctx context.Context, cart *entities.Cart) (entiti
 		return entities.CartID(oid), nil
 	}
 
-	return entities.CartID{}, ErrFailidTypecastObjectID
+	return entities.CartID{}, errs.ErrFailidTypecastObjectID
 }
 
 // FindByUserID

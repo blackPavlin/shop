@@ -6,13 +6,17 @@ services:
     container_name: mongo
     restart: always
     networks:
-      - shop-network
+      - shopNetwork
     ports: 
       - 27017:27017
     expose:
       - 27017  
-    command: ["mongod", "--replSet", "rsmongo"]
+    command: ["mongod", "--replSet", "rsmongo", "--bind_ip_all"]
+    healthcheck:
+      test: test $$(echo "rs.initiate({_id:'rsmongo',members:[{_id:0,host:\"mongo:27017\"}]}).ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
 
 networks:
-  shop-network:
+  shopNetwork:
     driver: bridge

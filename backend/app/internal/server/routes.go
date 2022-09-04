@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/blackPavlin/shop/app/internal/controllers/rest/address"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/auth"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/cart"
 	"github.com/blackPavlin/shop/app/internal/controllers/rest/category"
@@ -10,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// initRoutes
 func (s Server) initRoutes() *gin.Engine {
 	router := gin.New()
 
@@ -34,6 +36,7 @@ func (s Server) initRoutes() *gin.Engine {
 		user.NewUserController(s.usecases.UserUseCase, authMiddleware).RegisterRoutes(v1)
 		cart.NewCartController(s.usecases.CartUseCase, authMiddleware).RegisterRoutes(v1)
 		category.NewCategoryController(s.usecases.CategoryUseCase, authMiddleware).RegisterRoutes(v1)
+		address.NewAddressController(s.usecases.AddressUseCase, authMiddleware).RegisterRoutes(v1)
 	}
 
 	return router

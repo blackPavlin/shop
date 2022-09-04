@@ -19,7 +19,7 @@ func NewAddressService(addressRepository AddressRepository) AddressService {
 }
 
 // Create
-func (s AddressService) Create(ctx context.Context, address *entities.Address) (*entities.Address, error) {
+func (s AddressService) Create(ctx context.Context, address *entities.Address) (entities.AddressID, error) {
 	return s.addressRepository.Create(ctx, address)
 }
 

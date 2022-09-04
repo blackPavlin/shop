@@ -260,7 +260,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCategoryRequest'
+              $ref: '#/components/schemas/Category'
       responses:
         '200':
           description: successful operation
@@ -617,10 +617,13 @@ components:
     CreateCategoryRequest:
       title: Тело запроса для создания категории
       type: object
-
-    UpdateCategoryRequest:
-      title: Тело запроса для изменения категории
-      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          x-oapi-codegen-extra-tags:
+            binding: required
 
     CreateProductRequest:
       title: Запрос для создания товара

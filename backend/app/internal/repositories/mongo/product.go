@@ -36,7 +36,7 @@ func (p ProductRepository) Create(ctx context.Context, product *entities.Product
 		return entities.ProductID(oid), nil
 	}
 
-	return entities.ProductID{}, ErrFailidTypecastObjectID
+	return entities.ProductID{}, errs.ErrFailidTypecastObjectID
 }
 
 // FindByID

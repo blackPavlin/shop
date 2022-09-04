@@ -36,7 +36,7 @@ func (c CategoryRepository) Create(ctx context.Context, category *entities.Categ
 		return entities.CategoryID(oid), nil
 	}
 
-	return entities.CategoryID{}, ErrFailidTypecastObjectID
+	return entities.CategoryID{}, errs.ErrFailidTypecastObjectID
 }
 
 // Find

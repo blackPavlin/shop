@@ -5,13 +5,10 @@ import (
 	"errors"
 
 	"github.com/blackPavlin/shop/app/internal/entities"
+	"github.com/blackPavlin/shop/app/internal/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-)
-
-var (
-	ErrAddressNotFound        = errors.New("Address not found")
 )
 
 // AddressRepository
@@ -29,18 +26,17 @@ func NewAddressRepository(db *mongo.Database) AddressRepository {
 }
 
 // Create
-func (a AddressRepository) Create(ctx context.Context, address *entities.Address) (*entities.Address, error) {
+func (a AddressRepository) Create(ctx context.Context, address *entities.Address) (entities.AddressID, error) {
 	res, err := a.collection.InsertOne(ctx, address)
 	if err != nil {
-		return nil, err
+		return entities.AddressID{}, err
 	}
 
 	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
-		address.ID = entities.AddressID(oid)
-		return address, nil
+		return entities.AddressID(oid), nil
 	}
 
-	return nil, ErrFailidTypecastObjectID
+	return entities.AddressID{}, errs.ErrFailidTypecastObjectID
 }
 
 // FindByID
@@ -49,7 +45,7 @@ func (a AddressRepository) FindByID(ctx context.Context, userID entities.UserID,
 
 	if err := a.collection.FindOne(ctx, bson.M{"_id": id, "user_id": userID}).Decode(address); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, ErrAddressNotFound
+			return nil, errs.ErrAddressNotFound
 		}
 		return nil, err
 	}
@@ -67,12 +63,8 @@ func (a AddressRepository) FindByUserID(ctx context.Context, userID entities.Use
 
 	addresses := []*entities.Address{}
 
-	for cursor.Next(ctx) {
-		address := &entities.Address{}
-		if err := cursor.Decode(address); err != nil {
-			return nil, err
-		}
-		addresses = append(addresses, address)
+	if err := cursor.All(ctx, addresses); err != nil {
+		return nil, err
 	}
 
 	return addresses, nil

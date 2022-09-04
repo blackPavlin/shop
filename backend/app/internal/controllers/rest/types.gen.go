@@ -66,7 +66,9 @@ type CreateAddressRequest struct {
 }
 
 // CreateCategoryRequest defines model for CreateCategoryRequest.
-type CreateCategoryRequest map[string]interface{}
+type CreateCategoryRequest struct {
+	Name string `binding:"required" json:"name"`
+}
 
 // CreateProductRequest defines model for CreateProductRequest.
 type CreateProductRequest map[string]interface{}
@@ -124,9 +126,6 @@ type SignupRequest struct {
 	Phone    string `binding:"required,e164" json:"phone"`
 }
 
-// UpdateCategoryRequest defines model for UpdateCategoryRequest.
-type UpdateCategoryRequest map[string]interface{}
-
 // UpdateProductRequest defines model for UpdateProductRequest.
 type UpdateProductRequest map[string]interface{}
 
@@ -158,7 +157,7 @@ type PatchCartJSONBody CartProduct
 type PostCartJSONBody CartProduct
 
 // PatchCategoryJSONBody defines parameters for PatchCategory.
-type PatchCategoryJSONBody UpdateCategoryRequest
+type PatchCategoryJSONBody Category
 
 // PostCategoryJSONBody defines parameters for PostCategory.
 type PostCategoryJSONBody CreateCategoryRequest

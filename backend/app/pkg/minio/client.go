@@ -5,6 +5,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
+// NewClient
 func NewClient(endpoint string, accessKeyID string, secretAccessKey string) (*minio.Client, error) {
 	client, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),

@@ -8,7 +8,7 @@ generate:
 
 .PHONY: openapi/generate
 openapi/generate:
-	oapi-codegen -generate types -o .\app\internal\controllers\rest\types.gen.go -package rest .\api\openapi.v1.yaml	
+	oapi-codegen -generate types -o ./app/internal/controllers/rest/types.gen.go -package rest ./api/openapi.v1.yaml	
 
 .PHONY: test
 test:

@@ -10,4 +10,5 @@ type Product struct {
 	Description string             `json:"description" bson:"description"`
 	CategoryID  primitive.ObjectID `json:"categoryId" bson:"category_id"`
 	Amount      int64              `json:"amount" bson:"amount"`
+	Price       float64            `json:"price" bson:"price"`
 }
