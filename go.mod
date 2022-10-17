@@ -11,7 +11,7 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.3.0
 	github.com/minio/minio-go/v7 v7.0.31
 	github.com/stretchr/testify v1.8.0
-	go.mongodb.org/mongo-driver v1.10.2
+	go.mongodb.org/mongo-driver v1.10.3
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 )
