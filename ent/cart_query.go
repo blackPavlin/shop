@@ -27,8 +27,6 @@ type CartQuery struct {
 	predicates   []predicate.Cart
 	withUsers    *UserQuery
 	withProducts *ProductQuery
-	modifiers    []func(*sql.Selector)
-	loadTotal    []func(context.Context, []*Cart) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -405,9 +403,6 @@ func (cq *CartQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cart, e
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(cq.modifiers) > 0 {
-		_spec.Modifiers = cq.modifiers
-	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -426,11 +421,6 @@ func (cq *CartQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cart, e
 	if query := cq.withProducts; query != nil {
 		if err := cq.loadProducts(ctx, query, nodes, nil,
 			func(n *Cart, e *Product) { n.Edges.Products = e }); err != nil {
-			return nil, err
-		}
-	}
-	for i := range cq.loadTotal {
-		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -492,9 +482,6 @@ func (cq *CartQuery) loadProducts(ctx context.Context, query *ProductQuery, node
 
 func (cq *CartQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
-	if len(cq.modifiers) > 0 {
-		_spec.Modifiers = cq.modifiers
-	}
 	_spec.Node.Columns = cq.fields
 	if len(cq.fields) > 0 {
 		_spec.Unique = cq.unique != nil && *cq.unique

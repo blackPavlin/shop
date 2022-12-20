@@ -3,7 +3,9 @@
     <el-aside width="250px">
       <category-side-bar />
     </el-aside>
-    <el-main>Products</el-main>
+    <el-main>
+      <router-view></router-view>
+    </el-main>
   </el-container>
 </template>
 

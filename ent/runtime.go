@@ -8,8 +8,11 @@ import (
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
+	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/order"
+	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/product"
+	"github.com/blackPavlin/shop/ent/productimage"
 	"github.com/blackPavlin/shop/ent/schema"
 	"github.com/blackPavlin/shop/ent/user"
 )
@@ -83,6 +86,21 @@ func init() {
 	categoryDescName := categoryFields[0].Descriptor()
 	// category.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	category.NameValidator = categoryDescName.Validators[0].(func(string) error)
+	imageMixin := schema.Image{}.Mixin()
+	imageMixinFields0 := imageMixin[0].Fields()
+	_ = imageMixinFields0
+	imageFields := schema.Image{}.Fields()
+	_ = imageFields
+	// imageDescCreatedAt is the schema descriptor for created_at field.
+	imageDescCreatedAt := imageMixinFields0[0].Descriptor()
+	// image.DefaultCreatedAt holds the default value on creation for the created_at field.
+	image.DefaultCreatedAt = imageDescCreatedAt.Default.(func() time.Time)
+	// imageDescUpdatedAt is the schema descriptor for updated_at field.
+	imageDescUpdatedAt := imageMixinFields0[1].Descriptor()
+	// image.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	image.DefaultUpdatedAt = imageDescUpdatedAt.Default.(func() time.Time)
+	// image.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	image.UpdateDefaultUpdatedAt = imageDescUpdatedAt.UpdateDefault.(func() time.Time)
 	orderMixin := schema.Order{}.Mixin()
 	orderMixinFields0 := orderMixin[0].Fields()
 	_ = orderMixinFields0
@@ -98,6 +116,21 @@ func init() {
 	order.DefaultUpdatedAt = orderDescUpdatedAt.Default.(func() time.Time)
 	// order.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	order.UpdateDefaultUpdatedAt = orderDescUpdatedAt.UpdateDefault.(func() time.Time)
+	orderproductMixin := schema.OrderProduct{}.Mixin()
+	orderproductMixinFields0 := orderproductMixin[0].Fields()
+	_ = orderproductMixinFields0
+	orderproductFields := schema.OrderProduct{}.Fields()
+	_ = orderproductFields
+	// orderproductDescCreatedAt is the schema descriptor for created_at field.
+	orderproductDescCreatedAt := orderproductMixinFields0[0].Descriptor()
+	// orderproduct.DefaultCreatedAt holds the default value on creation for the created_at field.
+	orderproduct.DefaultCreatedAt = orderproductDescCreatedAt.Default.(func() time.Time)
+	// orderproductDescUpdatedAt is the schema descriptor for updated_at field.
+	orderproductDescUpdatedAt := orderproductMixinFields0[1].Descriptor()
+	// orderproduct.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	orderproduct.DefaultUpdatedAt = orderproductDescUpdatedAt.Default.(func() time.Time)
+	// orderproduct.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	orderproduct.UpdateDefaultUpdatedAt = orderproductDescUpdatedAt.UpdateDefault.(func() time.Time)
 	productMixin := schema.Product{}.Mixin()
 	productMixinFields0 := productMixin[0].Fields()
 	_ = productMixinFields0
@@ -114,9 +147,34 @@ func init() {
 	// product.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	product.UpdateDefaultUpdatedAt = productDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// productDescName is the schema descriptor for name field.
-	productDescName := productFields[0].Descriptor()
+	productDescName := productFields[1].Descriptor()
 	// product.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	product.NameValidator = productDescName.Validators[0].(func(string) error)
+	// productDescAmount is the schema descriptor for amount field.
+	productDescAmount := productFields[3].Descriptor()
+	// product.DefaultAmount holds the default value on creation for the amount field.
+	product.DefaultAmount = productDescAmount.Default.(int64)
+	// product.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
+	product.AmountValidator = productDescAmount.Validators[0].(func(int64) error)
+	// productDescPrice is the schema descriptor for price field.
+	productDescPrice := productFields[4].Descriptor()
+	// product.PriceValidator is a validator for the "price" field. It is called by the builders before save.
+	product.PriceValidator = productDescPrice.Validators[0].(func(int64) error)
+	productimageMixin := schema.ProductImage{}.Mixin()
+	productimageMixinFields0 := productimageMixin[0].Fields()
+	_ = productimageMixinFields0
+	productimageFields := schema.ProductImage{}.Fields()
+	_ = productimageFields
+	// productimageDescCreatedAt is the schema descriptor for created_at field.
+	productimageDescCreatedAt := productimageMixinFields0[0].Descriptor()
+	// productimage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	productimage.DefaultCreatedAt = productimageDescCreatedAt.Default.(func() time.Time)
+	// productimageDescUpdatedAt is the schema descriptor for updated_at field.
+	productimageDescUpdatedAt := productimageMixinFields0[1].Descriptor()
+	// productimage.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	productimage.DefaultUpdatedAt = productimageDescUpdatedAt.Default.(func() time.Time)
+	// productimage.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	productimage.UpdateDefaultUpdatedAt = productimageDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0

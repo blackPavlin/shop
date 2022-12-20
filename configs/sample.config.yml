@@ -1,9 +1,0 @@
-http:
-  port: ":3000"
-  mode: "debug"
-mongo:
-  url: "mongodb://127.0.0.1:27017"
-  name: "dev_shop"
-auth:
-  signing_key: secret
-  expires_in: 60000 

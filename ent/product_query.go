@@ -28,9 +28,6 @@ type ProductQuery struct {
 	predicates     []predicate.Product
 	withCategories *CategoryQuery
 	withCarts      *CartQuery
-	modifiers      []func(*sql.Selector)
-	loadTotal      []func(context.Context, []*Product) error
-	withNamedCarts map[string]*CartQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -407,9 +404,6 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(pq.modifiers) > 0 {
-		_spec.Modifiers = pq.modifiers
-	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -429,18 +423,6 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 		if err := pq.loadCarts(ctx, query, nodes,
 			func(n *Product) { n.Edges.Carts = []*Cart{} },
 			func(n *Product, e *Cart) { n.Edges.Carts = append(n.Edges.Carts, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range pq.withNamedCarts {
-		if err := pq.loadCarts(ctx, query, nodes,
-			func(n *Product) { n.appendNamedCarts(name) },
-			func(n *Product, e *Cart) { n.appendNamedCarts(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for i := range pq.loadTotal {
-		if err := pq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -503,9 +485,6 @@ func (pq *ProductQuery) loadCarts(ctx context.Context, query *CartQuery, nodes [
 
 func (pq *ProductQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
-	if len(pq.modifiers) > 0 {
-		_spec.Modifiers = pq.modifiers
-	}
 	_spec.Node.Columns = pq.fields
 	if len(pq.fields) > 0 {
 		_spec.Unique = pq.unique != nil && *pq.unique
@@ -602,20 +581,6 @@ func (pq *ProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedCarts tells the query-builder to eager-load the nodes that are connected to the "carts"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProductQuery) WithNamedCarts(name string, opts ...func(*CartQuery)) *ProductQuery {
-	query := &CartQuery{config: pq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	if pq.withNamedCarts == nil {
-		pq.withNamedCarts = make(map[string]*CartQuery)
-	}
-	pq.withNamedCarts[name] = query
-	return pq
 }
 
 // ProductGroupBy is the group-by builder for Product entities.

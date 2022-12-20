@@ -13,8 +13,7 @@ export const useOrderStore = defineStore("order", {
   }),
   actions: {
     async loadOrders(): Promise<void> {
-      const orders = await OrderService.getOrder();
-      this.orders = orders;
+      this.orders = await OrderService.getOrder();
     },
   },
   getters: {

@@ -25,8 +25,6 @@ type OrderQuery struct {
 	fields     []string
 	predicates []predicate.Order
 	withUsers  *UserQuery
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Order) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -368,9 +366,6 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(oq.modifiers) > 0 {
-		_spec.Modifiers = oq.modifiers
-	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -383,11 +378,6 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 	if query := oq.withUsers; query != nil {
 		if err := oq.loadUsers(ctx, query, nodes, nil,
 			func(n *Order, e *User) { n.Edges.Users = e }); err != nil {
-			return nil, err
-		}
-	}
-	for i := range oq.loadTotal {
-		if err := oq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -423,9 +413,6 @@ func (oq *OrderQuery) loadUsers(ctx context.Context, query *UserQuery, nodes []*
 
 func (oq *OrderQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := oq.querySpec()
-	if len(oq.modifiers) > 0 {
-		_spec.Modifiers = oq.modifiers
-	}
 	_spec.Node.Columns = oq.fields
 	if len(oq.fields) > 0 {
 		_spec.Unique = oq.unique != nil && *oq.unique

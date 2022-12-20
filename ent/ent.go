@@ -13,8 +13,11 @@ import (
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
+	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/order"
+	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/product"
+	"github.com/blackPavlin/shop/ent/productimage"
 	"github.com/blackPavlin/shop/ent/user"
 )
 
@@ -36,12 +39,15 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		address.Table:  address.ValidColumn,
-		cart.Table:     cart.ValidColumn,
-		category.Table: category.ValidColumn,
-		order.Table:    order.ValidColumn,
-		product.Table:  product.ValidColumn,
-		user.Table:     user.ValidColumn,
+		address.Table:      address.ValidColumn,
+		cart.Table:         cart.ValidColumn,
+		category.Table:     category.ValidColumn,
+		image.Table:        image.ValidColumn,
+		order.Table:        order.ValidColumn,
+		orderproduct.Table: orderproduct.ValidColumn,
+		product.Table:      product.ValidColumn,
+		productimage.Table: productimage.ValidColumn,
+		user.Table:         user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

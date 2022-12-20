@@ -9,7 +9,7 @@ info:
 servers:
   - url: 'http://localhost:3000/api/v1'
 tags:
-  - name: Authorization
+  - name: Auth
     description: Авторизация
   - name: User
     description: Пользователь
@@ -28,7 +28,7 @@ paths:
     post:
       summary: Авторизация пользователя
       tags:
-        - Authorization
+        - Auth
       requestBody:
         content:
           application/json:
@@ -46,7 +46,7 @@ paths:
     post:
       summary: Регистрация пользователя
       tags:
-        - Authorization
+        - Auth
       requestBody:
         content:
           application/json:
@@ -358,7 +358,8 @@ components:
         - role
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
         name:
           type: string
         email:
@@ -376,6 +377,7 @@ components:
       type: object
       required:
         - id
+        - userId
         - country
         - city
         - street
@@ -383,7 +385,11 @@ components:
         - postcode
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
         country:
           type: string
         city:
@@ -428,12 +434,8 @@ components:
       properties:
         productId:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         amount:
           type: integer
-          x-oapi-codegen-extra-tags:
-            binding: required
  
     CartProductList:
       title: Список товаров в корзине пользователя
@@ -500,7 +502,8 @@ components:
         - name
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
         name:
           type: string
 
@@ -515,12 +518,27 @@ components:
       type: object
       required:
         - id
+        - categoryId
         - name
+        - amount
+        - price
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
+        categoryId:
+          type: integer
+          format: int64
         name:
           type: string
+        description:
+          type: string
+        amount:
+          type: integer
+          format: int64
+        price:
+          type: integer
+          format: int64
           
     ProductList:
       title: Список товаров
@@ -537,12 +555,8 @@ components:
       properties:
         email:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required,email 
         password:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
 
     LoginResponse:
       title: Токен авторизации
@@ -564,20 +578,12 @@ components:
       properties:
         name:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         email:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required,email
         phone:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required,e164
         password:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
  
     CreateAddressRequest: 
       title: Тело запроса для создания адреса доставки
@@ -591,28 +597,18 @@ components:
       properties:
         country:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         city:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         street:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
         house:
           type: integer
-          x-oapi-codegen-extra-tags:
-            binding: required
         letter:
           type: string
         flat:
           type: integer
         postcode:
           type: integer
-          x-oapi-codegen-extra-tags:
-            binding: required
 
     CreateCategoryRequest:
       title: Тело запроса для создания категории
@@ -622,8 +618,6 @@ components:
       properties:
         name:
           type: string
-          x-oapi-codegen-extra-tags:
-            binding: required
 
     CreateProductRequest:
       title: Запрос для создания товара

@@ -21,20 +21,15 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	limit              *int
-	offset             *int
-	unique             *bool
-	order              []OrderFunc
-	fields             []string
-	predicates         []predicate.User
-	withAddresses      *AddressQuery
-	withCarts          *CartQuery
-	withOrders         *OrderQuery
-	modifiers          []func(*sql.Selector)
-	loadTotal          []func(context.Context, []*User) error
-	withNamedAddresses map[string]*AddressQuery
-	withNamedCarts     map[string]*CartQuery
-	withNamedOrders    map[string]*OrderQuery
+	limit         *int
+	offset        *int
+	unique        *bool
+	order         []OrderFunc
+	fields        []string
+	predicates    []predicate.User
+	withAddresses *AddressQuery
+	withCarts     *CartQuery
+	withOrders    *OrderQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -446,9 +441,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(uq.modifiers) > 0 {
-		_spec.Modifiers = uq.modifiers
-	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -476,32 +468,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadOrders(ctx, query, nodes,
 			func(n *User) { n.Edges.Orders = []*Order{} },
 			func(n *User, e *Order) { n.Edges.Orders = append(n.Edges.Orders, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range uq.withNamedAddresses {
-		if err := uq.loadAddresses(ctx, query, nodes,
-			func(n *User) { n.appendNamedAddresses(name) },
-			func(n *User, e *Address) { n.appendNamedAddresses(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range uq.withNamedCarts {
-		if err := uq.loadCarts(ctx, query, nodes,
-			func(n *User) { n.appendNamedCarts(name) },
-			func(n *User, e *Cart) { n.appendNamedCarts(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range uq.withNamedOrders {
-		if err := uq.loadOrders(ctx, query, nodes,
-			func(n *User) { n.appendNamedOrders(name) },
-			func(n *User, e *Order) { n.appendNamedOrders(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for i := range uq.loadTotal {
-		if err := uq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -592,9 +558,6 @@ func (uq *UserQuery) loadOrders(ctx context.Context, query *OrderQuery, nodes []
 
 func (uq *UserQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := uq.querySpec()
-	if len(uq.modifiers) > 0 {
-		_spec.Modifiers = uq.modifiers
-	}
 	_spec.Node.Columns = uq.fields
 	if len(uq.fields) > 0 {
 		_spec.Unique = uq.unique != nil && *uq.unique
@@ -691,48 +654,6 @@ func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedAddresses tells the query-builder to eager-load the nodes that are connected to the "addresses"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithNamedAddresses(name string, opts ...func(*AddressQuery)) *UserQuery {
-	query := &AddressQuery{config: uq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	if uq.withNamedAddresses == nil {
-		uq.withNamedAddresses = make(map[string]*AddressQuery)
-	}
-	uq.withNamedAddresses[name] = query
-	return uq
-}
-
-// WithNamedCarts tells the query-builder to eager-load the nodes that are connected to the "carts"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithNamedCarts(name string, opts ...func(*CartQuery)) *UserQuery {
-	query := &CartQuery{config: uq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	if uq.withNamedCarts == nil {
-		uq.withNamedCarts = make(map[string]*CartQuery)
-	}
-	uq.withNamedCarts[name] = query
-	return uq
-}
-
-// WithNamedOrders tells the query-builder to eager-load the nodes that are connected to the "orders"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithNamedOrders(name string, opts ...func(*OrderQuery)) *UserQuery {
-	query := &OrderQuery{config: uq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	if uq.withNamedOrders == nil {
-		uq.withNamedOrders = make(map[string]*OrderQuery)
-	}
-	uq.withNamedOrders[name] = query
-	return uq
 }
 
 // UserGroupBy is the group-by builder for User entities.

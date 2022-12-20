@@ -48,17 +48,23 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("addresses", Address.Type).
-			Annotations(entsql.Annotation{OnDelete: entsql.Cascade}).
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Cascade},
+			).
 			StorageKey(
 				edge.Symbol("address_user_fk"),
 			),
 		edge.To("carts", Cart.Type).
-			Annotations(entsql.Annotation{OnDelete: entsql.Cascade}).
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Cascade},
+			).
 			StorageKey(
 				edge.Symbol("cart_user_fk"),
 			),
 		edge.To("orders", Order.Type).
-			Annotations(entsql.Annotation{OnDelete: entsql.Restrict}).
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Restrict},
+			).
 			StorageKey(
 				edge.Symbol("order_user_fk"),
 			),

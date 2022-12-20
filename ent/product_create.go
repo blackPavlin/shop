@@ -50,6 +50,12 @@ func (pc *ProductCreate) SetNillableUpdatedAt(t *time.Time) *ProductCreate {
 	return pc
 }
 
+// SetCategoryID sets the "category_id" field.
+func (pc *ProductCreate) SetCategoryID(i int64) *ProductCreate {
+	pc.mutation.SetCategoryID(i)
+	return pc
+}
+
 // SetName sets the "name" field.
 func (pc *ProductCreate) SetName(s string) *ProductCreate {
 	pc.mutation.SetName(s)
@@ -70,9 +76,23 @@ func (pc *ProductCreate) SetNillableDescription(s *string) *ProductCreate {
 	return pc
 }
 
-// SetCategoryID sets the "category_id" field.
-func (pc *ProductCreate) SetCategoryID(i int64) *ProductCreate {
-	pc.mutation.SetCategoryID(i)
+// SetAmount sets the "amount" field.
+func (pc *ProductCreate) SetAmount(i int64) *ProductCreate {
+	pc.mutation.SetAmount(i)
+	return pc
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (pc *ProductCreate) SetNillableAmount(i *int64) *ProductCreate {
+	if i != nil {
+		pc.SetAmount(*i)
+	}
+	return pc
+}
+
+// SetPrice sets the "price" field.
+func (pc *ProductCreate) SetPrice(i int64) *ProductCreate {
+	pc.mutation.SetPrice(i)
 	return pc
 }
 
@@ -187,6 +207,10 @@ func (pc *ProductCreate) defaults() {
 		v := product.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := pc.mutation.Amount(); !ok {
+		v := product.DefaultAmount
+		pc.mutation.SetAmount(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -197,6 +221,9 @@ func (pc *ProductCreate) check() error {
 	if _, ok := pc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Product.updated_at"`)}
 	}
+	if _, ok := pc.mutation.CategoryID(); !ok {
+		return &ValidationError{Name: "category_id", err: errors.New(`ent: missing required field "Product.category_id"`)}
+	}
 	if _, ok := pc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Product.name"`)}
 	}
@@ -205,8 +232,21 @@ func (pc *ProductCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Product.name": %w`, err)}
 		}
 	}
-	if _, ok := pc.mutation.CategoryID(); !ok {
-		return &ValidationError{Name: "category_id", err: errors.New(`ent: missing required field "Product.category_id"`)}
+	if _, ok := pc.mutation.Amount(); !ok {
+		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "Product.amount"`)}
+	}
+	if v, ok := pc.mutation.Amount(); ok {
+		if err := product.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Product.amount": %w`, err)}
+		}
+	}
+	if _, ok := pc.mutation.Price(); !ok {
+		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Product.price"`)}
+	}
+	if v, ok := pc.mutation.Price(); ok {
+		if err := product.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "Product.price": %w`, err)}
+		}
 	}
 	if _, ok := pc.mutation.CategoriesID(); !ok {
 		return &ValidationError{Name: "categories", err: errors.New(`ent: missing required edge "Product.categories"`)}
@@ -269,6 +309,22 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Column: product.FieldDescription,
 		})
 		_node.Description = value
+	}
+	if value, ok := pc.mutation.Amount(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldAmount,
+		})
+		_node.Amount = value
+	}
+	if value, ok := pc.mutation.Price(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldPrice,
+		})
+		_node.Price = value
 	}
 	if nodes := pc.mutation.CategoriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

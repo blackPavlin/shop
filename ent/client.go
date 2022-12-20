@@ -13,8 +13,11 @@ import (
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
+	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/order"
+	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/product"
+	"github.com/blackPavlin/shop/ent/productimage"
 	"github.com/blackPavlin/shop/ent/user"
 
 	"entgo.io/ent/dialect"
@@ -33,14 +36,18 @@ type Client struct {
 	Cart *CartClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
+	// Image is the client for interacting with the Image builders.
+	Image *ImageClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
+	// OrderProduct is the client for interacting with the OrderProduct builders.
+	OrderProduct *OrderProductClient
 	// Product is the client for interacting with the Product builders.
 	Product *ProductClient
+	// ProductImage is the client for interacting with the ProductImage builders.
+	ProductImage *ProductImageClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
-	// additional fields for node api
-	tables tables
 }
 
 // NewClient creates a new client configured with the given options.
@@ -57,8 +64,11 @@ func (c *Client) init() {
 	c.Address = NewAddressClient(c.config)
 	c.Cart = NewCartClient(c.config)
 	c.Category = NewCategoryClient(c.config)
+	c.Image = NewImageClient(c.config)
 	c.Order = NewOrderClient(c.config)
+	c.OrderProduct = NewOrderProductClient(c.config)
 	c.Product = NewProductClient(c.config)
+	c.ProductImage = NewProductImageClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -91,14 +101,17 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:      ctx,
-		config:   cfg,
-		Address:  NewAddressClient(cfg),
-		Cart:     NewCartClient(cfg),
-		Category: NewCategoryClient(cfg),
-		Order:    NewOrderClient(cfg),
-		Product:  NewProductClient(cfg),
-		User:     NewUserClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Address:      NewAddressClient(cfg),
+		Cart:         NewCartClient(cfg),
+		Category:     NewCategoryClient(cfg),
+		Image:        NewImageClient(cfg),
+		Order:        NewOrderClient(cfg),
+		OrderProduct: NewOrderProductClient(cfg),
+		Product:      NewProductClient(cfg),
+		ProductImage: NewProductImageClient(cfg),
+		User:         NewUserClient(cfg),
 	}, nil
 }
 
@@ -116,14 +129,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:      ctx,
-		config:   cfg,
-		Address:  NewAddressClient(cfg),
-		Cart:     NewCartClient(cfg),
-		Category: NewCategoryClient(cfg),
-		Order:    NewOrderClient(cfg),
-		Product:  NewProductClient(cfg),
-		User:     NewUserClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Address:      NewAddressClient(cfg),
+		Cart:         NewCartClient(cfg),
+		Category:     NewCategoryClient(cfg),
+		Image:        NewImageClient(cfg),
+		Order:        NewOrderClient(cfg),
+		OrderProduct: NewOrderProductClient(cfg),
+		Product:      NewProductClient(cfg),
+		ProductImage: NewProductImageClient(cfg),
+		User:         NewUserClient(cfg),
 	}, nil
 }
 
@@ -156,8 +172,11 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Address.Use(hooks...)
 	c.Cart.Use(hooks...)
 	c.Category.Use(hooks...)
+	c.Image.Use(hooks...)
 	c.Order.Use(hooks...)
+	c.OrderProduct.Use(hooks...)
 	c.Product.Use(hooks...)
+	c.ProductImage.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -495,6 +514,96 @@ func (c *CategoryClient) Hooks() []Hook {
 	return c.hooks.Category
 }
 
+// ImageClient is a client for the Image schema.
+type ImageClient struct {
+	config
+}
+
+// NewImageClient returns a client for the Image from the given config.
+func NewImageClient(c config) *ImageClient {
+	return &ImageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `image.Hooks(f(g(h())))`.
+func (c *ImageClient) Use(hooks ...Hook) {
+	c.hooks.Image = append(c.hooks.Image, hooks...)
+}
+
+// Create returns a builder for creating a Image entity.
+func (c *ImageClient) Create() *ImageCreate {
+	mutation := newImageMutation(c.config, OpCreate)
+	return &ImageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Image entities.
+func (c *ImageClient) CreateBulk(builders ...*ImageCreate) *ImageCreateBulk {
+	return &ImageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Image.
+func (c *ImageClient) Update() *ImageUpdate {
+	mutation := newImageMutation(c.config, OpUpdate)
+	return &ImageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ImageClient) UpdateOne(i *Image) *ImageUpdateOne {
+	mutation := newImageMutation(c.config, OpUpdateOne, withImage(i))
+	return &ImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ImageClient) UpdateOneID(id int64) *ImageUpdateOne {
+	mutation := newImageMutation(c.config, OpUpdateOne, withImageID(id))
+	return &ImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Image.
+func (c *ImageClient) Delete() *ImageDelete {
+	mutation := newImageMutation(c.config, OpDelete)
+	return &ImageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ImageClient) DeleteOne(i *Image) *ImageDeleteOne {
+	return c.DeleteOneID(i.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *ImageClient) DeleteOneID(id int64) *ImageDeleteOne {
+	builder := c.Delete().Where(image.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ImageDeleteOne{builder}
+}
+
+// Query returns a query builder for Image.
+func (c *ImageClient) Query() *ImageQuery {
+	return &ImageQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Image entity by its id.
+func (c *ImageClient) Get(ctx context.Context, id int64) (*Image, error) {
+	return c.Query().Where(image.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ImageClient) GetX(ctx context.Context, id int64) *Image {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ImageClient) Hooks() []Hook {
+	return c.hooks.Image
+}
+
 // OrderClient is a client for the Order schema.
 type OrderClient struct {
 	config
@@ -599,6 +708,96 @@ func (c *OrderClient) QueryUsers(o *Order) *UserQuery {
 // Hooks returns the client hooks.
 func (c *OrderClient) Hooks() []Hook {
 	return c.hooks.Order
+}
+
+// OrderProductClient is a client for the OrderProduct schema.
+type OrderProductClient struct {
+	config
+}
+
+// NewOrderProductClient returns a client for the OrderProduct from the given config.
+func NewOrderProductClient(c config) *OrderProductClient {
+	return &OrderProductClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `orderproduct.Hooks(f(g(h())))`.
+func (c *OrderProductClient) Use(hooks ...Hook) {
+	c.hooks.OrderProduct = append(c.hooks.OrderProduct, hooks...)
+}
+
+// Create returns a builder for creating a OrderProduct entity.
+func (c *OrderProductClient) Create() *OrderProductCreate {
+	mutation := newOrderProductMutation(c.config, OpCreate)
+	return &OrderProductCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OrderProduct entities.
+func (c *OrderProductClient) CreateBulk(builders ...*OrderProductCreate) *OrderProductCreateBulk {
+	return &OrderProductCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OrderProduct.
+func (c *OrderProductClient) Update() *OrderProductUpdate {
+	mutation := newOrderProductMutation(c.config, OpUpdate)
+	return &OrderProductUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OrderProductClient) UpdateOne(op *OrderProduct) *OrderProductUpdateOne {
+	mutation := newOrderProductMutation(c.config, OpUpdateOne, withOrderProduct(op))
+	return &OrderProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OrderProductClient) UpdateOneID(id int64) *OrderProductUpdateOne {
+	mutation := newOrderProductMutation(c.config, OpUpdateOne, withOrderProductID(id))
+	return &OrderProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OrderProduct.
+func (c *OrderProductClient) Delete() *OrderProductDelete {
+	mutation := newOrderProductMutation(c.config, OpDelete)
+	return &OrderProductDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OrderProductClient) DeleteOne(op *OrderProduct) *OrderProductDeleteOne {
+	return c.DeleteOneID(op.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *OrderProductClient) DeleteOneID(id int64) *OrderProductDeleteOne {
+	builder := c.Delete().Where(orderproduct.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OrderProductDeleteOne{builder}
+}
+
+// Query returns a query builder for OrderProduct.
+func (c *OrderProductClient) Query() *OrderProductQuery {
+	return &OrderProductQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a OrderProduct entity by its id.
+func (c *OrderProductClient) Get(ctx context.Context, id int64) (*OrderProduct, error) {
+	return c.Query().Where(orderproduct.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OrderProductClient) GetX(ctx context.Context, id int64) *OrderProduct {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OrderProductClient) Hooks() []Hook {
+	return c.hooks.OrderProduct
 }
 
 // ProductClient is a client for the Product schema.
@@ -721,6 +920,96 @@ func (c *ProductClient) QueryCarts(pr *Product) *CartQuery {
 // Hooks returns the client hooks.
 func (c *ProductClient) Hooks() []Hook {
 	return c.hooks.Product
+}
+
+// ProductImageClient is a client for the ProductImage schema.
+type ProductImageClient struct {
+	config
+}
+
+// NewProductImageClient returns a client for the ProductImage from the given config.
+func NewProductImageClient(c config) *ProductImageClient {
+	return &ProductImageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `productimage.Hooks(f(g(h())))`.
+func (c *ProductImageClient) Use(hooks ...Hook) {
+	c.hooks.ProductImage = append(c.hooks.ProductImage, hooks...)
+}
+
+// Create returns a builder for creating a ProductImage entity.
+func (c *ProductImageClient) Create() *ProductImageCreate {
+	mutation := newProductImageMutation(c.config, OpCreate)
+	return &ProductImageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProductImage entities.
+func (c *ProductImageClient) CreateBulk(builders ...*ProductImageCreate) *ProductImageCreateBulk {
+	return &ProductImageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProductImage.
+func (c *ProductImageClient) Update() *ProductImageUpdate {
+	mutation := newProductImageMutation(c.config, OpUpdate)
+	return &ProductImageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProductImageClient) UpdateOne(pi *ProductImage) *ProductImageUpdateOne {
+	mutation := newProductImageMutation(c.config, OpUpdateOne, withProductImage(pi))
+	return &ProductImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProductImageClient) UpdateOneID(id int64) *ProductImageUpdateOne {
+	mutation := newProductImageMutation(c.config, OpUpdateOne, withProductImageID(id))
+	return &ProductImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProductImage.
+func (c *ProductImageClient) Delete() *ProductImageDelete {
+	mutation := newProductImageMutation(c.config, OpDelete)
+	return &ProductImageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProductImageClient) DeleteOne(pi *ProductImage) *ProductImageDeleteOne {
+	return c.DeleteOneID(pi.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *ProductImageClient) DeleteOneID(id int64) *ProductImageDeleteOne {
+	builder := c.Delete().Where(productimage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProductImageDeleteOne{builder}
+}
+
+// Query returns a query builder for ProductImage.
+func (c *ProductImageClient) Query() *ProductImageQuery {
+	return &ProductImageQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a ProductImage entity by its id.
+func (c *ProductImageClient) Get(ctx context.Context, id int64) (*ProductImage, error) {
+	return c.Query().Where(productimage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProductImageClient) GetX(ctx context.Context, id int64) *ProductImage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProductImageClient) Hooks() []Hook {
+	return c.hooks.ProductImage
 }
 
 // UserClient is a client for the User schema.

@@ -55,6 +55,20 @@ func (oc *OrderCreate) SetUserID(i int64) *OrderCreate {
 	return oc
 }
 
+// SetStatus sets the "status" field.
+func (oc *OrderCreate) SetStatus(o order.Status) *OrderCreate {
+	oc.mutation.SetStatus(o)
+	return oc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (oc *OrderCreate) SetNillableStatus(o *order.Status) *OrderCreate {
+	if o != nil {
+		oc.SetStatus(*o)
+	}
+	return oc
+}
+
 // SetUsersID sets the "users" edge to the User entity by ID.
 func (oc *OrderCreate) SetUsersID(id int64) *OrderCreate {
 	oc.mutation.SetUsersID(id)
@@ -151,6 +165,10 @@ func (oc *OrderCreate) defaults() {
 		v := order.DefaultUpdatedAt()
 		oc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := oc.mutation.Status(); !ok {
+		v := order.DefaultStatus
+		oc.mutation.SetStatus(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -163,6 +181,14 @@ func (oc *OrderCreate) check() error {
 	}
 	if _, ok := oc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Order.user_id"`)}
+	}
+	if _, ok := oc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Order.status"`)}
+	}
+	if v, ok := oc.mutation.Status(); ok {
+		if err := order.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Order.status": %w`, err)}
+		}
 	}
 	if _, ok := oc.mutation.UsersID(); !ok {
 		return &ValidationError{Name: "users", err: errors.New(`ent: missing required edge "Order.users"`)}
@@ -209,6 +235,14 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Column: order.FieldUpdatedAt,
 		})
 		_node.UpdatedAt = value
+	}
+	if value, ok := oc.mutation.Status(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: order.FieldStatus,
+		})
+		_node.Status = value
 	}
 	if nodes := oc.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

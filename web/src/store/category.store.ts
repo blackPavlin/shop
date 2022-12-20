@@ -13,8 +13,7 @@ export const useCategoryStore = defineStore("category", {
   }),
   actions: {
     async loadCategories(): Promise<void> {
-      const categories = await CategoryService.getCategory();
-      this.categories = categories;
+      this.categories = await CategoryService.getCategory();
     },
   },
   getters: {

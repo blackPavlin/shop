@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
@@ -31,6 +32,16 @@ func (Order) Mixin() []ent.Mixin {
 func (Order) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("user_id").Unique(),
+		field.Enum("status").
+			Values(
+				"CREATED",
+				"ACCEPTED",
+				"CANCALLED",
+			).
+			Default("CREATED").
+			SchemaType(map[string]string{
+				dialect.Postgres: "order_status",
+			}),
 	}
 }
 

@@ -19,16 +19,13 @@ import (
 // CategoryQuery is the builder for querying Category entities.
 type CategoryQuery struct {
 	config
-	limit             *int
-	offset            *int
-	unique            *bool
-	order             []OrderFunc
-	fields            []string
-	predicates        []predicate.Category
-	withProducts      *ProductQuery
-	modifiers         []func(*sql.Selector)
-	loadTotal         []func(context.Context, []*Category) error
-	withNamedProducts map[string]*ProductQuery
+	limit        *int
+	offset       *int
+	unique       *bool
+	order        []OrderFunc
+	fields       []string
+	predicates   []predicate.Category
+	withProducts *ProductQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -370,9 +367,6 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(cq.modifiers) > 0 {
-		_spec.Modifiers = cq.modifiers
-	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -386,18 +380,6 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 		if err := cq.loadProducts(ctx, query, nodes,
 			func(n *Category) { n.Edges.Products = []*Product{} },
 			func(n *Category, e *Product) { n.Edges.Products = append(n.Edges.Products, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range cq.withNamedProducts {
-		if err := cq.loadProducts(ctx, query, nodes,
-			func(n *Category) { n.appendNamedProducts(name) },
-			func(n *Category, e *Product) { n.appendNamedProducts(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for i := range cq.loadTotal {
-		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -434,9 +416,6 @@ func (cq *CategoryQuery) loadProducts(ctx context.Context, query *ProductQuery, 
 
 func (cq *CategoryQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
-	if len(cq.modifiers) > 0 {
-		_spec.Modifiers = cq.modifiers
-	}
 	_spec.Node.Columns = cq.fields
 	if len(cq.fields) > 0 {
 		_spec.Unique = cq.unique != nil && *cq.unique
@@ -533,20 +512,6 @@ func (cq *CategoryQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedProducts tells the query-builder to eager-load the nodes that are connected to the "products"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (cq *CategoryQuery) WithNamedProducts(name string, opts ...func(*ProductQuery)) *CategoryQuery {
-	query := &ProductQuery{config: cq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	if cq.withNamedProducts == nil {
-		cq.withNamedProducts = make(map[string]*ProductQuery)
-	}
-	cq.withNamedProducts[name] = query
-	return cq
 }
 
 // CategoryGroupBy is the group-by builder for Category entities.

@@ -46,12 +46,6 @@ type UserEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
-	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
-
-	namedAddresses map[string][]*Address
-	namedCarts     map[string][]*Cart
-	namedOrders    map[string][]*Order
 }
 
 // AddressesOrErr returns the Addresses value or an error if the edge
@@ -219,78 +213,6 @@ func (u *User) String() string {
 	builder.WriteString("password=<sensitive>")
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// NamedAddresses returns the Addresses named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (u *User) NamedAddresses(name string) ([]*Address, error) {
-	if u.Edges.namedAddresses == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := u.Edges.namedAddresses[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (u *User) appendNamedAddresses(name string, edges ...*Address) {
-	if u.Edges.namedAddresses == nil {
-		u.Edges.namedAddresses = make(map[string][]*Address)
-	}
-	if len(edges) == 0 {
-		u.Edges.namedAddresses[name] = []*Address{}
-	} else {
-		u.Edges.namedAddresses[name] = append(u.Edges.namedAddresses[name], edges...)
-	}
-}
-
-// NamedCarts returns the Carts named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (u *User) NamedCarts(name string) ([]*Cart, error) {
-	if u.Edges.namedCarts == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := u.Edges.namedCarts[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (u *User) appendNamedCarts(name string, edges ...*Cart) {
-	if u.Edges.namedCarts == nil {
-		u.Edges.namedCarts = make(map[string][]*Cart)
-	}
-	if len(edges) == 0 {
-		u.Edges.namedCarts[name] = []*Cart{}
-	} else {
-		u.Edges.namedCarts[name] = append(u.Edges.namedCarts[name], edges...)
-	}
-}
-
-// NamedOrders returns the Orders named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (u *User) NamedOrders(name string) ([]*Order, error) {
-	if u.Edges.namedOrders == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := u.Edges.namedOrders[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (u *User) appendNamedOrders(name string, edges ...*Order) {
-	if u.Edges.namedOrders == nil {
-		u.Edges.namedOrders = make(map[string][]*Order)
-	}
-	if len(edges) == 0 {
-		u.Edges.namedOrders[name] = []*Order{}
-	} else {
-		u.Edges.namedOrders[name] = append(u.Edges.namedOrders[name], edges...)
-	}
 }
 
 // Users is a parsable slice of User.

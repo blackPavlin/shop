@@ -36,6 +36,12 @@ func (pu *ProductUpdate) SetUpdatedAt(t time.Time) *ProductUpdate {
 	return pu
 }
 
+// SetCategoryID sets the "category_id" field.
+func (pu *ProductUpdate) SetCategoryID(i int64) *ProductUpdate {
+	pu.mutation.SetCategoryID(i)
+	return pu
+}
+
 // SetName sets the "name" field.
 func (pu *ProductUpdate) SetName(s string) *ProductUpdate {
 	pu.mutation.SetName(s)
@@ -62,9 +68,37 @@ func (pu *ProductUpdate) ClearDescription() *ProductUpdate {
 	return pu
 }
 
-// SetCategoryID sets the "category_id" field.
-func (pu *ProductUpdate) SetCategoryID(i int64) *ProductUpdate {
-	pu.mutation.SetCategoryID(i)
+// SetAmount sets the "amount" field.
+func (pu *ProductUpdate) SetAmount(i int64) *ProductUpdate {
+	pu.mutation.ResetAmount()
+	pu.mutation.SetAmount(i)
+	return pu
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (pu *ProductUpdate) SetNillableAmount(i *int64) *ProductUpdate {
+	if i != nil {
+		pu.SetAmount(*i)
+	}
+	return pu
+}
+
+// AddAmount adds i to the "amount" field.
+func (pu *ProductUpdate) AddAmount(i int64) *ProductUpdate {
+	pu.mutation.AddAmount(i)
+	return pu
+}
+
+// SetPrice sets the "price" field.
+func (pu *ProductUpdate) SetPrice(i int64) *ProductUpdate {
+	pu.mutation.ResetPrice()
+	pu.mutation.SetPrice(i)
+	return pu
+}
+
+// AddPrice adds i to the "price" field.
+func (pu *ProductUpdate) AddPrice(i int64) *ProductUpdate {
+	pu.mutation.AddPrice(i)
 	return pu
 }
 
@@ -202,6 +236,16 @@ func (pu *ProductUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Product.name": %w`, err)}
 		}
 	}
+	if v, ok := pu.mutation.Amount(); ok {
+		if err := product.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Product.amount": %w`, err)}
+		}
+	}
+	if v, ok := pu.mutation.Price(); ok {
+		if err := product.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "Product.price": %w`, err)}
+		}
+	}
 	if _, ok := pu.mutation.CategoriesID(); pu.mutation.CategoriesCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Product.categories"`)
 	}
@@ -251,6 +295,34 @@ func (pu *ProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: product.FieldDescription,
+		})
+	}
+	if value, ok := pu.mutation.Amount(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldAmount,
+		})
+	}
+	if value, ok := pu.mutation.AddedAmount(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldAmount,
+		})
+	}
+	if value, ok := pu.mutation.Price(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldPrice,
+		})
+	}
+	if value, ok := pu.mutation.AddedPrice(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldPrice,
 		})
 	}
 	if pu.mutation.CategoriesCleared() {
@@ -367,6 +439,12 @@ func (puo *ProductUpdateOne) SetUpdatedAt(t time.Time) *ProductUpdateOne {
 	return puo
 }
 
+// SetCategoryID sets the "category_id" field.
+func (puo *ProductUpdateOne) SetCategoryID(i int64) *ProductUpdateOne {
+	puo.mutation.SetCategoryID(i)
+	return puo
+}
+
 // SetName sets the "name" field.
 func (puo *ProductUpdateOne) SetName(s string) *ProductUpdateOne {
 	puo.mutation.SetName(s)
@@ -393,9 +471,37 @@ func (puo *ProductUpdateOne) ClearDescription() *ProductUpdateOne {
 	return puo
 }
 
-// SetCategoryID sets the "category_id" field.
-func (puo *ProductUpdateOne) SetCategoryID(i int64) *ProductUpdateOne {
-	puo.mutation.SetCategoryID(i)
+// SetAmount sets the "amount" field.
+func (puo *ProductUpdateOne) SetAmount(i int64) *ProductUpdateOne {
+	puo.mutation.ResetAmount()
+	puo.mutation.SetAmount(i)
+	return puo
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (puo *ProductUpdateOne) SetNillableAmount(i *int64) *ProductUpdateOne {
+	if i != nil {
+		puo.SetAmount(*i)
+	}
+	return puo
+}
+
+// AddAmount adds i to the "amount" field.
+func (puo *ProductUpdateOne) AddAmount(i int64) *ProductUpdateOne {
+	puo.mutation.AddAmount(i)
+	return puo
+}
+
+// SetPrice sets the "price" field.
+func (puo *ProductUpdateOne) SetPrice(i int64) *ProductUpdateOne {
+	puo.mutation.ResetPrice()
+	puo.mutation.SetPrice(i)
+	return puo
+}
+
+// AddPrice adds i to the "price" field.
+func (puo *ProductUpdateOne) AddPrice(i int64) *ProductUpdateOne {
+	puo.mutation.AddPrice(i)
 	return puo
 }
 
@@ -546,6 +652,16 @@ func (puo *ProductUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Product.name": %w`, err)}
 		}
 	}
+	if v, ok := puo.mutation.Amount(); ok {
+		if err := product.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "Product.amount": %w`, err)}
+		}
+	}
+	if v, ok := puo.mutation.Price(); ok {
+		if err := product.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "Product.price": %w`, err)}
+		}
+	}
 	if _, ok := puo.mutation.CategoriesID(); puo.mutation.CategoriesCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Product.categories"`)
 	}
@@ -612,6 +728,34 @@ func (puo *ProductUpdateOne) sqlSave(ctx context.Context) (_node *Product, err e
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: product.FieldDescription,
+		})
+	}
+	if value, ok := puo.mutation.Amount(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldAmount,
+		})
+	}
+	if value, ok := puo.mutation.AddedAmount(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldAmount,
+		})
+	}
+	if value, ok := puo.mutation.Price(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldPrice,
+		})
+	}
+	if value, ok := puo.mutation.AddedPrice(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: product.FieldPrice,
 		})
 	}
 	if puo.mutation.CategoriesCleared() {

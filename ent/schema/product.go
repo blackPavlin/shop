@@ -30,9 +30,11 @@ func (Product) Mixin() []ent.Mixin {
 // Fields of the Product.
 func (Product) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int64("category_id").Unique(),
 		field.String("name").NotEmpty(),
 		field.String("description").Optional(),
-		field.Int64("category_id").Unique(),
+		field.Int64("amount").Min(0).Default(0),
+		field.Int64("price").Min(0),
 	}
 }
 
@@ -45,7 +47,9 @@ func (Product) Edges() []ent.Edge {
 			Required().
 			Field("category_id"),
 		edge.To("carts", Cart.Type).
-			Annotations(entsql.Annotation{OnDelete: entsql.Restrict}).
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Restrict},
+			).
 			StorageKey(
 				edge.Symbol("cart_product_fk"),
 			),

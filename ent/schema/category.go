@@ -38,9 +38,11 @@ func (Category) Fields() []ent.Field {
 func (Category) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("products", Product.Type).
-		Annotations(entsql.Annotation{OnDelete: entsql.Restrict}).
-		StorageKey(
-			edge.Symbol("product_category_fk"),
-		),
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Restrict},
+			).
+			StorageKey(
+				edge.Symbol("product_category_fk"),
+			),
 	}
 }

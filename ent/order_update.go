@@ -41,6 +41,20 @@ func (ou *OrderUpdate) SetUserID(i int64) *OrderUpdate {
 	return ou
 }
 
+// SetStatus sets the "status" field.
+func (ou *OrderUpdate) SetStatus(o order.Status) *OrderUpdate {
+	ou.mutation.SetStatus(o)
+	return ou
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (ou *OrderUpdate) SetNillableStatus(o *order.Status) *OrderUpdate {
+	if o != nil {
+		ou.SetStatus(*o)
+	}
+	return ou
+}
+
 // SetUsersID sets the "users" edge to the User entity by ID.
 func (ou *OrderUpdate) SetUsersID(id int64) *OrderUpdate {
 	ou.mutation.SetUsersID(id)
@@ -134,6 +148,11 @@ func (ou *OrderUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ou *OrderUpdate) check() error {
+	if v, ok := ou.mutation.Status(); ok {
+		if err := order.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Order.status": %w`, err)}
+		}
+	}
 	if _, ok := ou.mutation.UsersID(); ou.mutation.UsersCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.users"`)
 	}
@@ -163,6 +182,13 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: order.FieldUpdatedAt,
+		})
+	}
+	if value, ok := ou.mutation.Status(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: order.FieldStatus,
 		})
 	}
 	if ou.mutation.UsersCleared() {
@@ -228,6 +254,20 @@ func (ouo *OrderUpdateOne) SetUpdatedAt(t time.Time) *OrderUpdateOne {
 // SetUserID sets the "user_id" field.
 func (ouo *OrderUpdateOne) SetUserID(i int64) *OrderUpdateOne {
 	ouo.mutation.SetUserID(i)
+	return ouo
+}
+
+// SetStatus sets the "status" field.
+func (ouo *OrderUpdateOne) SetStatus(o order.Status) *OrderUpdateOne {
+	ouo.mutation.SetStatus(o)
+	return ouo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (ouo *OrderUpdateOne) SetNillableStatus(o *order.Status) *OrderUpdateOne {
+	if o != nil {
+		ouo.SetStatus(*o)
+	}
 	return ouo
 }
 
@@ -337,6 +377,11 @@ func (ouo *OrderUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ouo *OrderUpdateOne) check() error {
+	if v, ok := ouo.mutation.Status(); ok {
+		if err := order.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Order.status": %w`, err)}
+		}
+	}
 	if _, ok := ouo.mutation.UsersID(); ouo.mutation.UsersCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Order.users"`)
 	}
@@ -383,6 +428,13 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: order.FieldUpdatedAt,
+		})
+	}
+	if value, ok := ouo.mutation.Status(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: order.FieldStatus,
 		})
 	}
 	if ouo.mutation.UsersCleared() {

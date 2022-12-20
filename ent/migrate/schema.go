@@ -79,11 +79,24 @@ var (
 		Columns:    CategoriesColumns,
 		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
 	}
+	// ImagesColumns holds the columns for the "images" table.
+	ImagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+	}
+	// ImagesTable holds the schema information for the "images" table.
+	ImagesTable = &schema.Table{
+		Name:       "images",
+		Columns:    ImagesColumns,
+		PrimaryKey: []*schema.Column{ImagesColumns[0]},
+	}
 	// OrdersColumns holds the columns for the "orders" table.
 	OrdersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"CREATED", "ACCEPTED", "CANCALLED"}, Default: "CREATED", SchemaType: map[string]string{"postgres": "order_status"}},
 		{Name: "user_id", Type: field.TypeInt64},
 	}
 	// OrdersTable holds the schema information for the "orders" table.
@@ -94,11 +107,23 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "order_user_fk",
-				Columns:    []*schema.Column{OrdersColumns[3]},
+				Columns:    []*schema.Column{OrdersColumns[4]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Restrict,
 			},
 		},
+	}
+	// OrderProductsColumns holds the columns for the "order_products" table.
+	OrderProductsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+	}
+	// OrderProductsTable holds the schema information for the "order_products" table.
+	OrderProductsTable = &schema.Table{
+		Name:       "order_products",
+		Columns:    OrderProductsColumns,
+		PrimaryKey: []*schema.Column{OrderProductsColumns[0]},
 	}
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
@@ -107,6 +132,8 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "amount", Type: field.TypeInt64, Default: 0},
+		{Name: "price", Type: field.TypeInt64},
 		{Name: "category_id", Type: field.TypeInt64},
 	}
 	// ProductsTable holds the schema information for the "products" table.
@@ -117,11 +144,23 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "product_category_fk",
-				Columns:    []*schema.Column{ProductsColumns[5]},
+				Columns:    []*schema.Column{ProductsColumns[7]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.Restrict,
 			},
 		},
+	}
+	// ProductImagesColumns holds the columns for the "product_images" table.
+	ProductImagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+	}
+	// ProductImagesTable holds the schema information for the "product_images" table.
+	ProductImagesTable = &schema.Table{
+		Name:       "product_images",
+		Columns:    ProductImagesColumns,
+		PrimaryKey: []*schema.Column{ProductImagesColumns[0]},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -145,8 +184,11 @@ var (
 		AddressesTable,
 		CartsTable,
 		CategoriesTable,
+		ImagesTable,
 		OrdersTable,
+		OrderProductsTable,
 		ProductsTable,
+		ProductImagesTable,
 		UsersTable,
 	}
 )
@@ -164,13 +206,22 @@ func init() {
 	CategoriesTable.Annotation = &entsql.Annotation{
 		Table: "categories",
 	}
+	ImagesTable.Annotation = &entsql.Annotation{
+		Table: "images",
+	}
 	OrdersTable.ForeignKeys[0].RefTable = UsersTable
 	OrdersTable.Annotation = &entsql.Annotation{
 		Table: "orders",
 	}
+	OrderProductsTable.Annotation = &entsql.Annotation{
+		Table: "order_products",
+	}
 	ProductsTable.ForeignKeys[0].RefTable = CategoriesTable
 	ProductsTable.Annotation = &entsql.Annotation{
 		Table: "products",
+	}
+	ProductImagesTable.Annotation = &entsql.Annotation{
+		Table: "product_images",
 	}
 	UsersTable.Annotation = &entsql.Annotation{
 		Table: "users",

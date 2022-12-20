@@ -13,8 +13,7 @@ export const useUserStore = defineStore("user", {
   }),
   actions: {
     async loadUser(): Promise<void> {
-      const user = await UserService.getUser();
-      this.user = user;
+      this.user = await UserService.getUser();
     },
   },
   getters: {

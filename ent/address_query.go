@@ -25,8 +25,6 @@ type AddressQuery struct {
 	fields     []string
 	predicates []predicate.Address
 	withUsers  *UserQuery
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Address) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -368,9 +366,6 @@ func (aq *AddressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Addr
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(aq.modifiers) > 0 {
-		_spec.Modifiers = aq.modifiers
-	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -383,11 +378,6 @@ func (aq *AddressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Addr
 	if query := aq.withUsers; query != nil {
 		if err := aq.loadUsers(ctx, query, nodes, nil,
 			func(n *Address, e *User) { n.Edges.Users = e }); err != nil {
-			return nil, err
-		}
-	}
-	for i := range aq.loadTotal {
-		if err := aq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -423,9 +413,6 @@ func (aq *AddressQuery) loadUsers(ctx context.Context, query *UserQuery, nodes [
 
 func (aq *AddressQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := aq.querySpec()
-	if len(aq.modifiers) > 0 {
-		_spec.Modifiers = aq.modifiers
-	}
 	_spec.Node.Columns = aq.fields
 	if len(aq.fields) > 0 {
 		_spec.Unique = aq.unique != nil && *aq.unique
