@@ -11,8 +11,8 @@ import (
 // Config
 type Config struct {
 	Logger   *logger.LoggerConfig
-	Server   *ServerConfig           `envconfig:"REST_SRV" required:"true"`
-	Cors     *CorsConfig             `envconfig:"CORS" required:"true"`
+	Server   *ServerConfig          `envconfig:"REST_SRV" required:"true"`
+	Cors     *CorsConfig            `envconfig:"CORS" required:"true"`
 	Postgres *pgutil.PostgresConfig `envconfig:"POSTGRES" required:"true"`
 	Auth     *AuthConfig
 }

@@ -5,6 +5,8 @@ import "context"
 // AddressService
 type AddressService interface {
 	Create(ctx context.Context, props *Props) (*Address, error)
+	Get(ctx context.Context, filter *Filter) (*Address, error)
+	Query(ctx context.Context, criteria *QueryCriteria) (Addresses, error)
 }
 
 // AddressUseCase

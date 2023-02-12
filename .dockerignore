@@ -3,3 +3,13 @@
 .gitignore
 
 .vscode
+
+web
+build
+configs
+
+README.md
+Makefile
+
+shop
+shop.exe

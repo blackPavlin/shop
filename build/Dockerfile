@@ -1,15 +1,13 @@
-FROM golang:1.17-alpine as build
+FROM golang:1.18-alpine
 
 WORKDIR /app
 
 COPY go.mod go.sum /
 RUN go mod download
 
-COPY ./app ./app
+COPY . .
 
-VOLUME ["./configs/local.config.yml:/app/configs/local.config.yml"]
-
-RUN CGO_ENABLED=0 GOOS=linux go build -v ./app/cmd/topsigner
+RUN CGO_ENABLED=0 GOOS=linux go build -v ./cmd/shop
 
 EXPOSE 3000
 

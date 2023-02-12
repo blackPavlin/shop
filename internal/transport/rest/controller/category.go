@@ -4,7 +4,10 @@ import (
 	"net/http"
 
 	"github.com/blackPavlin/shop/internal/domain/category"
+	"github.com/blackPavlin/shop/internal/transport/rest"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
+	"github.com/blackPavlin/shop/pkg/errorx"
+	"github.com/blackPavlin/shop/pkg/restx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -40,4 +43,19 @@ func (ctrl *CategoryController) GetCategoriesHandler(w http.ResponseWriter, r *h
 }
 
 // CreateCategoryHandler
-func (ctrl *CategoryController) CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {}
+func (ctrl *CategoryController) CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	request := &rest.CreateCategoryRequest{}
+	if err := render.DecodeJSON(r.Body, request); err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+
+	categ, err := ctrl.categoryService.Create(r.Context(), request.ToDomainEntity())
+	if err != nil {
+		restx.HandleError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.Respond(w, r, mapping.CreateCategoryResponse(categ))
+}

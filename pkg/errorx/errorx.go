@@ -35,6 +35,11 @@ var (
 )
 
 // NewBadRequestError
-func NewBadRequestError(err error) *Error {
-	return NewError(http.StatusBadRequest, err.Error())
+func NewBadRequestError(msg string) *Error {
+	return NewError(http.StatusBadRequest, msg)
+}
+
+// NewNotFoundError
+func NewNotFoundError(msg string) *Error {
+	return NewError(http.StatusNotExtended, msg)
 }

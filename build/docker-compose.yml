@@ -1,22 +1,22 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    restart: always
-    networks:
-      - shopNetwork
-    ports: 
-      - 27017:27017
-    expose:
-      - 27017  
-    command: ["mongod", "--replSet", "rsmongo", "--bind_ip_all"]
-    healthcheck:
-      test: test $$(echo "rs.initiate({_id:'rsmongo',members:[{_id:0,host:\"mongo:27017\"}]}).ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
-      interval: 10s
-      start_period: 30s
+  shop:
+    build:
+      context: ../
+      dockerfile: build/Dockerfile
+    env_file:
+      - ../configs/local.config.env
+    ports:
+      - "3000:3000"  
+    depends_on:
+      - postgres  
 
-networks:
-  shopNetwork:
-    driver: bridge
+  postgres:
+    image: postgres:14.1-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shop
+    ports:
+      - "5432:5432"

@@ -12,7 +12,7 @@ func (r LoginRequest) Validate() error {
 		validation.Field(&r.Email, validation.Required, is.EmailFormat),
 		validation.Field(&r.Password, validation.Required),
 	); err != nil {
-		return errorx.NewBadRequestError(err)
+		return errorx.NewBadRequestError(err.Error())
 	}
 	return nil
 }
@@ -25,7 +25,7 @@ func (r SignupRequest) Validate() error {
 		validation.Field(&r.Phone, validation.Required, is.E164),
 		validation.Field(&r.Password, validation.Required),
 	); err != nil {
-		return errorx.NewBadRequestError(err)
+		return errorx.NewBadRequestError(err.Error())
 	}
 	return nil
 }
@@ -39,7 +39,7 @@ func (r CreateAddressRequest) Validate() error {
 		validation.Field(&r.Postcode, validation.Required, validation.Min(1)),
 		validation.Field(&r.Street, validation.Required),
 	); err != nil {
-		return errorx.NewBadRequestError(err)
+		return errorx.NewBadRequestError(err.Error())
 	}
 	return nil
 }
@@ -49,7 +49,7 @@ func (r CreateCategoryRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Name, validation.Required),
 	); err != nil {
-		return errorx.NewBadRequestError(err)
+		return errorx.NewBadRequestError(err.Error())
 	}
 	return nil
 }

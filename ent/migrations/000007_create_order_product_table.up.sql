@@ -6,6 +6,6 @@ CREATE TABLE order_products
     created_at  TIMESTAMP       NOT NULL    DEFAULT (now() at time zone 'utc'),
     updated_at  TIMESTAMP       NOT NULL    DEFAULT (now() at time zone 'utc'),
 
-    PRIMARY KEY (id),
+    PRIMARY KEY (id)
 );
 COMMIT;

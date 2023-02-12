@@ -5,6 +5,7 @@ import (
 
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
+	"github.com/blackPavlin/shop/pkg/restx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -32,6 +33,7 @@ func (ctrl *UserController) RegisterRoutes(r chi.Router) chi.Router {
 func (ctrl *UserController) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := ctrl.userService.Get(r.Context(), &user.Filter{})
 	if err != nil {
+		restx.HandleError(w, r, err)
 		return
 	}
 
