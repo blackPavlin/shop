@@ -77,7 +77,7 @@ export default defineComponent({
     const store = useAuthStore();
     const router = useRouter();
 
-    const login = async (formEl?: FormInstance) => {
+    const login = (formEl?: FormInstance) => {
       if (!formEl) {
         return;
       }

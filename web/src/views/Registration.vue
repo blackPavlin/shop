@@ -23,6 +23,7 @@
             v-model="form.phone"
             placeholder="Phone"
             :prefix-icon="Phone"
+            type="tel"
           ></el-input>
         </el-form-item>
 
@@ -31,6 +32,7 @@
             v-model="form.email"
             placeholder="Email"
             :prefix-icon="Message"
+            type="email"
           ></el-input>
         </el-form-item>
 

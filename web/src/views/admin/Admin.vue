@@ -3,7 +3,7 @@
     <el-aside>
       <admin-side-bar />
     </el-aside>
-    <el-main></el-main>
+    <router-view />
   </el-container>
 </template>
 

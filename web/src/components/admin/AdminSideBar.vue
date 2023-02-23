@@ -1,18 +1,18 @@
 <template>
   <el-menu :router="true" :default-active="$route.path">
-    <el-menu-item>
+    <el-menu-item index="/admin/category" route="/admin/category">
       <el-icon></el-icon>
-      <template #title></template>
+      <template #title>Управление категориями</template>
     </el-menu-item>
 
-    <el-menu-item>
+    <el-menu-item index="/admin/product" route="/admin/product">
       <el-icon></el-icon>
-      <template #title></template>
+      <template #title>Управление товарами</template>
     </el-menu-item>
 
-    <el-menu-item>
+    <el-menu-item index="/admin/order" route="/admin/order">
       <el-icon></el-icon>
-      <template #title></template>
+      <template #title>Управление заказами</template>
     </el-menu-item>
   </el-menu>
 </template>

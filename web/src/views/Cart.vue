@@ -75,10 +75,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-.el-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-</style>
+<style lang="scss"></style>

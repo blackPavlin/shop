@@ -7,6 +7,7 @@ import (
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/pkg/errorx"
+	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 	"go.uber.org/zap"
 )
 
@@ -30,9 +31,14 @@ func (r *CategoryRepository) Create(
 		SetName(props.Name).
 		Save(ctx)
 	if err != nil {
+		if pg.IsUniqueViolationErr(err) {
+			return nil, errorx.ErrAllreadyExists
+		}
+
 		r.logger.Error("create category error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
+
 	return mapDomainCategoryFromRow(row), nil
 }
 
@@ -50,6 +56,7 @@ func (r *CategoryRepository) Query(
 		r.logger.Error("query categories error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
+
 	return mapDomainCategoriesFromRows(rows), nil
 }
 
@@ -66,7 +73,39 @@ func (r *CategoryRepository) Get(
 		r.logger.Error("get category error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
+
 	return mapDomainCategoryFromRow(row), err
+}
+
+// Update
+func (r *CategoryRepository) Update(
+	ctx context.Context,
+	id category.ID,
+	props *category.Props,
+) (*category.Category, error) {
+	row, err := r.client.Category.
+		UpdateOneID(int64(id)).
+		SetName(props.Name).
+		Save(ctx)
+	if err != nil {
+		r.logger.Error("update category error", zap.Error(err))
+		return nil, errorx.ErrInternal
+	}
+
+	return mapDomainCategoryFromRow(row), err
+}
+
+// Delete
+func (r *CategoryRepository) Delete(ctx context.Context, id category.ID) error {
+	err := r.client.Category.
+		DeleteOneID(int64(id)).
+		Exec(ctx)
+	if err != nil {
+		r.logger.Error("delete category error", zap.Error(err))
+		return errorx.ErrInternal
+	}
+
+	return nil
 }
 
 func makePredicate(criteria *category.QueryCriteria) []predicate.Category {
@@ -91,5 +130,6 @@ func mapDomainCategoriesFromRows(rows ent.Categories) category.Categories {
 	for _, row := range rows {
 		result = append(result, mapDomainCategoryFromRow(row))
 	}
+
 	return result
 }

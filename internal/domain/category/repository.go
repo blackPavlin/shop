@@ -9,6 +9,8 @@ type Repository interface {
 	Create(ctx context.Context, props *Props) (*Category, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (Categories, error)
 	Get(ctx context.Context, filter *Filter) (*Category, error)
+	Update(ctx context.Context, id ID, props *Props) (*Category, error)
+	Delete(ctx context.Context, id ID) error
 }
 
 // QueryCriteria

@@ -50,6 +50,20 @@ const routes: RouteRecordRaw[] = [
     path: "/admin",
     name: "AdminView",
     component: () => import("@/views/admin/Admin.vue"),
+    children: [
+      {
+        path: "category",
+        component: () => import("@/views/admin/CategoryAdmin.vue"),
+      },
+      {
+        path: "product",
+        component: () => import("@/views/admin/ProductAdmin.vue"),
+      },
+      {
+        path: "order",
+        component: () => import("@/views/admin/OrderAdmin.vue"),
+      },
+    ],
   },
   {
     path: "/:pathMatch(.*)*",

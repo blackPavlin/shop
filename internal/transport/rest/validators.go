@@ -45,6 +45,17 @@ func (r CreateAddressRequest) Validate() error {
 }
 
 // Validate
+func (r Category) Validate() error {
+	if err := validation.ValidateStruct(&r,
+		validation.Field(&r.Id, validation.Required),
+		validation.Field(&r.Name, validation.Required),
+	); err != nil {
+		return errorx.NewBadRequestError(err.Error())
+	}
+	return nil
+}
+
+// Validate
 func (r CreateCategoryRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Name, validation.Required),
