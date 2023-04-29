@@ -66,6 +66,9 @@ func (r *AddressRepository) Get(
 		Where(predicate...).
 		First(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errorx.ErrNotFound
+		}
 		r.logger.Error("get address error:", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}

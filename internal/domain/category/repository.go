@@ -15,8 +15,23 @@ type Repository interface {
 
 // QueryCriteria
 type QueryCriteria struct {
-	Filter *Filter
+	Filter Filter
 }
 
 // Filter
-type Filter struct{}
+type Filter struct {
+	ID   IDFilter
+	Name NameFilter
+}
+
+// IDFilter
+type IDFilter struct {
+	Eq  IDs
+	Neq IDs
+}
+
+// NameFilter
+type NameFilter struct {
+	Eq  []string
+	Neq []string
+}

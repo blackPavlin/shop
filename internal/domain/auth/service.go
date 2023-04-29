@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 type AuthService interface {
 	Login(ctx context.Context, props *LoginProps) (string, error)
 	Signup(ctx context.Context, props *SignupProps) (string, error)
+	ValidateToken(accessToken string) (*UserClaims, error)
 }
 
 // AuthUseCase
@@ -52,14 +54,12 @@ func (s *AuthUseCase) Login(ctx context.Context, props *LoginProps) (string, err
 		}
 		return "", err
 	}
-
 	if err := bcrypt.CompareHashAndPassword(
 		[]byte(user.Props.Password),
 		[]byte(props.Password),
 	); err != nil {
 		return "", errorx.ErrInvalidLoginOrPassword
 	}
-
 	claims := &UserClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Duration(s.config.ExpiresIn) * time.Second).Unix(),
@@ -68,14 +68,12 @@ func (s *AuthUseCase) Login(ctx context.Context, props *LoginProps) (string, err
 		UserID:   user.ID,
 		UserRole: user.Role,
 	}
-
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(
 		[]byte(s.config.SigningKey),
 	)
 	if err != nil {
 		return "", err
 	}
-
 	return token, nil
 }
 
@@ -88,28 +86,40 @@ func (s *AuthUseCase) Signup(ctx context.Context, props *SignupProps) (string, e
 	if exist {
 		return "", errorx.ErrAllreadyExists
 	}
-
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(props.Password), 14)
 	if err != nil {
 		s.logger.Error("generate password hash error:", zap.Error(err))
 		return "", errorx.ErrInternal
 	}
-
 	userProps := &user.Props{
 		Email:    strings.ToLower(props.Email),
 		Name:     props.Name,
 		Phone:    props.Phone,
 		Password: string(passwordHash),
 	}
-
 	if _, err := s.userRepo.Create(ctx, userProps); err != nil {
 		return "", err
 	}
-
 	loginProps := &LoginProps{
 		Email:    props.Email,
 		Password: props.Password,
 	}
-
 	return s.Login(ctx, loginProps)
+}
+
+// ValidateToken
+func (s *AuthUseCase) ValidateToken(accessToken string) (*UserClaims, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{},func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", t.Method.Alg())
+		}
+		return []byte(s.config.SigningKey), nil
+	})
+	if err != nil {
+		return nil, errorx.ErrUnauthorized
+	}
+	if claims, ok := token.Claims.(*UserClaims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, errorx.ErrUnauthorized
 }

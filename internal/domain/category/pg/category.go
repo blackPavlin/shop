@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/blackPavlin/shop/ent"
+	entcategory "github.com/blackPavlin/shop/ent/category"
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/pkg/errorx"
@@ -38,7 +39,6 @@ func (r *CategoryRepository) Create(
 		r.logger.Error("create category error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-
 	return mapDomainCategoryFromRow(row), nil
 }
 
@@ -56,7 +56,6 @@ func (r *CategoryRepository) Query(
 		r.logger.Error("query categories error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-
 	return mapDomainCategoriesFromRows(rows), nil
 }
 
@@ -65,15 +64,17 @@ func (r *CategoryRepository) Get(
 	ctx context.Context,
 	filter *category.Filter,
 ) (*category.Category, error) {
-	predicates := makePredicate(&category.QueryCriteria{Filter: filter})
+	predicates := makePredicate(&category.QueryCriteria{Filter: *filter})
 	row, err := r.client.Category.Query().
 		Where(predicates...).
 		First(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errorx.ErrNotFound
+		}
 		r.logger.Error("get category error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-
 	return mapDomainCategoryFromRow(row), err
 }
 
@@ -91,7 +92,6 @@ func (r *CategoryRepository) Update(
 		r.logger.Error("update category error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-
 	return mapDomainCategoryFromRow(row), err
 }
 
@@ -104,13 +104,17 @@ func (r *CategoryRepository) Delete(ctx context.Context, id category.ID) error {
 		r.logger.Error("delete category error", zap.Error(err))
 		return errorx.ErrInternal
 	}
-
 	return nil
 }
 
 func makePredicate(criteria *category.QueryCriteria) []predicate.Category {
 	predicates := make([]predicate.Category, 0)
-
+	if len(criteria.Filter.ID.Eq) != 0 {
+		predicates = append(predicates, entcategory.IDIn(criteria.Filter.ID.Eq.ToInt64()...))
+	}
+	if len(criteria.Filter.Name.Eq) != 0 {
+		predicates = append(predicates, entcategory.NameIn(criteria.Filter.Name.Eq...))
+	}
 	return predicates
 }
 
@@ -130,6 +134,5 @@ func mapDomainCategoriesFromRows(rows ent.Categories) category.Categories {
 	for _, row := range rows {
 		result = append(result, mapDomainCategoryFromRow(row))
 	}
-
 	return result
 }

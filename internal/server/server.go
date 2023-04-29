@@ -60,7 +60,7 @@ func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) 
 		Debug:              config.Cors.Debug,
 	}).Handler)
 
-	// Repositoryes
+	// Repositories
 	userRepository := userpg.NewUserRepository(database, logger)
 	cartRepository := cartpg.NewCartRepository(database, logger)
 	addressRepository := addresspg.NewAddressRepository(database, logger)
@@ -82,6 +82,8 @@ func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) 
 	addressController := controller.NewAddressController(addressService)
 	productController := controller.NewProductController(productService)
 	categoryController := controller.NewCategoryController(categoryService)
+
+	// Middlewares
 
 	router.Route("/api", func(r chi.Router) {
 		userController.RegisterRoutes(r)     // /api/user
