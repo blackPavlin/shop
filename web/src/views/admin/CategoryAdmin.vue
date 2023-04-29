@@ -92,7 +92,12 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, computed, onMounted } from "vue";
-import { FormRules, FormInstance, ElNotification } from "element-plus";
+import {
+  FormRules,
+  FormInstance,
+  ElNotification,
+  ElMessageBox,
+} from "element-plus";
 import { Delete, Edit } from "@element-plus/icons-vue";
 import { useCategoryStore } from "@/store/category.store";
 
@@ -204,13 +209,46 @@ export default defineComponent({
           return;
         }
 
-        formEl.resetFields();
-        isUpdateDialogVisible.value = false;
+        store
+          .updateCategory(updateForm)
+          .then(async () => {
+            formEl.resetFields();
+            isUpdateDialogVisible.value = false;
+            ElNotification.success("Category successful updated");
+
+            await loadCategories();
+          })
+          .catch((error) => {
+            ElNotification.error(error.message);
+          });
       });
     };
 
     const deleteCategory = (id: number): void => {
-      console.log(id);
+      ElMessageBox.confirm(
+        "Вы уверены, что хотите удалить категорию?",
+        "Warning",
+        {
+          confirmButtonText: "Удалить",
+          cancelButtonText: "Отмена",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          store
+            .deleteCategory(id)
+            .then(async () => {
+              ElNotification.success("Category successful deleted");
+
+              await loadCategories();
+            })
+            .catch((error) => {
+              ElNotification.error(error.message);
+            });
+        })
+        .catch(() => {
+          ElNotification.info("Удаление отменено");
+        });
     };
 
     onMounted(() => loadCategories());

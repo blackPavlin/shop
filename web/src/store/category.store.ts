@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
-import { CategoryService, CategoryList, CreateCategoryRequest } from "@/api";
+import { Category } from "@/api/models/Category";
+import { CategoryList } from "@/api/models/CategoryList";
+import { CreateCategoryRequest } from "@/api/models/CreateCategoryRequest";
+import { CategoryService } from "@/api/services/CategoryService";
 
 type State = {
   categories: CategoryList;
@@ -15,6 +18,12 @@ export const useCategoryStore = defineStore("category", {
     },
     async createCategory(body: CreateCategoryRequest): Promise<void> {
       await CategoryService.postCategory(body);
+    },
+    async updateCategory(body: Category): Promise<void> {
+      await CategoryService.patchCategory(body);
+    },
+    async deleteCategory(categoryId: number): Promise<void> {
+      await CategoryService.deleteCategory(categoryId);
     },
   },
   getters: {
