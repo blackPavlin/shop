@@ -9,12 +9,12 @@
     "generate": "openapi --input ../api/openapi.v1.yaml --output ./src/api --client axios"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.4.0",
     "core-js": "^3.8.3",
-    "element-plus": "^2.2.2",
-    "pinia": "^2.0.14",
-    "vue": "^3.2.13",
-    "vue-router": "^4.1.15"
+    "element-plus": "^2.3.4",
+    "pinia": "^2.0.35",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",
@@ -29,7 +29,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.0.3",
-    "openapi-typescript-codegen": "^0.23.0",
+    "openapi-typescript-codegen": "^0.24.0",
     "prettier": "^2.4.1",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
