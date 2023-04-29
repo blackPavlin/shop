@@ -3,6 +3,10 @@
 /* eslint-disable */
 
 export type Product = {
-    id: string;
+    id: number;
+    categoryId: number;
     name: string;
+    description?: string;
+    amount: number;
+    price: number;
 };

@@ -30,7 +30,7 @@ export type { UpdateProductRequest } from './models/UpdateProductRequest';
 export { User } from './models/User';
 
 export { AddressService } from './services/AddressService';
-export { AuthorizationService } from './services/AuthorizationService';
+export { AuthService } from './services/AuthService';
 export { CartService } from './services/CartService';
 export { CategoryService } from './services/CategoryService';
 export { OrderService } from './services/OrderService';

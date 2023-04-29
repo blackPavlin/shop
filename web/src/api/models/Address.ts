@@ -3,7 +3,8 @@
 /* eslint-disable */
 
 export type Address = {
-    id: string;
+    id: number;
+    userId: number;
     country: string;
     city: string;
     street: string;

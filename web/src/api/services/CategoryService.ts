@@ -57,4 +57,22 @@ requestBody?: Category,
         });
     }
 
+    /**
+     * Удалить категорию
+     * @param categoryId ID заказа
+     * @returns any successful operation
+     * @throws ApiError
+     */
+    public static deleteCategory(
+categoryId: number,
+): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/category/{categoryId}',
+            path: {
+                'categoryId': categoryId,
+            },
+        });
+    }
+
 }
