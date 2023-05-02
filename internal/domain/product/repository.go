@@ -24,7 +24,15 @@ type QueryResult struct {
 }
 
 // Filter
-type Filter struct{}
+type Filter struct {
+	ID IDFilter
+}
+
+// IDFilter
+type IDFilter struct {
+	Eq  IDs
+	Neq IDs
+}
 
 // Ordering
 type Ordering struct{}

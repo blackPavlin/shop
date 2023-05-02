@@ -8,31 +8,31 @@ import (
 
 //go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "cart"
 
-// CartService
-type CartService interface {
+// Service
+type Service interface {
 	Create(ctx context.Context, props *Props) (*Cart, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
-// CartUseCase
-type CartUseCase struct {
+// UseCase
+type UseCase struct {
 	cartRepo    Repository
 	productRepo product.Repository
 }
 
-// NewCartUseCase
-func NewCartUseCase(cartRepo Repository, productRepo product.Repository) *CartUseCase {
-	return &CartUseCase{cartRepo: cartRepo, productRepo: productRepo}
+// NewUseCase
+func NewUseCase(cartRepo Repository, productRepo product.Repository) *UseCase {
+	return &UseCase{cartRepo: cartRepo, productRepo: productRepo}
 }
 
 // Create
-func (s *CartUseCase) Create(ctx context.Context, props *Props) (*Cart, error) {
+func (s *UseCase) Create(ctx context.Context, props *Props) (*Cart, error) {
 	// TODO: check product count
 
 	return s.cartRepo.Create(ctx, props)
 }
 
 // Query
-func (s *CartUseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
+func (s *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
 	return s.cartRepo.Query(ctx, criteria)
 }

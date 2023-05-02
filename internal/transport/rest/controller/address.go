@@ -3,22 +3,23 @@ package controller
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+
 	"github.com/blackPavlin/shop/internal/domain/address"
 	"github.com/blackPavlin/shop/internal/transport/rest"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/restx"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
 // AddressController
 type AddressController struct {
-	addressService address.AddressService
+	addressService address.Service
 }
 
 // NewAddressController
-func NewAddressController(addressService address.AddressService) *AddressController {
+func NewAddressController(addressService address.Service) *AddressController {
 	return &AddressController{
 		addressService: addressService,
 	}

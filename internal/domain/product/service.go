@@ -2,16 +2,16 @@ package product
 
 //go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "product"
 
-// ProductService
-type ProductService interface {
+// Service
+type Service interface {
 }
 
-// ProductUseCase
-type ProductUseCase struct {
+// UseCase
+type UseCase struct {
 	productRepo Repository
 }
 
-// NewProductUseCase
-func NewProductUseCase(productRepo Repository) *ProductUseCase {
-	return &ProductUseCase{productRepo: productRepo}
+// NewUseCase
+func NewUseCase(productRepo Repository) *UseCase {
+	return &UseCase{productRepo: productRepo}
 }

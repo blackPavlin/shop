@@ -8,25 +8,25 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockProductService is a mock of ProductService interface.
-type MockProductService struct {
+// MockService is a mock of Service interface.
+type MockService struct {
 	ctrl     *gomock.Controller
-	recorder *MockProductServiceMockRecorder
+	recorder *MockServiceMockRecorder
 }
 
-// MockProductServiceMockRecorder is the mock recorder for MockProductService.
-type MockProductServiceMockRecorder struct {
-	mock *MockProductService
+// MockServiceMockRecorder is the mock recorder for MockService.
+type MockServiceMockRecorder struct {
+	mock *MockService
 }
 
-// NewMockProductService creates a new mock instance.
-func NewMockProductService(ctrl *gomock.Controller) *MockProductService {
-	mock := &MockProductService{ctrl: ctrl}
-	mock.recorder = &MockProductServiceMockRecorder{mock}
+// NewMockService creates a new mock instance.
+func NewMockService(ctrl *gomock.Controller) *MockService {
+	mock := &MockService{ctrl: ctrl}
+	mock.recorder = &MockServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockProductService) EXPECT() *MockProductServiceMockRecorder {
+func (m *MockService) EXPECT() *MockServiceMockRecorder {
 	return m.recorder
 }

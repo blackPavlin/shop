@@ -71,10 +71,10 @@ func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) 
 	// Services
 	userService := user.NewUserUseCase(userRepository)
 	authService := auth.NewUseCase(logger, config.Auth, userRepository)
-	cartService := cart.NewCartUseCase(cartRepository, productRepository)
-	addressService := address.NewAddressUseCase(addressRepository)
-	productService := product.NewProductUseCase(productRepository)
-	categoryService := category.NewCategoryUseCase(categoryRepository)
+	cartService := cart.NewUseCase(cartRepository, productRepository)
+	addressService := address.NewUseCase(addressRepository)
+	productService := product.NewUseCase(productRepository)
+	categoryService := category.NewUseCase(categoryRepository)
 
 	// Controllers
 	userController := controller.NewUserController(userService)

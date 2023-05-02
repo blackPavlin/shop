@@ -4,22 +4,23 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/transport/rest"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/restx"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
 // CategoryController
 type CategoryController struct {
-	categoryService category.CategoryService
+	categoryService category.Service
 }
 
 // NewCategoryController
-func NewCategoryController(categoryService category.CategoryService) *CategoryController {
+func NewCategoryController(categoryService category.Service) *CategoryController {
 	return &CategoryController{
 		categoryService: categoryService,
 	}

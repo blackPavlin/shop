@@ -48,7 +48,9 @@ func NewUseCase(
 
 // Login
 func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) {
-	user, err := s.userRepo.Get(ctx, &user.Filter{Email: strings.ToLower(props.Email)})
+	user, err := s.userRepo.Get(ctx, &user.Filter{Email: user.EmailFilter{
+		Eq: []string{strings.ToLower(props.Email)}},
+	})
 	if err != nil {
 		if errors.Is(err, errorx.ErrNotFound) {
 			return "", errorx.ErrInvalidLoginOrPassword
@@ -80,7 +82,9 @@ func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) 
 
 // Signup
 func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error) {
-	exist, err := s.userRepo.Exist(ctx, &user.Filter{Email: strings.ToLower(props.Email)})
+	exist, err := s.userRepo.Exist(ctx, &user.Filter{Email: user.EmailFilter{
+		Eq: []string{strings.ToLower(props.Email)}},
+	})
 	if err != nil {
 		return "", err
 	}

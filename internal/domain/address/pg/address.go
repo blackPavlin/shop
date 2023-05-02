@@ -3,13 +3,15 @@ package pg
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
+	entaddress "github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/address"
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
-	"go.uber.org/zap"
 )
 
 // AddressRepository
@@ -95,9 +97,14 @@ func (r *AddressRepository) Query(
 	return mapDomainAddressesFromRows(rows), nil
 }
 
-func makePredicates(criteria *address.Filter) []predicate.Address {
+func makePredicates(filter *address.Filter) []predicate.Address {
 	predicates := make([]predicate.Address, 0)
-	// TODO
+	if len(filter.ID.Eq) > 0 {
+		predicates = append(predicates, entaddress.IDIn(filter.ID.Eq.ToInt64()...))
+	}
+	if len(filter.UserID.Eq) > 0 {
+		predicates = append(predicates, entaddress.UserIDIn(filter.UserID.Eq.ToInt64()...))
+	}
 	return predicates
 }
 

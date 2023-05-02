@@ -11,31 +11,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockCartService is a mock of CartService interface.
-type MockCartService struct {
+// MockService is a mock of Service interface.
+type MockService struct {
 	ctrl     *gomock.Controller
-	recorder *MockCartServiceMockRecorder
+	recorder *MockServiceMockRecorder
 }
 
-// MockCartServiceMockRecorder is the mock recorder for MockCartService.
-type MockCartServiceMockRecorder struct {
-	mock *MockCartService
+// MockServiceMockRecorder is the mock recorder for MockService.
+type MockServiceMockRecorder struct {
+	mock *MockService
 }
 
-// NewMockCartService creates a new mock instance.
-func NewMockCartService(ctrl *gomock.Controller) *MockCartService {
-	mock := &MockCartService{ctrl: ctrl}
-	mock.recorder = &MockCartServiceMockRecorder{mock}
+// NewMockService creates a new mock instance.
+func NewMockService(ctrl *gomock.Controller) *MockService {
+	mock := &MockService{ctrl: ctrl}
+	mock.recorder = &MockServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCartService) EXPECT() *MockCartServiceMockRecorder {
+func (m *MockService) EXPECT() *MockServiceMockRecorder {
 	return m.recorder
 }
 
 // Create mocks base method.
-func (m *MockCartService) Create(ctx context.Context, props *Props) (*Cart, error) {
+func (m *MockService) Create(ctx context.Context, props *Props) (*Cart, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, props)
 	ret0, _ := ret[0].(*Cart)
@@ -44,13 +44,13 @@ func (m *MockCartService) Create(ctx context.Context, props *Props) (*Cart, erro
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockCartServiceMockRecorder) Create(ctx, props interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) Create(ctx, props interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCartService)(nil).Create), ctx, props)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockService)(nil).Create), ctx, props)
 }
 
 // Query mocks base method.
-func (m *MockCartService) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
+func (m *MockService) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Query", ctx, criteria)
 	ret0, _ := ret[0].(*QueryResult)
@@ -59,7 +59,7 @@ func (m *MockCartService) Query(ctx context.Context, criteria *QueryCriteria) (*
 }
 
 // Query indicates an expected call of Query.
-func (mr *MockCartServiceMockRecorder) Query(ctx, criteria interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) Query(ctx, criteria interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockCartService)(nil).Query), ctx, criteria)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockService)(nil).Query), ctx, criteria)
 }

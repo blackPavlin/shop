@@ -83,7 +83,7 @@ func (s *AuthServiceSuite) TestSignup() {
 			prepare: func(ctx context.Context) context.Context {
 				s.userRepo.EXPECT().
 					Exist(ctx, &user.Filter{
-						Email: signupProps1.Email,
+						Email: user.EmailFilter{Eq: []string{signupProps1.Email}},
 					}).
 					Return(true, nil)
 				return ctx

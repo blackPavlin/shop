@@ -2,23 +2,26 @@ package user
 
 import "time"
 
-//go:generate enumer -sql -linecomment -type UserRole -trimprefix Role -output role_string.go user.go
+//go:generate enumer -sql -linecomment -type Role -trimprefix Role -output role_string.go user.go
 
 const (
-	RoleUser  UserRole = iota // USER
-	RoleAdmin                 // ADMIN
+	RoleUser  Role = iota // USER
+	RoleAdmin             // ADMIN
 )
 
 // ID
 type ID int64
 
-// UserRole
-type UserRole uint8
+// IDs
+type IDs []ID
+
+// Role
+type Role uint8
 
 // User
 type User struct {
 	ID   ID
-	Role UserRole
+	Role Role
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -31,4 +34,13 @@ type Props struct {
 	Name     string
 	Phone    string
 	Password string
+}
+
+// ToInt64
+func (ids IDs) ToInt64() []int64 {
+	result := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		result = append(result, int64(id))
+	}
+	return result
 }

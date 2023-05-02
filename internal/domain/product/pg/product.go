@@ -3,11 +3,13 @@ package pg
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
 	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"go.uber.org/zap"
 )
 
 // ProductRepository
@@ -45,7 +47,7 @@ func (r *ProductRepository) Query(
 	ctx context.Context,
 	criteria *product.QueryCriteria,
 ) (*product.QueryResult, error) {
-	predicates := makePredicates(criteria)
+	predicates := makePredicates(&criteria.Filter)
 	rows, err := r.client.Product.Query().
 		Where(predicates...).
 		Limit(criteria.Pagination.Limit).
@@ -69,7 +71,7 @@ func (r *ProductRepository) Query(
 	return result, nil
 }
 
-func makePredicates(criteria *product.QueryCriteria) []predicate.Product {
+func makePredicates(filter *product.Filter) []predicate.Product {
 	predicates := make([]predicate.Product, 0)
 	// TODO
 	return predicates
@@ -79,7 +81,16 @@ func makeOrderings() {}
 
 func mapDomainProductFromRow(row *ent.Product) *product.Product {
 	return &product.Product{
-		ID: product.ID(row.ID),
+		ID:        product.ID(row.ID),
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+		Props: &product.Props{
+			CategoryID:  category.ID(row.CategoryID),
+			Name:        row.Name,
+			Description: row.Description,
+			Amount:      row.Amount,
+			Price:       row.Price,
+		},
 	}
 }
 

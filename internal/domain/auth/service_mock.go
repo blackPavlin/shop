@@ -11,31 +11,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockAuthService is a mock of Service interface.
-type MockAuthService struct {
+// MockService is a mock of Service interface.
+type MockService struct {
 	ctrl     *gomock.Controller
-	recorder *MockAuthServiceMockRecorder
+	recorder *MockServiceMockRecorder
 }
 
-// MockAuthServiceMockRecorder is the mock recorder for MockAuthService.
-type MockAuthServiceMockRecorder struct {
-	mock *MockAuthService
+// MockServiceMockRecorder is the mock recorder for MockService.
+type MockServiceMockRecorder struct {
+	mock *MockService
 }
 
-// NewMockAuthService creates a new mock instance.
-func NewMockAuthService(ctrl *gomock.Controller) *MockAuthService {
-	mock := &MockAuthService{ctrl: ctrl}
-	mock.recorder = &MockAuthServiceMockRecorder{mock}
+// NewMockService creates a new mock instance.
+func NewMockService(ctrl *gomock.Controller) *MockService {
+	mock := &MockService{ctrl: ctrl}
+	mock.recorder = &MockServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAuthService) EXPECT() *MockAuthServiceMockRecorder {
+func (m *MockService) EXPECT() *MockServiceMockRecorder {
 	return m.recorder
 }
 
 // Login mocks base method.
-func (m *MockAuthService) Login(ctx context.Context, props *LoginProps) (string, error) {
+func (m *MockService) Login(ctx context.Context, props *LoginProps) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", ctx, props)
 	ret0, _ := ret[0].(string)
@@ -44,13 +44,13 @@ func (m *MockAuthService) Login(ctx context.Context, props *LoginProps) (string,
 }
 
 // Login indicates an expected call of Login.
-func (mr *MockAuthServiceMockRecorder) Login(ctx, props interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) Login(ctx, props interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockAuthService)(nil).Login), ctx, props)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockService)(nil).Login), ctx, props)
 }
 
 // Signup mocks base method.
-func (m *MockAuthService) Signup(ctx context.Context, props *SignupProps) (string, error) {
+func (m *MockService) Signup(ctx context.Context, props *SignupProps) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Signup", ctx, props)
 	ret0, _ := ret[0].(string)
@@ -59,13 +59,13 @@ func (m *MockAuthService) Signup(ctx context.Context, props *SignupProps) (strin
 }
 
 // Signup indicates an expected call of Signup.
-func (mr *MockAuthServiceMockRecorder) Signup(ctx, props interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) Signup(ctx, props interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signup", reflect.TypeOf((*MockAuthService)(nil).Signup), ctx, props)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signup", reflect.TypeOf((*MockService)(nil).Signup), ctx, props)
 }
 
 // ValidateToken mocks base method.
-func (m *MockAuthService) ValidateToken(accessToken string) (*UserClaims, error) {
+func (m *MockService) ValidateToken(accessToken string) (*UserClaims, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidateToken", accessToken)
 	ret0, _ := ret[0].(*UserClaims)
@@ -74,7 +74,7 @@ func (m *MockAuthService) ValidateToken(accessToken string) (*UserClaims, error)
 }
 
 // ValidateToken indicates an expected call of ValidateToken.
-func (mr *MockAuthServiceMockRecorder) ValidateToken(accessToken interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) ValidateToken(accessToken interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateToken", reflect.TypeOf((*MockAuthService)(nil).ValidateToken), accessToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateToken", reflect.TypeOf((*MockService)(nil).ValidateToken), accessToken)
 }

@@ -9,6 +9,9 @@ import (
 // ID
 type ID int64
 
+// IDs
+type IDs []ID
+
 // Product
 type Product struct {
 	ID ID

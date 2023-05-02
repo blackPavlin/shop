@@ -2,34 +2,34 @@ package address
 
 import "context"
 
-// AddressService
-type AddressService interface {
+// Service
+type Service interface {
 	Create(ctx context.Context, props *Props) (*Address, error)
 	Get(ctx context.Context, filter *Filter) (*Address, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (Addresses, error)
 }
 
-// AddressUseCase
-type AddressUseCase struct {
+// UseCase
+type UseCase struct {
 	addressRepo Repository
 }
 
-// NewAddressUseCase
-func NewAddressUseCase(addressRepo Repository) *AddressUseCase {
-	return &AddressUseCase{addressRepo: addressRepo}
+// NewUseCase
+func NewUseCase(addressRepo Repository) *UseCase {
+	return &UseCase{addressRepo: addressRepo}
 }
 
 // Create
-func (s *AddressUseCase) Create(ctx context.Context, props *Props) (*Address, error) {
+func (s *UseCase) Create(ctx context.Context, props *Props) (*Address, error) {
 	return s.addressRepo.Create(ctx, props)
 }
 
 // Get
-func (s *AddressUseCase) Get(ctx context.Context, filter *Filter) (*Address, error) {
+func (s *UseCase) Get(ctx context.Context, filter *Filter) (*Address, error) {
 	return s.addressRepo.Get(ctx, filter)
 }
 
 // Query
-func (s *AddressUseCase) Query(ctx context.Context, criteria *QueryCriteria) (Addresses, error) {
+func (s *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (Addresses, error) {
 	return s.addressRepo.Query(ctx, criteria)
 }

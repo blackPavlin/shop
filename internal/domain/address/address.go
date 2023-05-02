@@ -5,6 +5,9 @@ import "github.com/blackPavlin/shop/internal/domain/user"
 // ID
 type ID int64
 
+// IDs
+type IDs []ID
+
 // Address
 type Address struct {
 	ID     ID
@@ -12,6 +15,9 @@ type Address struct {
 
 	Props *Props
 }
+
+// Addresses
+type Addresses []*Address
 
 // Props
 type Props struct {
@@ -24,4 +30,11 @@ type Props struct {
 	Street   string
 }
 
-type Addresses []*Address
+// ToInt64
+func (ids IDs) ToInt64() []int64 {
+	result := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		result = append(result, int64(id))
+	}
+	return result
+}

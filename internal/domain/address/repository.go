@@ -22,5 +22,12 @@ type QueryCriteria struct {
 
 // Filter
 type Filter struct {
-	UserID user.ID
+	ID     IDFilter
+	UserID user.IDFilter
+}
+
+// IDFilter
+type IDFilter struct {
+	Eq  IDs
+	Neq IDs
 }

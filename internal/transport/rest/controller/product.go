@@ -3,17 +3,18 @@ package controller
 import (
 	"net/http"
 
-	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/go-chi/chi/v5"
+
+	"github.com/blackPavlin/shop/internal/domain/product"
 )
 
 // ProductController
 type ProductController struct {
-	productService product.ProductService
+	productService product.Service
 }
 
 // NewProductController
-func NewProductController(productService product.ProductService) *ProductController {
+func NewProductController(productService product.Service) *ProductController {
 	return &ProductController{
 		productService: productService,
 	}

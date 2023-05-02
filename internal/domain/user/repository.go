@@ -18,5 +18,18 @@ type QueryCriteria struct {
 
 // Filter
 type Filter struct {
-	Email string
+	ID    IDFilter
+	Email EmailFilter
+}
+
+// IDFilter
+type IDFilter struct {
+	Eq  IDs
+	Neq IDs
+}
+
+// EmailFilter
+type EmailFilter struct {
+	Eq  []string
+	Neq []string
 }
