@@ -1,2 +1,9 @@
-local.config.env
-*.exe
+.DS_Store
+
+# Editor directories and files
+/.idea
+/.vscode
+
+# Dependency and binaries directories and files
+/vendor
+/target
