@@ -9,6 +9,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
 	"github.com/blackPavlin/shop/internal/config"
 	"github.com/blackPavlin/shop/internal/domain/address"
@@ -23,10 +28,6 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/user"
 	userpg "github.com/blackPavlin/shop/internal/domain/user/pg"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/cors"
-	"go.uber.org/zap"
 )
 
 // Server
@@ -69,7 +70,7 @@ func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) 
 
 	// Services
 	userService := user.NewUserUseCase(userRepository)
-	authService := auth.NewAuthUseCase(logger, config.Auth, userRepository)
+	authService := auth.NewUseCase(logger, config.Auth, userRepository)
 	cartService := cart.NewCartUseCase(cartRepository, productRepository)
 	addressService := address.NewAddressUseCase(addressRepository)
 	productService := product.NewProductUseCase(productRepository)

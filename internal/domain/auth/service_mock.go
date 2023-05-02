@@ -11,7 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockAuthService is a mock of AuthService interface.
+// MockAuthService is a mock of Service interface.
 type MockAuthService struct {
 	ctrl     *gomock.Controller
 	recorder *MockAuthServiceMockRecorder

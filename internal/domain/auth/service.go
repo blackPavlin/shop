@@ -18,28 +18,28 @@ import (
 
 //go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "auth"
 
-// AuthService
-type AuthService interface {
+// Service
+type Service interface {
 	Login(ctx context.Context, props *LoginProps) (string, error)
 	Signup(ctx context.Context, props *SignupProps) (string, error)
 	ValidateToken(accessToken string) (*UserClaims, error)
 }
 
-// AuthUseCase
-type AuthUseCase struct {
+// UseCase
+type UseCase struct {
 	logger *zap.Logger
 	config *config.AuthConfig
 
 	userRepo user.Repository
 }
 
-// NewAuthUseCase
-func NewAuthUseCase(
+// NewUseCase
+func NewUseCase(
 	logger *zap.Logger,
 	config *config.AuthConfig,
 	userRepo user.Repository,
-) *AuthUseCase {
-	return &AuthUseCase{
+) *UseCase {
+	return &UseCase{
 		logger:   logger,
 		config:   config,
 		userRepo: userRepo,
@@ -47,7 +47,7 @@ func NewAuthUseCase(
 }
 
 // Login
-func (s *AuthUseCase) Login(ctx context.Context, props *LoginProps) (string, error) {
+func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) {
 	user, err := s.userRepo.Get(ctx, &user.Filter{Email: strings.ToLower(props.Email)})
 	if err != nil {
 		if errors.Is(err, errorx.ErrNotFound) {
@@ -79,7 +79,7 @@ func (s *AuthUseCase) Login(ctx context.Context, props *LoginProps) (string, err
 }
 
 // Signup
-func (s *AuthUseCase) Signup(ctx context.Context, props *SignupProps) (string, error) {
+func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error) {
 	exist, err := s.userRepo.Exist(ctx, &user.Filter{Email: strings.ToLower(props.Email)})
 	if err != nil {
 		return "", err
@@ -109,7 +109,7 @@ func (s *AuthUseCase) Signup(ctx context.Context, props *SignupProps) (string, e
 }
 
 // ValidateToken
-func (s *AuthUseCase) ValidateToken(accessToken string) (*UserClaims, error) {
+func (s *UseCase) ValidateToken(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", t.Method.Alg())

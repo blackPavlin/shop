@@ -3,22 +3,23 @@ package controller
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+
 	"github.com/blackPavlin/shop/internal/domain/auth"
 	"github.com/blackPavlin/shop/internal/transport/rest"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/restx"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
 // AuthController
 type AuthController struct {
-	authService auth.AuthService
+	authService auth.Service
 }
 
 // NewAuthController
-func NewAuthController(authService auth.AuthService) *AuthController {
+func NewAuthController(authService auth.Service) *AuthController {
 	return &AuthController{
 		authService: authService,
 	}
