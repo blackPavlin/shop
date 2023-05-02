@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/blackPavlin/shop/ent/category"
 	"github.com/blackPavlin/shop/ent/product"
@@ -33,7 +34,8 @@ type Product struct {
 	Price int64 `json:"price,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductQuery when eager-loading is set.
-	Edges ProductEdges `json:"edges"`
+	Edges        ProductEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
@@ -81,7 +83,7 @@ func (*Product) scanValues(columns []string) ([]any, error) {
 		case product.FieldCreatedAt, product.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Product", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -143,26 +145,34 @@ func (pr *Product) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pr.Price = value.Int64
 			}
+		default:
+			pr.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// Value returns the ent.Value that was dynamically selected and assigned to the Product.
+// This includes values selected through modifiers, order, etc.
+func (pr *Product) Value(name string) (ent.Value, error) {
+	return pr.selectValues.Get(name)
+}
+
 // QueryCategories queries the "categories" edge of the Product entity.
 func (pr *Product) QueryCategories() *CategoryQuery {
-	return (&ProductClient{config: pr.config}).QueryCategories(pr)
+	return NewProductClient(pr.config).QueryCategories(pr)
 }
 
 // QueryCarts queries the "carts" edge of the Product entity.
 func (pr *Product) QueryCarts() *CartQuery {
-	return (&ProductClient{config: pr.config}).QueryCarts(pr)
+	return NewProductClient(pr.config).QueryCarts(pr)
 }
 
 // Update returns a builder for updating this Product.
 // Note that you need to call Product.Unwrap() before calling this method if this Product
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (pr *Product) Update() *ProductUpdateOne {
-	return (&ProductClient{config: pr.config}).UpdateOne(pr)
+	return NewProductClient(pr.config).UpdateOne(pr)
 }
 
 // Unwrap unwraps the Product entity that was returned from a transaction after it was closed,
@@ -207,9 +217,3 @@ func (pr *Product) String() string {
 
 // Products is a parsable slice of Product.
 type Products []*Product
-
-func (pr Products) config(cfg config) {
-	for _i := range pr {
-		pr[_i].config = cfg
-	}
-}

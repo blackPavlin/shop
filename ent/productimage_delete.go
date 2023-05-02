@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (pid *ProductImageDelete) Where(ps ...predicate.ProductImage) *ProductImage
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (pid *ProductImageDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(pid.hooks) == 0 {
-		affected, err = pid.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ProductImageMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			pid.mutation = mutation
-			affected, err = pid.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(pid.hooks) - 1; i >= 0; i-- {
-			if pid.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = pid.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, pid.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks(ctx, pid.sqlExec, pid.mutation, pid.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -68,15 +40,7 @@ func (pid *ProductImageDelete) ExecX(ctx context.Context) int {
 }
 
 func (pid *ProductImageDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: productimage.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: productimage.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(productimage.Table, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
 	if ps := pid.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -88,12 +52,19 @@ func (pid *ProductImageDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	pid.mutation.done = true
 	return affected, err
 }
 
 // ProductImageDeleteOne is the builder for deleting a single ProductImage entity.
 type ProductImageDeleteOne struct {
 	pid *ProductImageDelete
+}
+
+// Where appends a list predicates to the ProductImageDelete builder.
+func (pido *ProductImageDeleteOne) Where(ps ...predicate.ProductImage) *ProductImageDeleteOne {
+	pido.pid.mutation.Where(ps...)
+	return pido
 }
 
 // Exec executes the deletion query.
@@ -111,5 +82,7 @@ func (pido *ProductImageDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (pido *ProductImageDeleteOne) ExecX(ctx context.Context) {
-	pido.pid.ExecX(ctx)
+	if err := pido.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

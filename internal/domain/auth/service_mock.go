@@ -63,3 +63,18 @@ func (mr *MockAuthServiceMockRecorder) Signup(ctx, props interface{}) *gomock.Ca
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signup", reflect.TypeOf((*MockAuthService)(nil).Signup), ctx, props)
 }
+
+// ValidateToken mocks base method.
+func (m *MockAuthService) ValidateToken(accessToken string) (*UserClaims, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ValidateToken", accessToken)
+	ret0, _ := ret[0].(*UserClaims)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ValidateToken indicates an expected call of ValidateToken.
+func (mr *MockAuthServiceMockRecorder) ValidateToken(accessToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateToken", reflect.TypeOf((*MockAuthService)(nil).ValidateToken), accessToken)
+}

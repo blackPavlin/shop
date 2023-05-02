@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/product"
@@ -30,7 +31,8 @@ type Cart struct {
 	Amount int64 `json:"amount,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CartQuery when eager-loading is set.
-	Edges CartEdges `json:"edges"`
+	Edges        CartEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // CartEdges holds the relations/edges for other nodes in the graph.
@@ -80,7 +82,7 @@ func (*Cart) scanValues(columns []string) ([]any, error) {
 		case cart.FieldCreatedAt, cart.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Cart", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -130,26 +132,34 @@ func (c *Cart) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Amount = value.Int64
 			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// Value returns the ent.Value that was dynamically selected and assigned to the Cart.
+// This includes values selected through modifiers, order, etc.
+func (c *Cart) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
+}
+
 // QueryUsers queries the "users" edge of the Cart entity.
 func (c *Cart) QueryUsers() *UserQuery {
-	return (&CartClient{config: c.config}).QueryUsers(c)
+	return NewCartClient(c.config).QueryUsers(c)
 }
 
 // QueryProducts queries the "products" edge of the Cart entity.
 func (c *Cart) QueryProducts() *ProductQuery {
-	return (&CartClient{config: c.config}).QueryProducts(c)
+	return NewCartClient(c.config).QueryProducts(c)
 }
 
 // Update returns a builder for updating this Cart.
 // Note that you need to call Cart.Unwrap() before calling this method if this Cart
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (c *Cart) Update() *CartUpdateOne {
-	return (&CartClient{config: c.config}).UpdateOne(c)
+	return NewCartClient(c.config).UpdateOne(c)
 }
 
 // Unwrap unwraps the Cart entity that was returned from a transaction after it was closed,
@@ -188,9 +198,3 @@ func (c *Cart) String() string {
 
 // Carts is a parsable slice of Cart.
 type Carts []*Cart
-
-func (c Carts) config(cfg config) {
-	for _i := range c {
-		c[_i].config = cfg
-	}
-}

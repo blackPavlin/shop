@@ -87,50 +87,8 @@ func (oc *OrderCreate) Mutation() *OrderMutation {
 
 // Save creates the Order in the database.
 func (oc *OrderCreate) Save(ctx context.Context) (*Order, error) {
-	var (
-		err  error
-		node *Order
-	)
 	oc.defaults()
-	if len(oc.hooks) == 0 {
-		if err = oc.check(); err != nil {
-			return nil, err
-		}
-		node, err = oc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*OrderMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = oc.check(); err != nil {
-				return nil, err
-			}
-			oc.mutation = mutation
-			if node, err = oc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(oc.hooks) - 1; i >= 0; i-- {
-			if oc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = oc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, oc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Order)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from OrderMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks(ctx, oc.sqlSave, oc.mutation, oc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -197,6 +155,9 @@ func (oc *OrderCreate) check() error {
 }
 
 func (oc *OrderCreate) sqlSave(ctx context.Context) (*Order, error) {
+	if err := oc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := oc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, oc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -206,42 +167,26 @@ func (oc *OrderCreate) sqlSave(ctx context.Context) (*Order, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int64(id)
+	oc.mutation.id = &_node.ID
+	oc.mutation.done = true
 	return _node, nil
 }
 
 func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Order{config: oc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: order.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: order.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(order.Table, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64))
 	)
 	if value, ok := oc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: order.FieldCreatedAt,
-		})
+		_spec.SetField(order.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := oc.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: order.FieldUpdatedAt,
-		})
+		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := oc.mutation.Status(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: order.FieldStatus,
-		})
+		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
 	if nodes := oc.mutation.UsersIDs(); len(nodes) > 0 {
@@ -252,10 +197,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -291,8 +233,8 @@ func (ocb *OrderCreateBulk) Save(ctx context.Context) ([]*Order, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ocb.builders[i+1].mutation)
 				} else {

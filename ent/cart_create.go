@@ -97,50 +97,8 @@ func (cc *CartCreate) Mutation() *CartMutation {
 
 // Save creates the Cart in the database.
 func (cc *CartCreate) Save(ctx context.Context) (*Cart, error) {
-	var (
-		err  error
-		node *Cart
-	)
 	cc.defaults()
-	if len(cc.hooks) == 0 {
-		if err = cc.check(); err != nil {
-			return nil, err
-		}
-		node, err = cc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*CartMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = cc.check(); err != nil {
-				return nil, err
-			}
-			cc.mutation = mutation
-			if node, err = cc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(cc.hooks) - 1; i >= 0; i-- {
-			if cc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, cc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Cart)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from CartMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -209,6 +167,9 @@ func (cc *CartCreate) check() error {
 }
 
 func (cc *CartCreate) sqlSave(ctx context.Context) (*Cart, error) {
+	if err := cc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := cc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, cc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -218,42 +179,26 @@ func (cc *CartCreate) sqlSave(ctx context.Context) (*Cart, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int64(id)
+	cc.mutation.id = &_node.ID
+	cc.mutation.done = true
 	return _node, nil
 }
 
 func (cc *CartCreate) createSpec() (*Cart, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Cart{config: cc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: cart.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: cart.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(cart.Table, sqlgraph.NewFieldSpec(cart.FieldID, field.TypeInt64))
 	)
 	if value, ok := cc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: cart.FieldCreatedAt,
-		})
+		_spec.SetField(cart.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := cc.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: cart.FieldUpdatedAt,
-		})
+		_spec.SetField(cart.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := cc.mutation.Amount(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
-			Value:  value,
-			Column: cart.FieldAmount,
-		})
+		_spec.SetField(cart.FieldAmount, field.TypeInt64, value)
 		_node.Amount = value
 	}
 	if nodes := cc.mutation.UsersIDs(); len(nodes) > 0 {
@@ -264,10 +209,7 @@ func (cc *CartCreate) createSpec() (*Cart, *sqlgraph.CreateSpec) {
 			Columns: []string{cart.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -284,10 +226,7 @@ func (cc *CartCreate) createSpec() (*Cart, *sqlgraph.CreateSpec) {
 			Columns: []string{cart.ProductsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: product.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -323,8 +262,8 @@ func (ccb *CartCreateBulk) Save(ctx context.Context) ([]*Cart, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {

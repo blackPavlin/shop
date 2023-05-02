@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/blackPavlin/shop/ent/productimage"
 )
@@ -19,7 +20,8 @@ type ProductImage struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +34,7 @@ func (*ProductImage) scanValues(columns []string) ([]any, error) {
 		case productimage.FieldCreatedAt, productimage.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type ProductImage", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -64,16 +66,24 @@ func (pi *ProductImage) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pi.UpdatedAt = value.Time
 			}
+		default:
+			pi.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the ProductImage.
+// This includes values selected through modifiers, order, etc.
+func (pi *ProductImage) Value(name string) (ent.Value, error) {
+	return pi.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this ProductImage.
 // Note that you need to call ProductImage.Unwrap() before calling this method if this ProductImage
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (pi *ProductImage) Update() *ProductImageUpdateOne {
-	return (&ProductImageClient{config: pi.config}).UpdateOne(pi)
+	return NewProductImageClient(pi.config).UpdateOne(pi)
 }
 
 // Unwrap unwraps the ProductImage entity that was returned from a transaction after it was closed,
@@ -103,9 +113,3 @@ func (pi *ProductImage) String() string {
 
 // ProductImages is a parsable slice of ProductImage.
 type ProductImages []*ProductImage
-
-func (pi ProductImages) config(cfg config) {
-	for _i := range pi {
-		pi[_i].config = cfg
-	}
-}

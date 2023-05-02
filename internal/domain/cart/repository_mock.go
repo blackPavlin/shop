@@ -35,16 +35,31 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockRepository) Create(ctx context.Context, cart *Cart) (*Cart, error) {
+func (m *MockRepository) Create(ctx context.Context, props *Props) (*Cart, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, cart)
+	ret := m.ctrl.Call(m, "Create", ctx, props)
 	ret0, _ := ret[0].(*Cart)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockRepositoryMockRecorder) Create(ctx, cart interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) Create(ctx, props interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, cart)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, props)
+}
+
+// Query mocks base method.
+func (m *MockRepository) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Query", ctx, criteria)
+	ret0, _ := ret[0].(*QueryResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockRepositoryMockRecorder) Query(ctx, criteria interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockRepository)(nil).Query), ctx, criteria)
 }

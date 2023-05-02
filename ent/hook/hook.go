@@ -15,11 +15,10 @@ type AddressFunc func(context.Context, *ent.AddressMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f AddressFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.AddressMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AddressMutation", m)
+	if mv, ok := m.(*ent.AddressMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AddressMutation", m)
 }
 
 // The CartFunc type is an adapter to allow the use of ordinary
@@ -28,11 +27,10 @@ type CartFunc func(context.Context, *ent.CartMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f CartFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.CartMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CartMutation", m)
+	if mv, ok := m.(*ent.CartMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CartMutation", m)
 }
 
 // The CategoryFunc type is an adapter to allow the use of ordinary
@@ -41,11 +39,10 @@ type CategoryFunc func(context.Context, *ent.CategoryMutation) (ent.Value, error
 
 // Mutate calls f(ctx, m).
 func (f CategoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.CategoryMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategoryMutation", m)
+	if mv, ok := m.(*ent.CategoryMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategoryMutation", m)
 }
 
 // The ImageFunc type is an adapter to allow the use of ordinary
@@ -54,11 +51,10 @@ type ImageFunc func(context.Context, *ent.ImageMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f ImageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ImageMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ImageMutation", m)
+	if mv, ok := m.(*ent.ImageMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ImageMutation", m)
 }
 
 // The OrderFunc type is an adapter to allow the use of ordinary
@@ -67,11 +63,10 @@ type OrderFunc func(context.Context, *ent.OrderMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f OrderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.OrderMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderMutation", m)
+	if mv, ok := m.(*ent.OrderMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderMutation", m)
 }
 
 // The OrderProductFunc type is an adapter to allow the use of ordinary
@@ -80,11 +75,10 @@ type OrderProductFunc func(context.Context, *ent.OrderProductMutation) (ent.Valu
 
 // Mutate calls f(ctx, m).
 func (f OrderProductFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.OrderProductMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderProductMutation", m)
+	if mv, ok := m.(*ent.OrderProductMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OrderProductMutation", m)
 }
 
 // The ProductFunc type is an adapter to allow the use of ordinary
@@ -93,11 +87,10 @@ type ProductFunc func(context.Context, *ent.ProductMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f ProductFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ProductMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProductMutation", m)
+	if mv, ok := m.(*ent.ProductMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProductMutation", m)
 }
 
 // The ProductImageFunc type is an adapter to allow the use of ordinary
@@ -106,11 +99,10 @@ type ProductImageFunc func(context.Context, *ent.ProductImageMutation) (ent.Valu
 
 // Mutate calls f(ctx, m).
 func (f ProductImageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ProductImageMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProductImageMutation", m)
+	if mv, ok := m.(*ent.ProductImageMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProductImageMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary
@@ -119,11 +111,10 @@ type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.UserMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+	if mv, ok := m.(*ent.UserMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
 }
 
 // Condition is a hook condition function.
@@ -221,7 +212,6 @@ func HasFields(field string, fields ...string) Condition {
 // If executes the given hook under condition.
 //
 //	hook.If(ComputeAverage, And(HasFields(...), HasAddedFields(...)))
-//
 func If(hk ent.Hook, cond Condition) ent.Hook {
 	return func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -236,7 +226,6 @@ func If(hk ent.Hook, cond Condition) ent.Hook {
 // On executes the given hook only for the given operation.
 //
 //	hook.On(Log, ent.Delete|ent.Create)
-//
 func On(hk ent.Hook, op ent.Op) ent.Hook {
 	return If(hk, HasOp(op))
 }
@@ -244,7 +233,6 @@ func On(hk ent.Hook, op ent.Op) ent.Hook {
 // Unless skips the given hook only for the given operation.
 //
 //	hook.Unless(Log, ent.Update|ent.UpdateOne)
-//
 func Unless(hk ent.Hook, op ent.Op) ent.Hook {
 	return If(hk, Not(HasOp(op)))
 }
@@ -265,7 +253,6 @@ func FixedError(err error) ent.Hook {
 //			Reject(ent.Delete|ent.Update),
 //		}
 //	}
-//
 func Reject(op ent.Op) ent.Hook {
 	hk := FixedError(fmt.Errorf("%s operation is not allowed", op))
 	return On(hk, op)

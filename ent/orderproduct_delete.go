@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (opd *OrderProductDelete) Where(ps ...predicate.OrderProduct) *OrderProduct
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (opd *OrderProductDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(opd.hooks) == 0 {
-		affected, err = opd.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*OrderProductMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			opd.mutation = mutation
-			affected, err = opd.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(opd.hooks) - 1; i >= 0; i-- {
-			if opd.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = opd.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, opd.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks(ctx, opd.sqlExec, opd.mutation, opd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -68,15 +40,7 @@ func (opd *OrderProductDelete) ExecX(ctx context.Context) int {
 }
 
 func (opd *OrderProductDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: orderproduct.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: orderproduct.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(orderproduct.Table, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
 	if ps := opd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -88,12 +52,19 @@ func (opd *OrderProductDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	opd.mutation.done = true
 	return affected, err
 }
 
 // OrderProductDeleteOne is the builder for deleting a single OrderProduct entity.
 type OrderProductDeleteOne struct {
 	opd *OrderProductDelete
+}
+
+// Where appends a list predicates to the OrderProductDelete builder.
+func (opdo *OrderProductDeleteOne) Where(ps ...predicate.OrderProduct) *OrderProductDeleteOne {
+	opdo.opd.mutation.Where(ps...)
+	return opdo
 }
 
 // Exec executes the deletion query.
@@ -111,5 +82,7 @@ func (opdo *OrderProductDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (opdo *OrderProductDeleteOne) ExecX(ctx context.Context) {
-	opdo.opd.ExecX(ctx)
+	if err := opdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

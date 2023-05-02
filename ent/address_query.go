@@ -18,11 +18,9 @@ import (
 // AddressQuery is the builder for querying Address entities.
 type AddressQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
+	ctx        *QueryContext
+	order      []address.OrderOption
+	inters     []Interceptor
 	predicates []predicate.Address
 	withUsers  *UserQuery
 	// intermediate query (i.e. traversal path).
@@ -36,34 +34,34 @@ func (aq *AddressQuery) Where(ps ...predicate.Address) *AddressQuery {
 	return aq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (aq *AddressQuery) Limit(limit int) *AddressQuery {
-	aq.limit = &limit
+	aq.ctx.Limit = &limit
 	return aq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (aq *AddressQuery) Offset(offset int) *AddressQuery {
-	aq.offset = &offset
+	aq.ctx.Offset = &offset
 	return aq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (aq *AddressQuery) Unique(unique bool) *AddressQuery {
-	aq.unique = &unique
+	aq.ctx.Unique = &unique
 	return aq
 }
 
-// Order adds an order step to the query.
-func (aq *AddressQuery) Order(o ...OrderFunc) *AddressQuery {
+// Order specifies how the records should be ordered.
+func (aq *AddressQuery) Order(o ...address.OrderOption) *AddressQuery {
 	aq.order = append(aq.order, o...)
 	return aq
 }
 
 // QueryUsers chains the current query on the "users" edge.
 func (aq *AddressQuery) QueryUsers() *UserQuery {
-	query := &UserQuery{config: aq.config}
+	query := (&UserClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -86,7 +84,7 @@ func (aq *AddressQuery) QueryUsers() *UserQuery {
 // First returns the first Address entity from the query.
 // Returns a *NotFoundError when no Address was found.
 func (aq *AddressQuery) First(ctx context.Context) (*Address, error) {
-	nodes, err := aq.Limit(1).All(ctx)
+	nodes, err := aq.Limit(1).All(setContextOp(ctx, aq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +107,7 @@ func (aq *AddressQuery) FirstX(ctx context.Context) *Address {
 // Returns a *NotFoundError when no Address ID was found.
 func (aq *AddressQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = aq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -132,7 +130,7 @@ func (aq *AddressQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one Address entity is found.
 // Returns a *NotFoundError when no Address entities are found.
 func (aq *AddressQuery) Only(ctx context.Context) (*Address, error) {
-	nodes, err := aq.Limit(2).All(ctx)
+	nodes, err := aq.Limit(2).All(setContextOp(ctx, aq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +158,7 @@ func (aq *AddressQuery) OnlyX(ctx context.Context) *Address {
 // Returns a *NotFoundError when no entities are found.
 func (aq *AddressQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = aq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -185,10 +183,12 @@ func (aq *AddressQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of Addresses.
 func (aq *AddressQuery) All(ctx context.Context) ([]*Address, error) {
+	ctx = setContextOp(ctx, aq.ctx, "All")
 	if err := aq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return aq.sqlAll(ctx)
+	qr := querierAll[[]*Address, *AddressQuery]()
+	return withInterceptors[[]*Address](ctx, aq, qr, aq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -201,9 +201,12 @@ func (aq *AddressQuery) AllX(ctx context.Context) []*Address {
 }
 
 // IDs executes the query and returns a list of Address IDs.
-func (aq *AddressQuery) IDs(ctx context.Context) ([]int64, error) {
-	var ids []int64
-	if err := aq.Select(address.FieldID).Scan(ctx, &ids); err != nil {
+func (aq *AddressQuery) IDs(ctx context.Context) (ids []int64, err error) {
+	if aq.ctx.Unique == nil && aq.path != nil {
+		aq.Unique(true)
+	}
+	ctx = setContextOp(ctx, aq.ctx, "IDs")
+	if err = aq.Select(address.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -220,10 +223,11 @@ func (aq *AddressQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (aq *AddressQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, aq.ctx, "Count")
 	if err := aq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return aq.sqlCount(ctx)
+	return withInterceptors[int](ctx, aq, querierCount[*AddressQuery](), aq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -237,10 +241,15 @@ func (aq *AddressQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (aq *AddressQuery) Exist(ctx context.Context) (bool, error) {
-	if err := aq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, aq.ctx, "Exist")
+	switch _, err := aq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return aq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -260,22 +269,21 @@ func (aq *AddressQuery) Clone() *AddressQuery {
 	}
 	return &AddressQuery{
 		config:     aq.config,
-		limit:      aq.limit,
-		offset:     aq.offset,
-		order:      append([]OrderFunc{}, aq.order...),
+		ctx:        aq.ctx.Clone(),
+		order:      append([]address.OrderOption{}, aq.order...),
+		inters:     append([]Interceptor{}, aq.inters...),
 		predicates: append([]predicate.Address{}, aq.predicates...),
 		withUsers:  aq.withUsers.Clone(),
 		// clone intermediate query.
-		sql:    aq.sql.Clone(),
-		path:   aq.path,
-		unique: aq.unique,
+		sql:  aq.sql.Clone(),
+		path: aq.path,
 	}
 }
 
 // WithUsers tells the query-builder to eager-load the nodes that are connected to
 // the "users" edge. The optional arguments are used to configure the query builder of the edge.
 func (aq *AddressQuery) WithUsers(opts ...func(*UserQuery)) *AddressQuery {
-	query := &UserQuery{config: aq.config}
+	query := (&UserClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -297,18 +305,12 @@ func (aq *AddressQuery) WithUsers(opts ...func(*UserQuery)) *AddressQuery {
 //		GroupBy(address.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (aq *AddressQuery) GroupBy(field string, fields ...string) *AddressGroupBy {
-	grbuild := &AddressGroupBy{config: aq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return aq.sqlQuery(ctx), nil
-	}
+	aq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &AddressGroupBy{build: aq}
+	grbuild.flds = &aq.ctx.Fields
 	grbuild.label = address.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -324,17 +326,31 @@ func (aq *AddressQuery) GroupBy(field string, fields ...string) *AddressGroupBy 
 //	client.Address.Query().
 //		Select(address.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (aq *AddressQuery) Select(fields ...string) *AddressSelect {
-	aq.fields = append(aq.fields, fields...)
-	selbuild := &AddressSelect{AddressQuery: aq}
-	selbuild.label = address.Label
-	selbuild.flds, selbuild.scan = &aq.fields, selbuild.Scan
-	return selbuild
+	aq.ctx.Fields = append(aq.ctx.Fields, fields...)
+	sbuild := &AddressSelect{AddressQuery: aq}
+	sbuild.label = address.Label
+	sbuild.flds, sbuild.scan = &aq.ctx.Fields, sbuild.Scan
+	return sbuild
+}
+
+// Aggregate returns a AddressSelect configured with the given aggregations.
+func (aq *AddressQuery) Aggregate(fns ...AggregateFunc) *AddressSelect {
+	return aq.Select().Aggregate(fns...)
 }
 
 func (aq *AddressQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range aq.fields {
+	for _, inter := range aq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, aq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range aq.ctx.Fields {
 		if !address.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -394,6 +410,9 @@ func (aq *AddressQuery) loadUsers(ctx context.Context, query *UserQuery, nodes [
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(user.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -413,47 +432,31 @@ func (aq *AddressQuery) loadUsers(ctx context.Context, query *UserQuery, nodes [
 
 func (aq *AddressQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := aq.querySpec()
-	_spec.Node.Columns = aq.fields
-	if len(aq.fields) > 0 {
-		_spec.Unique = aq.unique != nil && *aq.unique
+	_spec.Node.Columns = aq.ctx.Fields
+	if len(aq.ctx.Fields) > 0 {
+		_spec.Unique = aq.ctx.Unique != nil && *aq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, aq.driver, _spec)
 }
 
-func (aq *AddressQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := aq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (aq *AddressQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   address.Table,
-			Columns: address.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: address.FieldID,
-			},
-		},
-		From:   aq.sql,
-		Unique: true,
-	}
-	if unique := aq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt64))
+	_spec.From = aq.sql
+	if unique := aq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if aq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := aq.fields; len(fields) > 0 {
+	if fields := aq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, address.FieldID)
 		for i := range fields {
 			if fields[i] != address.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if aq.withUsers != nil {
+			_spec.Node.AddColumnOnce(address.FieldUserID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {
@@ -463,10 +466,10 @@ func (aq *AddressQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := aq.limit; limit != nil {
+	if limit := aq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := aq.offset; offset != nil {
+	if offset := aq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := aq.order; len(ps) > 0 {
@@ -482,7 +485,7 @@ func (aq *AddressQuery) querySpec() *sqlgraph.QuerySpec {
 func (aq *AddressQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(aq.driver.Dialect())
 	t1 := builder.Table(address.Table)
-	columns := aq.fields
+	columns := aq.ctx.Fields
 	if len(columns) == 0 {
 		columns = address.Columns
 	}
@@ -491,7 +494,7 @@ func (aq *AddressQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = aq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if aq.unique != nil && *aq.unique {
+	if aq.ctx.Unique != nil && *aq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range aq.predicates {
@@ -500,12 +503,12 @@ func (aq *AddressQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range aq.order {
 		p(selector)
 	}
-	if offset := aq.offset; offset != nil {
+	if offset := aq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := aq.limit; limit != nil {
+	if limit := aq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -513,13 +516,8 @@ func (aq *AddressQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // AddressGroupBy is the group-by builder for Address entities.
 type AddressGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *AddressQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -528,74 +526,77 @@ func (agb *AddressGroupBy) Aggregate(fns ...AggregateFunc) *AddressGroupBy {
 	return agb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (agb *AddressGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := agb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, agb.build.ctx, "GroupBy")
+	if err := agb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	agb.sql = query
-	return agb.sqlScan(ctx, v)
+	return scanWithInterceptors[*AddressQuery, *AddressGroupBy](ctx, agb.build, agb, agb.build.inters, v)
 }
 
-func (agb *AddressGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range agb.fields {
-		if !address.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (agb *AddressGroupBy) sqlScan(ctx context.Context, root *AddressQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(agb.fns))
+	for _, fn := range agb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := agb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*agb.flds)+len(agb.fns))
+		for _, f := range *agb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*agb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := agb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := agb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (agb *AddressGroupBy) sqlQuery() *sql.Selector {
-	selector := agb.sql.Select()
-	aggregation := make([]string, 0, len(agb.fns))
-	for _, fn := range agb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	// If no columns were selected in a custom aggregation function, the default
-	// selection is the fields used for "group-by", and the aggregation functions.
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(agb.fields)+len(agb.fns))
-		for _, f := range agb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(agb.fields...)...)
-}
-
 // AddressSelect is the builder for selecting fields of Address entities.
 type AddressSelect struct {
 	*AddressQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
+}
+
+// Aggregate adds the given aggregation functions to the selector query.
+func (as *AddressSelect) Aggregate(fns ...AggregateFunc) *AddressSelect {
+	as.fns = append(as.fns, fns...)
+	return as
 }
 
 // Scan applies the selector query and scans the result into the given value.
 func (as *AddressSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, as.ctx, "Select")
 	if err := as.prepareQuery(ctx); err != nil {
 		return err
 	}
-	as.sql = as.AddressQuery.sqlQuery(ctx)
-	return as.sqlScan(ctx, v)
+	return scanWithInterceptors[*AddressQuery, *AddressSelect](ctx, as.AddressQuery, as, as.inters, v)
 }
 
-func (as *AddressSelect) sqlScan(ctx context.Context, v any) error {
+func (as *AddressSelect) sqlScan(ctx context.Context, root *AddressQuery, v any) error {
+	selector := root.sqlQuery(ctx)
+	aggregation := make([]string, 0, len(as.fns))
+	for _, fn := range as.fns {
+		aggregation = append(aggregation, fn(selector))
+	}
+	switch n := len(*as.selector.flds); {
+	case n == 0 && len(aggregation) > 0:
+		selector.Select(aggregation...)
+	case n != 0 && len(aggregation) > 0:
+		selector.AppendSelect(aggregation...)
+	}
 	rows := &sql.Rows{}
-	query, args := as.sql.Query()
+	query, args := selector.Query()
 	if err := as.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

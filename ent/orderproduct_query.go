@@ -17,11 +17,9 @@ import (
 // OrderProductQuery is the builder for querying OrderProduct entities.
 type OrderProductQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
+	ctx        *QueryContext
+	order      []orderproduct.OrderOption
+	inters     []Interceptor
 	predicates []predicate.OrderProduct
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -34,27 +32,27 @@ func (opq *OrderProductQuery) Where(ps ...predicate.OrderProduct) *OrderProductQ
 	return opq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (opq *OrderProductQuery) Limit(limit int) *OrderProductQuery {
-	opq.limit = &limit
+	opq.ctx.Limit = &limit
 	return opq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (opq *OrderProductQuery) Offset(offset int) *OrderProductQuery {
-	opq.offset = &offset
+	opq.ctx.Offset = &offset
 	return opq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (opq *OrderProductQuery) Unique(unique bool) *OrderProductQuery {
-	opq.unique = &unique
+	opq.ctx.Unique = &unique
 	return opq
 }
 
-// Order adds an order step to the query.
-func (opq *OrderProductQuery) Order(o ...OrderFunc) *OrderProductQuery {
+// Order specifies how the records should be ordered.
+func (opq *OrderProductQuery) Order(o ...orderproduct.OrderOption) *OrderProductQuery {
 	opq.order = append(opq.order, o...)
 	return opq
 }
@@ -62,7 +60,7 @@ func (opq *OrderProductQuery) Order(o ...OrderFunc) *OrderProductQuery {
 // First returns the first OrderProduct entity from the query.
 // Returns a *NotFoundError when no OrderProduct was found.
 func (opq *OrderProductQuery) First(ctx context.Context) (*OrderProduct, error) {
-	nodes, err := opq.Limit(1).All(ctx)
+	nodes, err := opq.Limit(1).All(setContextOp(ctx, opq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +83,7 @@ func (opq *OrderProductQuery) FirstX(ctx context.Context) *OrderProduct {
 // Returns a *NotFoundError when no OrderProduct ID was found.
 func (opq *OrderProductQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = opq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = opq.Limit(1).IDs(setContextOp(ctx, opq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -108,7 +106,7 @@ func (opq *OrderProductQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one OrderProduct entity is found.
 // Returns a *NotFoundError when no OrderProduct entities are found.
 func (opq *OrderProductQuery) Only(ctx context.Context) (*OrderProduct, error) {
-	nodes, err := opq.Limit(2).All(ctx)
+	nodes, err := opq.Limit(2).All(setContextOp(ctx, opq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +134,7 @@ func (opq *OrderProductQuery) OnlyX(ctx context.Context) *OrderProduct {
 // Returns a *NotFoundError when no entities are found.
 func (opq *OrderProductQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = opq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = opq.Limit(2).IDs(setContextOp(ctx, opq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -161,10 +159,12 @@ func (opq *OrderProductQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of OrderProducts.
 func (opq *OrderProductQuery) All(ctx context.Context) ([]*OrderProduct, error) {
+	ctx = setContextOp(ctx, opq.ctx, "All")
 	if err := opq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return opq.sqlAll(ctx)
+	qr := querierAll[[]*OrderProduct, *OrderProductQuery]()
+	return withInterceptors[[]*OrderProduct](ctx, opq, qr, opq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -177,9 +177,12 @@ func (opq *OrderProductQuery) AllX(ctx context.Context) []*OrderProduct {
 }
 
 // IDs executes the query and returns a list of OrderProduct IDs.
-func (opq *OrderProductQuery) IDs(ctx context.Context) ([]int64, error) {
-	var ids []int64
-	if err := opq.Select(orderproduct.FieldID).Scan(ctx, &ids); err != nil {
+func (opq *OrderProductQuery) IDs(ctx context.Context) (ids []int64, err error) {
+	if opq.ctx.Unique == nil && opq.path != nil {
+		opq.Unique(true)
+	}
+	ctx = setContextOp(ctx, opq.ctx, "IDs")
+	if err = opq.Select(orderproduct.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -196,10 +199,11 @@ func (opq *OrderProductQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (opq *OrderProductQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, opq.ctx, "Count")
 	if err := opq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return opq.sqlCount(ctx)
+	return withInterceptors[int](ctx, opq, querierCount[*OrderProductQuery](), opq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -213,10 +217,15 @@ func (opq *OrderProductQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (opq *OrderProductQuery) Exist(ctx context.Context) (bool, error) {
-	if err := opq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, opq.ctx, "Exist")
+	switch _, err := opq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return opq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -236,14 +245,13 @@ func (opq *OrderProductQuery) Clone() *OrderProductQuery {
 	}
 	return &OrderProductQuery{
 		config:     opq.config,
-		limit:      opq.limit,
-		offset:     opq.offset,
-		order:      append([]OrderFunc{}, opq.order...),
+		ctx:        opq.ctx.Clone(),
+		order:      append([]orderproduct.OrderOption{}, opq.order...),
+		inters:     append([]Interceptor{}, opq.inters...),
 		predicates: append([]predicate.OrderProduct{}, opq.predicates...),
 		// clone intermediate query.
-		sql:    opq.sql.Clone(),
-		path:   opq.path,
-		unique: opq.unique,
+		sql:  opq.sql.Clone(),
+		path: opq.path,
 	}
 }
 
@@ -261,18 +269,12 @@ func (opq *OrderProductQuery) Clone() *OrderProductQuery {
 //		GroupBy(orderproduct.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (opq *OrderProductQuery) GroupBy(field string, fields ...string) *OrderProductGroupBy {
-	grbuild := &OrderProductGroupBy{config: opq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := opq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return opq.sqlQuery(ctx), nil
-	}
+	opq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &OrderProductGroupBy{build: opq}
+	grbuild.flds = &opq.ctx.Fields
 	grbuild.label = orderproduct.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -288,17 +290,31 @@ func (opq *OrderProductQuery) GroupBy(field string, fields ...string) *OrderProd
 //	client.OrderProduct.Query().
 //		Select(orderproduct.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (opq *OrderProductQuery) Select(fields ...string) *OrderProductSelect {
-	opq.fields = append(opq.fields, fields...)
-	selbuild := &OrderProductSelect{OrderProductQuery: opq}
-	selbuild.label = orderproduct.Label
-	selbuild.flds, selbuild.scan = &opq.fields, selbuild.Scan
-	return selbuild
+	opq.ctx.Fields = append(opq.ctx.Fields, fields...)
+	sbuild := &OrderProductSelect{OrderProductQuery: opq}
+	sbuild.label = orderproduct.Label
+	sbuild.flds, sbuild.scan = &opq.ctx.Fields, sbuild.Scan
+	return sbuild
+}
+
+// Aggregate returns a OrderProductSelect configured with the given aggregations.
+func (opq *OrderProductQuery) Aggregate(fns ...AggregateFunc) *OrderProductSelect {
+	return opq.Select().Aggregate(fns...)
 }
 
 func (opq *OrderProductQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range opq.fields {
+	for _, inter := range opq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, opq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range opq.ctx.Fields {
 		if !orderproduct.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -340,41 +356,22 @@ func (opq *OrderProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 
 func (opq *OrderProductQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := opq.querySpec()
-	_spec.Node.Columns = opq.fields
-	if len(opq.fields) > 0 {
-		_spec.Unique = opq.unique != nil && *opq.unique
+	_spec.Node.Columns = opq.ctx.Fields
+	if len(opq.ctx.Fields) > 0 {
+		_spec.Unique = opq.ctx.Unique != nil && *opq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, opq.driver, _spec)
 }
 
-func (opq *OrderProductQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := opq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (opq *OrderProductQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   orderproduct.Table,
-			Columns: orderproduct.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: orderproduct.FieldID,
-			},
-		},
-		From:   opq.sql,
-		Unique: true,
-	}
-	if unique := opq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(orderproduct.Table, orderproduct.Columns, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
+	_spec.From = opq.sql
+	if unique := opq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if opq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := opq.fields; len(fields) > 0 {
+	if fields := opq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, orderproduct.FieldID)
 		for i := range fields {
@@ -390,10 +387,10 @@ func (opq *OrderProductQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := opq.limit; limit != nil {
+	if limit := opq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := opq.offset; offset != nil {
+	if offset := opq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := opq.order; len(ps) > 0 {
@@ -409,7 +406,7 @@ func (opq *OrderProductQuery) querySpec() *sqlgraph.QuerySpec {
 func (opq *OrderProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(opq.driver.Dialect())
 	t1 := builder.Table(orderproduct.Table)
-	columns := opq.fields
+	columns := opq.ctx.Fields
 	if len(columns) == 0 {
 		columns = orderproduct.Columns
 	}
@@ -418,7 +415,7 @@ func (opq *OrderProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = opq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if opq.unique != nil && *opq.unique {
+	if opq.ctx.Unique != nil && *opq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range opq.predicates {
@@ -427,12 +424,12 @@ func (opq *OrderProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range opq.order {
 		p(selector)
 	}
-	if offset := opq.offset; offset != nil {
+	if offset := opq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := opq.limit; limit != nil {
+	if limit := opq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -440,13 +437,8 @@ func (opq *OrderProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // OrderProductGroupBy is the group-by builder for OrderProduct entities.
 type OrderProductGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *OrderProductQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -455,74 +447,77 @@ func (opgb *OrderProductGroupBy) Aggregate(fns ...AggregateFunc) *OrderProductGr
 	return opgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (opgb *OrderProductGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := opgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, opgb.build.ctx, "GroupBy")
+	if err := opgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	opgb.sql = query
-	return opgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*OrderProductQuery, *OrderProductGroupBy](ctx, opgb.build, opgb, opgb.build.inters, v)
 }
 
-func (opgb *OrderProductGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range opgb.fields {
-		if !orderproduct.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (opgb *OrderProductGroupBy) sqlScan(ctx context.Context, root *OrderProductQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(opgb.fns))
+	for _, fn := range opgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := opgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*opgb.flds)+len(opgb.fns))
+		for _, f := range *opgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*opgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := opgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := opgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (opgb *OrderProductGroupBy) sqlQuery() *sql.Selector {
-	selector := opgb.sql.Select()
-	aggregation := make([]string, 0, len(opgb.fns))
-	for _, fn := range opgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	// If no columns were selected in a custom aggregation function, the default
-	// selection is the fields used for "group-by", and the aggregation functions.
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(opgb.fields)+len(opgb.fns))
-		for _, f := range opgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(opgb.fields...)...)
-}
-
 // OrderProductSelect is the builder for selecting fields of OrderProduct entities.
 type OrderProductSelect struct {
 	*OrderProductQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
+}
+
+// Aggregate adds the given aggregation functions to the selector query.
+func (ops *OrderProductSelect) Aggregate(fns ...AggregateFunc) *OrderProductSelect {
+	ops.fns = append(ops.fns, fns...)
+	return ops
 }
 
 // Scan applies the selector query and scans the result into the given value.
 func (ops *OrderProductSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, ops.ctx, "Select")
 	if err := ops.prepareQuery(ctx); err != nil {
 		return err
 	}
-	ops.sql = ops.OrderProductQuery.sqlQuery(ctx)
-	return ops.sqlScan(ctx, v)
+	return scanWithInterceptors[*OrderProductQuery, *OrderProductSelect](ctx, ops.OrderProductQuery, ops, ops.inters, v)
 }
 
-func (ops *OrderProductSelect) sqlScan(ctx context.Context, v any) error {
+func (ops *OrderProductSelect) sqlScan(ctx context.Context, root *OrderProductQuery, v any) error {
+	selector := root.sqlQuery(ctx)
+	aggregation := make([]string, 0, len(ops.fns))
+	for _, fn := range ops.fns {
+		aggregation = append(aggregation, fn(selector))
+	}
+	switch n := len(*ops.selector.flds); {
+	case n == 0 && len(aggregation) > 0:
+		selector.Select(aggregation...)
+	case n != 0 && len(aggregation) > 0:
+		selector.AppendSelect(aggregation...)
+	}
 	rows := &sql.Rows{}
-	query, args := ops.sql.Query()
+	query, args := selector.Query()
 	if err := ops.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/blackPavlin/shop/ent/orderproduct"
 )
@@ -19,7 +20,8 @@ type OrderProduct struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +34,7 @@ func (*OrderProduct) scanValues(columns []string) ([]any, error) {
 		case orderproduct.FieldCreatedAt, orderproduct.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type OrderProduct", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -64,16 +66,24 @@ func (op *OrderProduct) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				op.UpdatedAt = value.Time
 			}
+		default:
+			op.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the OrderProduct.
+// This includes values selected through modifiers, order, etc.
+func (op *OrderProduct) Value(name string) (ent.Value, error) {
+	return op.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this OrderProduct.
 // Note that you need to call OrderProduct.Unwrap() before calling this method if this OrderProduct
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (op *OrderProduct) Update() *OrderProductUpdateOne {
-	return (&OrderProductClient{config: op.config}).UpdateOne(op)
+	return NewOrderProductClient(op.config).UpdateOne(op)
 }
 
 // Unwrap unwraps the OrderProduct entity that was returned from a transaction after it was closed,
@@ -103,9 +113,3 @@ func (op *OrderProduct) String() string {
 
 // OrderProducts is a parsable slice of OrderProduct.
 type OrderProducts []*OrderProduct
-
-func (op OrderProducts) config(cfg config) {
-	for _i := range op {
-		op[_i].config = cfg
-	}
-}

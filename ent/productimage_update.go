@@ -41,35 +41,8 @@ func (piu *ProductImageUpdate) Mutation() *ProductImageMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (piu *ProductImageUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
 	piu.defaults()
-	if len(piu.hooks) == 0 {
-		affected, err = piu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ProductImageMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			piu.mutation = mutation
-			affected, err = piu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(piu.hooks) - 1; i >= 0; i-- {
-			if piu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = piu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, piu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks(ctx, piu.sqlSave, piu.mutation, piu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -103,16 +76,7 @@ func (piu *ProductImageUpdate) defaults() {
 }
 
 func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   productimage.Table,
-			Columns: productimage.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: productimage.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(productimage.Table, productimage.Columns, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
 	if ps := piu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -121,11 +85,7 @@ func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := piu.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: productimage.FieldUpdatedAt,
-		})
+		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, piu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -135,6 +95,7 @@ func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	piu.mutation.done = true
 	return n, nil
 }
 
@@ -157,6 +118,12 @@ func (piuo *ProductImageUpdateOne) Mutation() *ProductImageMutation {
 	return piuo.mutation
 }
 
+// Where appends a list predicates to the ProductImageUpdate builder.
+func (piuo *ProductImageUpdateOne) Where(ps ...predicate.ProductImage) *ProductImageUpdateOne {
+	piuo.mutation.Where(ps...)
+	return piuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (piuo *ProductImageUpdateOne) Select(field string, fields ...string) *ProductImageUpdateOne {
@@ -166,41 +133,8 @@ func (piuo *ProductImageUpdateOne) Select(field string, fields ...string) *Produ
 
 // Save executes the query and returns the updated ProductImage entity.
 func (piuo *ProductImageUpdateOne) Save(ctx context.Context) (*ProductImage, error) {
-	var (
-		err  error
-		node *ProductImage
-	)
 	piuo.defaults()
-	if len(piuo.hooks) == 0 {
-		node, err = piuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ProductImageMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			piuo.mutation = mutation
-			node, err = piuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(piuo.hooks) - 1; i >= 0; i-- {
-			if piuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = piuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, piuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*ProductImage)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ProductImageMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks(ctx, piuo.sqlSave, piuo.mutation, piuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -234,16 +168,7 @@ func (piuo *ProductImageUpdateOne) defaults() {
 }
 
 func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductImage, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   productimage.Table,
-			Columns: productimage.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: productimage.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(productimage.Table, productimage.Columns, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
 	id, ok := piuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProductImage.id" for update`)}
@@ -269,11 +194,7 @@ func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductI
 		}
 	}
 	if value, ok := piuo.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: productimage.FieldUpdatedAt,
-		})
+		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &ProductImage{config: piuo.config}
 	_spec.Assign = _node.assignValues
@@ -286,5 +207,6 @@ func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductI
 		}
 		return nil, err
 	}
+	piuo.mutation.done = true
 	return _node, nil
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/user"
@@ -39,7 +40,8 @@ type Address struct {
 	Street string `json:"street,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AddressQuery when eager-loading is set.
-	Edges AddressEdges `json:"edges"`
+	Edges        AddressEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // AddressEdges holds the relations/edges for other nodes in the graph.
@@ -76,7 +78,7 @@ func (*Address) scanValues(columns []string) ([]any, error) {
 		case address.FieldCreatedAt, address.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Address", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -156,21 +158,29 @@ func (a *Address) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Street = value.String
 			}
+		default:
+			a.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// Value returns the ent.Value that was dynamically selected and assigned to the Address.
+// This includes values selected through modifiers, order, etc.
+func (a *Address) Value(name string) (ent.Value, error) {
+	return a.selectValues.Get(name)
+}
+
 // QueryUsers queries the "users" edge of the Address entity.
 func (a *Address) QueryUsers() *UserQuery {
-	return (&AddressClient{config: a.config}).QueryUsers(a)
+	return NewAddressClient(a.config).QueryUsers(a)
 }
 
 // Update returns a builder for updating this Address.
 // Note that you need to call Address.Unwrap() before calling this method if this Address
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (a *Address) Update() *AddressUpdateOne {
-	return (&AddressClient{config: a.config}).UpdateOne(a)
+	return NewAddressClient(a.config).UpdateOne(a)
 }
 
 // Unwrap unwraps the Address entity that was returned from a transaction after it was closed,
@@ -224,9 +234,3 @@ func (a *Address) String() string {
 
 // Addresses is a parsable slice of Address.
 type Addresses []*Address
-
-func (a Addresses) config(cfg config) {
-	for _i := range a {
-		a[_i].config = cfg
-	}
-}

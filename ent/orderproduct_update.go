@@ -41,35 +41,8 @@ func (opu *OrderProductUpdate) Mutation() *OrderProductMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (opu *OrderProductUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
 	opu.defaults()
-	if len(opu.hooks) == 0 {
-		affected, err = opu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*OrderProductMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			opu.mutation = mutation
-			affected, err = opu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(opu.hooks) - 1; i >= 0; i-- {
-			if opu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = opu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, opu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks(ctx, opu.sqlSave, opu.mutation, opu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -103,16 +76,7 @@ func (opu *OrderProductUpdate) defaults() {
 }
 
 func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   orderproduct.Table,
-			Columns: orderproduct.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: orderproduct.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(orderproduct.Table, orderproduct.Columns, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
 	if ps := opu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -121,11 +85,7 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := opu.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: orderproduct.FieldUpdatedAt,
-		})
+		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, opu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -135,6 +95,7 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	opu.mutation.done = true
 	return n, nil
 }
 
@@ -157,6 +118,12 @@ func (opuo *OrderProductUpdateOne) Mutation() *OrderProductMutation {
 	return opuo.mutation
 }
 
+// Where appends a list predicates to the OrderProductUpdate builder.
+func (opuo *OrderProductUpdateOne) Where(ps ...predicate.OrderProduct) *OrderProductUpdateOne {
+	opuo.mutation.Where(ps...)
+	return opuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (opuo *OrderProductUpdateOne) Select(field string, fields ...string) *OrderProductUpdateOne {
@@ -166,41 +133,8 @@ func (opuo *OrderProductUpdateOne) Select(field string, fields ...string) *Order
 
 // Save executes the query and returns the updated OrderProduct entity.
 func (opuo *OrderProductUpdateOne) Save(ctx context.Context) (*OrderProduct, error) {
-	var (
-		err  error
-		node *OrderProduct
-	)
 	opuo.defaults()
-	if len(opuo.hooks) == 0 {
-		node, err = opuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*OrderProductMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			opuo.mutation = mutation
-			node, err = opuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(opuo.hooks) - 1; i >= 0; i-- {
-			if opuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = opuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, opuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*OrderProduct)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from OrderProductMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks(ctx, opuo.sqlSave, opuo.mutation, opuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -234,16 +168,7 @@ func (opuo *OrderProductUpdateOne) defaults() {
 }
 
 func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderProduct, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   orderproduct.Table,
-			Columns: orderproduct.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: orderproduct.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(orderproduct.Table, orderproduct.Columns, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
 	id, ok := opuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "OrderProduct.id" for update`)}
@@ -269,11 +194,7 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 		}
 	}
 	if value, ok := opuo.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: orderproduct.FieldUpdatedAt,
-		})
+		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &OrderProduct{config: opuo.config}
 	_spec.Assign = _node.assignValues
@@ -286,5 +207,6 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 		}
 		return nil, err
 	}
+	opuo.mutation.done = true
 	return _node, nil
 }

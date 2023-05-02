@@ -55,50 +55,8 @@ func (opc *OrderProductCreate) Mutation() *OrderProductMutation {
 
 // Save creates the OrderProduct in the database.
 func (opc *OrderProductCreate) Save(ctx context.Context) (*OrderProduct, error) {
-	var (
-		err  error
-		node *OrderProduct
-	)
 	opc.defaults()
-	if len(opc.hooks) == 0 {
-		if err = opc.check(); err != nil {
-			return nil, err
-		}
-		node, err = opc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*OrderProductMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = opc.check(); err != nil {
-				return nil, err
-			}
-			opc.mutation = mutation
-			if node, err = opc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(opc.hooks) - 1; i >= 0; i-- {
-			if opc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = opc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, opc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*OrderProduct)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from OrderProductMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks(ctx, opc.sqlSave, opc.mutation, opc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -147,6 +105,9 @@ func (opc *OrderProductCreate) check() error {
 }
 
 func (opc *OrderProductCreate) sqlSave(ctx context.Context) (*OrderProduct, error) {
+	if err := opc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := opc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, opc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -156,34 +117,22 @@ func (opc *OrderProductCreate) sqlSave(ctx context.Context) (*OrderProduct, erro
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int64(id)
+	opc.mutation.id = &_node.ID
+	opc.mutation.done = true
 	return _node, nil
 }
 
 func (opc *OrderProductCreate) createSpec() (*OrderProduct, *sqlgraph.CreateSpec) {
 	var (
 		_node = &OrderProduct{config: opc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: orderproduct.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: orderproduct.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(orderproduct.Table, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
 	)
 	if value, ok := opc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: orderproduct.FieldCreatedAt,
-		})
+		_spec.SetField(orderproduct.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := opc.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: orderproduct.FieldUpdatedAt,
-		})
+		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	return _node, _spec
@@ -213,8 +162,8 @@ func (opcb *OrderProductCreateBulk) Save(ctx context.Context) ([]*OrderProduct, 
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, opcb.builders[i+1].mutation)
 				} else {

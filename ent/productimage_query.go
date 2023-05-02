@@ -17,11 +17,9 @@ import (
 // ProductImageQuery is the builder for querying ProductImage entities.
 type ProductImageQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
+	ctx        *QueryContext
+	order      []productimage.OrderOption
+	inters     []Interceptor
 	predicates []predicate.ProductImage
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -34,27 +32,27 @@ func (piq *ProductImageQuery) Where(ps ...predicate.ProductImage) *ProductImageQ
 	return piq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (piq *ProductImageQuery) Limit(limit int) *ProductImageQuery {
-	piq.limit = &limit
+	piq.ctx.Limit = &limit
 	return piq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (piq *ProductImageQuery) Offset(offset int) *ProductImageQuery {
-	piq.offset = &offset
+	piq.ctx.Offset = &offset
 	return piq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (piq *ProductImageQuery) Unique(unique bool) *ProductImageQuery {
-	piq.unique = &unique
+	piq.ctx.Unique = &unique
 	return piq
 }
 
-// Order adds an order step to the query.
-func (piq *ProductImageQuery) Order(o ...OrderFunc) *ProductImageQuery {
+// Order specifies how the records should be ordered.
+func (piq *ProductImageQuery) Order(o ...productimage.OrderOption) *ProductImageQuery {
 	piq.order = append(piq.order, o...)
 	return piq
 }
@@ -62,7 +60,7 @@ func (piq *ProductImageQuery) Order(o ...OrderFunc) *ProductImageQuery {
 // First returns the first ProductImage entity from the query.
 // Returns a *NotFoundError when no ProductImage was found.
 func (piq *ProductImageQuery) First(ctx context.Context) (*ProductImage, error) {
-	nodes, err := piq.Limit(1).All(ctx)
+	nodes, err := piq.Limit(1).All(setContextOp(ctx, piq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +83,7 @@ func (piq *ProductImageQuery) FirstX(ctx context.Context) *ProductImage {
 // Returns a *NotFoundError when no ProductImage ID was found.
 func (piq *ProductImageQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = piq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = piq.Limit(1).IDs(setContextOp(ctx, piq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -108,7 +106,7 @@ func (piq *ProductImageQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one ProductImage entity is found.
 // Returns a *NotFoundError when no ProductImage entities are found.
 func (piq *ProductImageQuery) Only(ctx context.Context) (*ProductImage, error) {
-	nodes, err := piq.Limit(2).All(ctx)
+	nodes, err := piq.Limit(2).All(setContextOp(ctx, piq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +134,7 @@ func (piq *ProductImageQuery) OnlyX(ctx context.Context) *ProductImage {
 // Returns a *NotFoundError when no entities are found.
 func (piq *ProductImageQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = piq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = piq.Limit(2).IDs(setContextOp(ctx, piq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -161,10 +159,12 @@ func (piq *ProductImageQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of ProductImages.
 func (piq *ProductImageQuery) All(ctx context.Context) ([]*ProductImage, error) {
+	ctx = setContextOp(ctx, piq.ctx, "All")
 	if err := piq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return piq.sqlAll(ctx)
+	qr := querierAll[[]*ProductImage, *ProductImageQuery]()
+	return withInterceptors[[]*ProductImage](ctx, piq, qr, piq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -177,9 +177,12 @@ func (piq *ProductImageQuery) AllX(ctx context.Context) []*ProductImage {
 }
 
 // IDs executes the query and returns a list of ProductImage IDs.
-func (piq *ProductImageQuery) IDs(ctx context.Context) ([]int64, error) {
-	var ids []int64
-	if err := piq.Select(productimage.FieldID).Scan(ctx, &ids); err != nil {
+func (piq *ProductImageQuery) IDs(ctx context.Context) (ids []int64, err error) {
+	if piq.ctx.Unique == nil && piq.path != nil {
+		piq.Unique(true)
+	}
+	ctx = setContextOp(ctx, piq.ctx, "IDs")
+	if err = piq.Select(productimage.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -196,10 +199,11 @@ func (piq *ProductImageQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (piq *ProductImageQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, piq.ctx, "Count")
 	if err := piq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return piq.sqlCount(ctx)
+	return withInterceptors[int](ctx, piq, querierCount[*ProductImageQuery](), piq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -213,10 +217,15 @@ func (piq *ProductImageQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (piq *ProductImageQuery) Exist(ctx context.Context) (bool, error) {
-	if err := piq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, piq.ctx, "Exist")
+	switch _, err := piq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return piq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -236,14 +245,13 @@ func (piq *ProductImageQuery) Clone() *ProductImageQuery {
 	}
 	return &ProductImageQuery{
 		config:     piq.config,
-		limit:      piq.limit,
-		offset:     piq.offset,
-		order:      append([]OrderFunc{}, piq.order...),
+		ctx:        piq.ctx.Clone(),
+		order:      append([]productimage.OrderOption{}, piq.order...),
+		inters:     append([]Interceptor{}, piq.inters...),
 		predicates: append([]predicate.ProductImage{}, piq.predicates...),
 		// clone intermediate query.
-		sql:    piq.sql.Clone(),
-		path:   piq.path,
-		unique: piq.unique,
+		sql:  piq.sql.Clone(),
+		path: piq.path,
 	}
 }
 
@@ -261,18 +269,12 @@ func (piq *ProductImageQuery) Clone() *ProductImageQuery {
 //		GroupBy(productimage.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (piq *ProductImageQuery) GroupBy(field string, fields ...string) *ProductImageGroupBy {
-	grbuild := &ProductImageGroupBy{config: piq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := piq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return piq.sqlQuery(ctx), nil
-	}
+	piq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &ProductImageGroupBy{build: piq}
+	grbuild.flds = &piq.ctx.Fields
 	grbuild.label = productimage.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -288,17 +290,31 @@ func (piq *ProductImageQuery) GroupBy(field string, fields ...string) *ProductIm
 //	client.ProductImage.Query().
 //		Select(productimage.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (piq *ProductImageQuery) Select(fields ...string) *ProductImageSelect {
-	piq.fields = append(piq.fields, fields...)
-	selbuild := &ProductImageSelect{ProductImageQuery: piq}
-	selbuild.label = productimage.Label
-	selbuild.flds, selbuild.scan = &piq.fields, selbuild.Scan
-	return selbuild
+	piq.ctx.Fields = append(piq.ctx.Fields, fields...)
+	sbuild := &ProductImageSelect{ProductImageQuery: piq}
+	sbuild.label = productimage.Label
+	sbuild.flds, sbuild.scan = &piq.ctx.Fields, sbuild.Scan
+	return sbuild
+}
+
+// Aggregate returns a ProductImageSelect configured with the given aggregations.
+func (piq *ProductImageQuery) Aggregate(fns ...AggregateFunc) *ProductImageSelect {
+	return piq.Select().Aggregate(fns...)
 }
 
 func (piq *ProductImageQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range piq.fields {
+	for _, inter := range piq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, piq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range piq.ctx.Fields {
 		if !productimage.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -340,41 +356,22 @@ func (piq *ProductImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 
 func (piq *ProductImageQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := piq.querySpec()
-	_spec.Node.Columns = piq.fields
-	if len(piq.fields) > 0 {
-		_spec.Unique = piq.unique != nil && *piq.unique
+	_spec.Node.Columns = piq.ctx.Fields
+	if len(piq.ctx.Fields) > 0 {
+		_spec.Unique = piq.ctx.Unique != nil && *piq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, piq.driver, _spec)
 }
 
-func (piq *ProductImageQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := piq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (piq *ProductImageQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   productimage.Table,
-			Columns: productimage.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: productimage.FieldID,
-			},
-		},
-		From:   piq.sql,
-		Unique: true,
-	}
-	if unique := piq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(productimage.Table, productimage.Columns, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
+	_spec.From = piq.sql
+	if unique := piq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if piq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := piq.fields; len(fields) > 0 {
+	if fields := piq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, productimage.FieldID)
 		for i := range fields {
@@ -390,10 +387,10 @@ func (piq *ProductImageQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := piq.limit; limit != nil {
+	if limit := piq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := piq.offset; offset != nil {
+	if offset := piq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := piq.order; len(ps) > 0 {
@@ -409,7 +406,7 @@ func (piq *ProductImageQuery) querySpec() *sqlgraph.QuerySpec {
 func (piq *ProductImageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(piq.driver.Dialect())
 	t1 := builder.Table(productimage.Table)
-	columns := piq.fields
+	columns := piq.ctx.Fields
 	if len(columns) == 0 {
 		columns = productimage.Columns
 	}
@@ -418,7 +415,7 @@ func (piq *ProductImageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = piq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if piq.unique != nil && *piq.unique {
+	if piq.ctx.Unique != nil && *piq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range piq.predicates {
@@ -427,12 +424,12 @@ func (piq *ProductImageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range piq.order {
 		p(selector)
 	}
-	if offset := piq.offset; offset != nil {
+	if offset := piq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := piq.limit; limit != nil {
+	if limit := piq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -440,13 +437,8 @@ func (piq *ProductImageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // ProductImageGroupBy is the group-by builder for ProductImage entities.
 type ProductImageGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *ProductImageQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -455,74 +447,77 @@ func (pigb *ProductImageGroupBy) Aggregate(fns ...AggregateFunc) *ProductImageGr
 	return pigb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (pigb *ProductImageGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := pigb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, pigb.build.ctx, "GroupBy")
+	if err := pigb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	pigb.sql = query
-	return pigb.sqlScan(ctx, v)
+	return scanWithInterceptors[*ProductImageQuery, *ProductImageGroupBy](ctx, pigb.build, pigb, pigb.build.inters, v)
 }
 
-func (pigb *ProductImageGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range pigb.fields {
-		if !productimage.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (pigb *ProductImageGroupBy) sqlScan(ctx context.Context, root *ProductImageQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(pigb.fns))
+	for _, fn := range pigb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := pigb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*pigb.flds)+len(pigb.fns))
+		for _, f := range *pigb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*pigb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := pigb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := pigb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (pigb *ProductImageGroupBy) sqlQuery() *sql.Selector {
-	selector := pigb.sql.Select()
-	aggregation := make([]string, 0, len(pigb.fns))
-	for _, fn := range pigb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	// If no columns were selected in a custom aggregation function, the default
-	// selection is the fields used for "group-by", and the aggregation functions.
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(pigb.fields)+len(pigb.fns))
-		for _, f := range pigb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(pigb.fields...)...)
-}
-
 // ProductImageSelect is the builder for selecting fields of ProductImage entities.
 type ProductImageSelect struct {
 	*ProductImageQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
+}
+
+// Aggregate adds the given aggregation functions to the selector query.
+func (pis *ProductImageSelect) Aggregate(fns ...AggregateFunc) *ProductImageSelect {
+	pis.fns = append(pis.fns, fns...)
+	return pis
 }
 
 // Scan applies the selector query and scans the result into the given value.
 func (pis *ProductImageSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, pis.ctx, "Select")
 	if err := pis.prepareQuery(ctx); err != nil {
 		return err
 	}
-	pis.sql = pis.ProductImageQuery.sqlQuery(ctx)
-	return pis.sqlScan(ctx, v)
+	return scanWithInterceptors[*ProductImageQuery, *ProductImageSelect](ctx, pis.ProductImageQuery, pis, pis.inters, v)
 }
 
-func (pis *ProductImageSelect) sqlScan(ctx context.Context, v any) error {
+func (pis *ProductImageSelect) sqlScan(ctx context.Context, root *ProductImageQuery, v any) error {
+	selector := root.sqlQuery(ctx)
+	aggregation := make([]string, 0, len(pis.fns))
+	for _, fn := range pis.fns {
+		aggregation = append(aggregation, fn(selector))
+	}
+	switch n := len(*pis.selector.flds); {
+	case n == 0 && len(aggregation) > 0:
+		selector.Select(aggregation...)
+	case n != 0 && len(aggregation) > 0:
+		selector.AppendSelect(aggregation...)
+	}
 	rows := &sql.Rows{}
-	query, args := pis.sql.Query()
+	query, args := selector.Query()
 	if err := pis.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

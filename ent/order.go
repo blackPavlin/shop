@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/blackPavlin/shop/ent/order"
 	"github.com/blackPavlin/shop/ent/user"
@@ -27,7 +28,8 @@ type Order struct {
 	Status order.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderQuery when eager-loading is set.
-	Edges OrderEdges `json:"edges"`
+	Edges        OrderEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // OrderEdges holds the relations/edges for other nodes in the graph.
@@ -64,7 +66,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 		case order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Order", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -108,21 +110,29 @@ func (o *Order) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				o.Status = order.Status(value.String)
 			}
+		default:
+			o.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// Value returns the ent.Value that was dynamically selected and assigned to the Order.
+// This includes values selected through modifiers, order, etc.
+func (o *Order) Value(name string) (ent.Value, error) {
+	return o.selectValues.Get(name)
+}
+
 // QueryUsers queries the "users" edge of the Order entity.
 func (o *Order) QueryUsers() *UserQuery {
-	return (&OrderClient{config: o.config}).QueryUsers(o)
+	return NewOrderClient(o.config).QueryUsers(o)
 }
 
 // Update returns a builder for updating this Order.
 // Note that you need to call Order.Unwrap() before calling this method if this Order
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (o *Order) Update() *OrderUpdateOne {
-	return (&OrderClient{config: o.config}).UpdateOne(o)
+	return NewOrderClient(o.config).UpdateOne(o)
 }
 
 // Unwrap unwraps the Order entity that was returned from a transaction after it was closed,
@@ -158,9 +168,3 @@ func (o *Order) String() string {
 
 // Orders is a parsable slice of Order.
 type Orders []*Order
-
-func (o Orders) config(cfg config) {
-	for _i := range o {
-		o[_i].config = cfg
-	}
-}

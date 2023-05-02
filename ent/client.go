@@ -10,6 +10,10 @@ import (
 
 	"github.com/blackPavlin/shop/ent/migrate"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
@@ -19,10 +23,6 @@ import (
 	"github.com/blackPavlin/shop/ent/product"
 	"github.com/blackPavlin/shop/ent/productimage"
 	"github.com/blackPavlin/shop/ent/user"
-
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -52,7 +52,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -70,6 +70,55 @@ func (c *Client) init() {
 	c.Product = NewProductClient(c.config)
 	c.ProductImage = NewProductImageClient(c.config)
 	c.User = NewUserClient(c.config)
+}
+
+type (
+	// config is the configuration for the client and its builder.
+	config struct {
+		// driver used for executing database requests.
+		driver dialect.Driver
+		// debug enable a debug logging.
+		debug bool
+		// log used for logging on debug mode.
+		log func(...any)
+		// hooks to execute on mutations.
+		hooks *hooks
+		// interceptors to execute on queries.
+		inters *inters
+	}
+	// Option function to configure the client.
+	Option func(*config)
+)
+
+// options applies the options on the config object.
+func (c *config) options(opts ...Option) {
+	for _, opt := range opts {
+		opt(c)
+	}
+	if c.debug {
+		c.driver = dialect.Debug(c.driver, c.log)
+	}
+}
+
+// Debug enables debug logging on the ent.Driver.
+func Debug() Option {
+	return func(c *config) {
+		c.debug = true
+	}
+}
+
+// Log sets the logging function for debug mode.
+func Log(fn func(...any)) Option {
+	return func(c *config) {
+		c.log = fn
+	}
+}
+
+// Driver configures the client driver.
+func Driver(driver dialect.Driver) Option {
+	return func(c *config) {
+		c.driver = driver
+	}
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -149,7 +198,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 //		Address.
 //		Query().
 //		Count(ctx)
-//
 func (c *Client) Debug() *Client {
 	if c.debug {
 		return c
@@ -169,15 +217,49 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Address.Use(hooks...)
-	c.Cart.Use(hooks...)
-	c.Category.Use(hooks...)
-	c.Image.Use(hooks...)
-	c.Order.Use(hooks...)
-	c.OrderProduct.Use(hooks...)
-	c.Product.Use(hooks...)
-	c.ProductImage.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Address, c.Cart, c.Category, c.Image, c.Order, c.OrderProduct, c.Product,
+		c.ProductImage, c.User,
+	} {
+		n.Use(hooks...)
+	}
+}
+
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Address, c.Cart, c.Category, c.Image, c.Order, c.OrderProduct, c.Product,
+		c.ProductImage, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
+}
+
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *AddressMutation:
+		return c.Address.mutate(ctx, m)
+	case *CartMutation:
+		return c.Cart.mutate(ctx, m)
+	case *CategoryMutation:
+		return c.Category.mutate(ctx, m)
+	case *ImageMutation:
+		return c.Image.mutate(ctx, m)
+	case *OrderMutation:
+		return c.Order.mutate(ctx, m)
+	case *OrderProductMutation:
+		return c.OrderProduct.mutate(ctx, m)
+	case *ProductMutation:
+		return c.Product.mutate(ctx, m)
+	case *ProductImageMutation:
+		return c.ProductImage.mutate(ctx, m)
+	case *UserMutation:
+		return c.User.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
 }
 
 // AddressClient is a client for the Address schema.
@@ -194,6 +276,12 @@ func NewAddressClient(c config) *AddressClient {
 // A call to `Use(f, g, h)` equals to `address.Hooks(f(g(h())))`.
 func (c *AddressClient) Use(hooks ...Hook) {
 	c.hooks.Address = append(c.hooks.Address, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `address.Intercept(f(g(h())))`.
+func (c *AddressClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Address = append(c.inters.Address, interceptors...)
 }
 
 // Create returns a builder for creating a Address entity.
@@ -236,7 +324,7 @@ func (c *AddressClient) DeleteOne(a *Address) *AddressDeleteOne {
 	return c.DeleteOneID(a.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *AddressClient) DeleteOneID(id int64) *AddressDeleteOne {
 	builder := c.Delete().Where(address.ID(id))
 	builder.mutation.id = &id
@@ -248,6 +336,8 @@ func (c *AddressClient) DeleteOneID(id int64) *AddressDeleteOne {
 func (c *AddressClient) Query() *AddressQuery {
 	return &AddressQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeAddress},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -267,8 +357,8 @@ func (c *AddressClient) GetX(ctx context.Context, id int64) *Address {
 
 // QueryUsers queries the users edge of a Address.
 func (c *AddressClient) QueryUsers(a *Address) *UserQuery {
-	query := &UserQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(address.Table, address.FieldID, id),
@@ -286,6 +376,26 @@ func (c *AddressClient) Hooks() []Hook {
 	return c.hooks.Address
 }
 
+// Interceptors returns the client interceptors.
+func (c *AddressClient) Interceptors() []Interceptor {
+	return c.inters.Address
+}
+
+func (c *AddressClient) mutate(ctx context.Context, m *AddressMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AddressCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AddressUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AddressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AddressDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Address mutation op: %q", m.Op())
+	}
+}
+
 // CartClient is a client for the Cart schema.
 type CartClient struct {
 	config
@@ -300,6 +410,12 @@ func NewCartClient(c config) *CartClient {
 // A call to `Use(f, g, h)` equals to `cart.Hooks(f(g(h())))`.
 func (c *CartClient) Use(hooks ...Hook) {
 	c.hooks.Cart = append(c.hooks.Cart, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `cart.Intercept(f(g(h())))`.
+func (c *CartClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Cart = append(c.inters.Cart, interceptors...)
 }
 
 // Create returns a builder for creating a Cart entity.
@@ -342,7 +458,7 @@ func (c *CartClient) DeleteOne(ca *Cart) *CartDeleteOne {
 	return c.DeleteOneID(ca.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *CartClient) DeleteOneID(id int64) *CartDeleteOne {
 	builder := c.Delete().Where(cart.ID(id))
 	builder.mutation.id = &id
@@ -354,6 +470,8 @@ func (c *CartClient) DeleteOneID(id int64) *CartDeleteOne {
 func (c *CartClient) Query() *CartQuery {
 	return &CartQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeCart},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -373,8 +491,8 @@ func (c *CartClient) GetX(ctx context.Context, id int64) *Cart {
 
 // QueryUsers queries the users edge of a Cart.
 func (c *CartClient) QueryUsers(ca *Cart) *UserQuery {
-	query := &UserQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ca.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(cart.Table, cart.FieldID, id),
@@ -389,8 +507,8 @@ func (c *CartClient) QueryUsers(ca *Cart) *UserQuery {
 
 // QueryProducts queries the products edge of a Cart.
 func (c *CartClient) QueryProducts(ca *Cart) *ProductQuery {
-	query := &ProductQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&ProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ca.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(cart.Table, cart.FieldID, id),
@@ -408,6 +526,26 @@ func (c *CartClient) Hooks() []Hook {
 	return c.hooks.Cart
 }
 
+// Interceptors returns the client interceptors.
+func (c *CartClient) Interceptors() []Interceptor {
+	return c.inters.Cart
+}
+
+func (c *CartClient) mutate(ctx context.Context, m *CartMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CartCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CartUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CartUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CartDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Cart mutation op: %q", m.Op())
+	}
+}
+
 // CategoryClient is a client for the Category schema.
 type CategoryClient struct {
 	config
@@ -422,6 +560,12 @@ func NewCategoryClient(c config) *CategoryClient {
 // A call to `Use(f, g, h)` equals to `category.Hooks(f(g(h())))`.
 func (c *CategoryClient) Use(hooks ...Hook) {
 	c.hooks.Category = append(c.hooks.Category, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `category.Intercept(f(g(h())))`.
+func (c *CategoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Category = append(c.inters.Category, interceptors...)
 }
 
 // Create returns a builder for creating a Category entity.
@@ -464,7 +608,7 @@ func (c *CategoryClient) DeleteOne(ca *Category) *CategoryDeleteOne {
 	return c.DeleteOneID(ca.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *CategoryClient) DeleteOneID(id int64) *CategoryDeleteOne {
 	builder := c.Delete().Where(category.ID(id))
 	builder.mutation.id = &id
@@ -476,6 +620,8 @@ func (c *CategoryClient) DeleteOneID(id int64) *CategoryDeleteOne {
 func (c *CategoryClient) Query() *CategoryQuery {
 	return &CategoryQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeCategory},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -495,8 +641,8 @@ func (c *CategoryClient) GetX(ctx context.Context, id int64) *Category {
 
 // QueryProducts queries the products edge of a Category.
 func (c *CategoryClient) QueryProducts(ca *Category) *ProductQuery {
-	query := &ProductQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&ProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ca.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(category.Table, category.FieldID, id),
@@ -514,6 +660,26 @@ func (c *CategoryClient) Hooks() []Hook {
 	return c.hooks.Category
 }
 
+// Interceptors returns the client interceptors.
+func (c *CategoryClient) Interceptors() []Interceptor {
+	return c.inters.Category
+}
+
+func (c *CategoryClient) mutate(ctx context.Context, m *CategoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CategoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Category mutation op: %q", m.Op())
+	}
+}
+
 // ImageClient is a client for the Image schema.
 type ImageClient struct {
 	config
@@ -528,6 +694,12 @@ func NewImageClient(c config) *ImageClient {
 // A call to `Use(f, g, h)` equals to `image.Hooks(f(g(h())))`.
 func (c *ImageClient) Use(hooks ...Hook) {
 	c.hooks.Image = append(c.hooks.Image, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `image.Intercept(f(g(h())))`.
+func (c *ImageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Image = append(c.inters.Image, interceptors...)
 }
 
 // Create returns a builder for creating a Image entity.
@@ -570,7 +742,7 @@ func (c *ImageClient) DeleteOne(i *Image) *ImageDeleteOne {
 	return c.DeleteOneID(i.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *ImageClient) DeleteOneID(id int64) *ImageDeleteOne {
 	builder := c.Delete().Where(image.ID(id))
 	builder.mutation.id = &id
@@ -582,6 +754,8 @@ func (c *ImageClient) DeleteOneID(id int64) *ImageDeleteOne {
 func (c *ImageClient) Query() *ImageQuery {
 	return &ImageQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeImage},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -604,6 +778,26 @@ func (c *ImageClient) Hooks() []Hook {
 	return c.hooks.Image
 }
 
+// Interceptors returns the client interceptors.
+func (c *ImageClient) Interceptors() []Interceptor {
+	return c.inters.Image
+}
+
+func (c *ImageClient) mutate(ctx context.Context, m *ImageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ImageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ImageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ImageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Image mutation op: %q", m.Op())
+	}
+}
+
 // OrderClient is a client for the Order schema.
 type OrderClient struct {
 	config
@@ -618,6 +812,12 @@ func NewOrderClient(c config) *OrderClient {
 // A call to `Use(f, g, h)` equals to `order.Hooks(f(g(h())))`.
 func (c *OrderClient) Use(hooks ...Hook) {
 	c.hooks.Order = append(c.hooks.Order, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `order.Intercept(f(g(h())))`.
+func (c *OrderClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Order = append(c.inters.Order, interceptors...)
 }
 
 // Create returns a builder for creating a Order entity.
@@ -660,7 +860,7 @@ func (c *OrderClient) DeleteOne(o *Order) *OrderDeleteOne {
 	return c.DeleteOneID(o.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *OrderClient) DeleteOneID(id int64) *OrderDeleteOne {
 	builder := c.Delete().Where(order.ID(id))
 	builder.mutation.id = &id
@@ -672,6 +872,8 @@ func (c *OrderClient) DeleteOneID(id int64) *OrderDeleteOne {
 func (c *OrderClient) Query() *OrderQuery {
 	return &OrderQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeOrder},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -691,8 +893,8 @@ func (c *OrderClient) GetX(ctx context.Context, id int64) *Order {
 
 // QueryUsers queries the users edge of a Order.
 func (c *OrderClient) QueryUsers(o *Order) *UserQuery {
-	query := &UserQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := o.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, id),
@@ -710,6 +912,26 @@ func (c *OrderClient) Hooks() []Hook {
 	return c.hooks.Order
 }
 
+// Interceptors returns the client interceptors.
+func (c *OrderClient) Interceptors() []Interceptor {
+	return c.inters.Order
+}
+
+func (c *OrderClient) mutate(ctx context.Context, m *OrderMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OrderCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OrderUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OrderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Order mutation op: %q", m.Op())
+	}
+}
+
 // OrderProductClient is a client for the OrderProduct schema.
 type OrderProductClient struct {
 	config
@@ -724,6 +946,12 @@ func NewOrderProductClient(c config) *OrderProductClient {
 // A call to `Use(f, g, h)` equals to `orderproduct.Hooks(f(g(h())))`.
 func (c *OrderProductClient) Use(hooks ...Hook) {
 	c.hooks.OrderProduct = append(c.hooks.OrderProduct, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `orderproduct.Intercept(f(g(h())))`.
+func (c *OrderProductClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OrderProduct = append(c.inters.OrderProduct, interceptors...)
 }
 
 // Create returns a builder for creating a OrderProduct entity.
@@ -766,7 +994,7 @@ func (c *OrderProductClient) DeleteOne(op *OrderProduct) *OrderProductDeleteOne 
 	return c.DeleteOneID(op.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *OrderProductClient) DeleteOneID(id int64) *OrderProductDeleteOne {
 	builder := c.Delete().Where(orderproduct.ID(id))
 	builder.mutation.id = &id
@@ -778,6 +1006,8 @@ func (c *OrderProductClient) DeleteOneID(id int64) *OrderProductDeleteOne {
 func (c *OrderProductClient) Query() *OrderProductQuery {
 	return &OrderProductQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeOrderProduct},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -800,6 +1030,26 @@ func (c *OrderProductClient) Hooks() []Hook {
 	return c.hooks.OrderProduct
 }
 
+// Interceptors returns the client interceptors.
+func (c *OrderProductClient) Interceptors() []Interceptor {
+	return c.inters.OrderProduct
+}
+
+func (c *OrderProductClient) mutate(ctx context.Context, m *OrderProductMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OrderProductCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OrderProductUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OrderProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OrderProductDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OrderProduct mutation op: %q", m.Op())
+	}
+}
+
 // ProductClient is a client for the Product schema.
 type ProductClient struct {
 	config
@@ -814,6 +1064,12 @@ func NewProductClient(c config) *ProductClient {
 // A call to `Use(f, g, h)` equals to `product.Hooks(f(g(h())))`.
 func (c *ProductClient) Use(hooks ...Hook) {
 	c.hooks.Product = append(c.hooks.Product, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `product.Intercept(f(g(h())))`.
+func (c *ProductClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Product = append(c.inters.Product, interceptors...)
 }
 
 // Create returns a builder for creating a Product entity.
@@ -856,7 +1112,7 @@ func (c *ProductClient) DeleteOne(pr *Product) *ProductDeleteOne {
 	return c.DeleteOneID(pr.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *ProductClient) DeleteOneID(id int64) *ProductDeleteOne {
 	builder := c.Delete().Where(product.ID(id))
 	builder.mutation.id = &id
@@ -868,6 +1124,8 @@ func (c *ProductClient) DeleteOneID(id int64) *ProductDeleteOne {
 func (c *ProductClient) Query() *ProductQuery {
 	return &ProductQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeProduct},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -887,8 +1145,8 @@ func (c *ProductClient) GetX(ctx context.Context, id int64) *Product {
 
 // QueryCategories queries the categories edge of a Product.
 func (c *ProductClient) QueryCategories(pr *Product) *CategoryQuery {
-	query := &CategoryQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&CategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
@@ -903,8 +1161,8 @@ func (c *ProductClient) QueryCategories(pr *Product) *CategoryQuery {
 
 // QueryCarts queries the carts edge of a Product.
 func (c *ProductClient) QueryCarts(pr *Product) *CartQuery {
-	query := &CartQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&CartClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
@@ -922,6 +1180,26 @@ func (c *ProductClient) Hooks() []Hook {
 	return c.hooks.Product
 }
 
+// Interceptors returns the client interceptors.
+func (c *ProductClient) Interceptors() []Interceptor {
+	return c.inters.Product
+}
+
+func (c *ProductClient) mutate(ctx context.Context, m *ProductMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProductCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProductUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProductDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Product mutation op: %q", m.Op())
+	}
+}
+
 // ProductImageClient is a client for the ProductImage schema.
 type ProductImageClient struct {
 	config
@@ -936,6 +1214,12 @@ func NewProductImageClient(c config) *ProductImageClient {
 // A call to `Use(f, g, h)` equals to `productimage.Hooks(f(g(h())))`.
 func (c *ProductImageClient) Use(hooks ...Hook) {
 	c.hooks.ProductImage = append(c.hooks.ProductImage, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `productimage.Intercept(f(g(h())))`.
+func (c *ProductImageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProductImage = append(c.inters.ProductImage, interceptors...)
 }
 
 // Create returns a builder for creating a ProductImage entity.
@@ -978,7 +1262,7 @@ func (c *ProductImageClient) DeleteOne(pi *ProductImage) *ProductImageDeleteOne 
 	return c.DeleteOneID(pi.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *ProductImageClient) DeleteOneID(id int64) *ProductImageDeleteOne {
 	builder := c.Delete().Where(productimage.ID(id))
 	builder.mutation.id = &id
@@ -990,6 +1274,8 @@ func (c *ProductImageClient) DeleteOneID(id int64) *ProductImageDeleteOne {
 func (c *ProductImageClient) Query() *ProductImageQuery {
 	return &ProductImageQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeProductImage},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1012,6 +1298,26 @@ func (c *ProductImageClient) Hooks() []Hook {
 	return c.hooks.ProductImage
 }
 
+// Interceptors returns the client interceptors.
+func (c *ProductImageClient) Interceptors() []Interceptor {
+	return c.inters.ProductImage
+}
+
+func (c *ProductImageClient) mutate(ctx context.Context, m *ProductImageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProductImageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProductImageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProductImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProductImageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProductImage mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -1026,6 +1332,12 @@ func NewUserClient(c config) *UserClient {
 // A call to `Use(f, g, h)` equals to `user.Hooks(f(g(h())))`.
 func (c *UserClient) Use(hooks ...Hook) {
 	c.hooks.User = append(c.hooks.User, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `user.Intercept(f(g(h())))`.
+func (c *UserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.User = append(c.inters.User, interceptors...)
 }
 
 // Create returns a builder for creating a User entity.
@@ -1068,7 +1380,7 @@ func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
 	return c.DeleteOneID(u.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *UserClient) DeleteOneID(id int64) *UserDeleteOne {
 	builder := c.Delete().Where(user.ID(id))
 	builder.mutation.id = &id
@@ -1080,6 +1392,8 @@ func (c *UserClient) DeleteOneID(id int64) *UserDeleteOne {
 func (c *UserClient) Query() *UserQuery {
 	return &UserQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeUser},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1099,8 +1413,8 @@ func (c *UserClient) GetX(ctx context.Context, id int64) *User {
 
 // QueryAddresses queries the addresses edge of a User.
 func (c *UserClient) QueryAddresses(u *User) *AddressQuery {
-	query := &AddressQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&AddressClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
@@ -1115,8 +1429,8 @@ func (c *UserClient) QueryAddresses(u *User) *AddressQuery {
 
 // QueryCarts queries the carts edge of a User.
 func (c *UserClient) QueryCarts(u *User) *CartQuery {
-	query := &CartQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&CartClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
@@ -1131,8 +1445,8 @@ func (c *UserClient) QueryCarts(u *User) *CartQuery {
 
 // QueryOrders queries the orders edge of a User.
 func (c *UserClient) QueryOrders(u *User) *OrderQuery {
-	query := &OrderQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query := (&OrderClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
@@ -1149,3 +1463,35 @@ func (c *UserClient) QueryOrders(u *User) *OrderQuery {
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
 }
+
+// Interceptors returns the client interceptors.
+func (c *UserClient) Interceptors() []Interceptor {
+	return c.inters.User
+}
+
+func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown User mutation op: %q", m.Op())
+	}
+}
+
+// hooks and interceptors per client, for fast access.
+type (
+	hooks struct {
+		Address, Cart, Category, Image, Order, OrderProduct, Product, ProductImage,
+		User []ent.Hook
+	}
+	inters struct {
+		Address, Cart, Category, Image, Order, OrderProduct, Product, ProductImage,
+		User []ent.Interceptor
+	}
+)

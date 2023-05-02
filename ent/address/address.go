@@ -4,6 +4,9 @@ package address
 
 import (
 	"time"
+
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -83,3 +86,75 @@ var (
 	// StreetValidator is a validator for the "street" field. It is called by the builders before save.
 	StreetValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the Address queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+}
+
+// ByCity orders the results by the city field.
+func ByCity(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCity, opts...).ToFunc()
+}
+
+// ByCountry orders the results by the country field.
+func ByCountry(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCountry, opts...).ToFunc()
+}
+
+// ByFlat orders the results by the flat field.
+func ByFlat(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFlat, opts...).ToFunc()
+}
+
+// ByHouse orders the results by the house field.
+func ByHouse(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHouse, opts...).ToFunc()
+}
+
+// ByLetter orders the results by the letter field.
+func ByLetter(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLetter, opts...).ToFunc()
+}
+
+// ByPostcode orders the results by the postcode field.
+func ByPostcode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPostcode, opts...).ToFunc()
+}
+
+// ByStreet orders the results by the street field.
+func ByStreet(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStreet, opts...).ToFunc()
+}
+
+// ByUsersField orders the results by users field.
+func ByUsersField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUsersStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newUsersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UsersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UsersTable, UsersColumn),
+	)
+}

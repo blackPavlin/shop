@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/blackPavlin/shop/ent/image"
 )
@@ -19,7 +20,8 @@ type Image struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +34,7 @@ func (*Image) scanValues(columns []string) ([]any, error) {
 		case image.FieldCreatedAt, image.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Image", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -64,16 +66,24 @@ func (i *Image) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.UpdatedAt = value.Time
 			}
+		default:
+			i.selectValues.Set(columns[j], values[j])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Image.
+// This includes values selected through modifiers, order, etc.
+func (i *Image) Value(name string) (ent.Value, error) {
+	return i.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Image.
 // Note that you need to call Image.Unwrap() before calling this method if this Image
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (i *Image) Update() *ImageUpdateOne {
-	return (&ImageClient{config: i.config}).UpdateOne(i)
+	return NewImageClient(i.config).UpdateOne(i)
 }
 
 // Unwrap unwraps the Image entity that was returned from a transaction after it was closed,
@@ -103,9 +113,3 @@ func (i *Image) String() string {
 
 // Images is a parsable slice of Image.
 type Images []*Image
-
-func (i Images) config(cfg config) {
-	for _i := range i {
-		i[_i].config = cfg
-	}
-}

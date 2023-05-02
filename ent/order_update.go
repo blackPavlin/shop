@@ -79,41 +79,8 @@ func (ou *OrderUpdate) ClearUsers() *OrderUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ou *OrderUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
 	ou.defaults()
-	if len(ou.hooks) == 0 {
-		if err = ou.check(); err != nil {
-			return 0, err
-		}
-		affected, err = ou.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*OrderMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = ou.check(); err != nil {
-				return 0, err
-			}
-			ou.mutation = mutation
-			affected, err = ou.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(ou.hooks) - 1; i >= 0; i-- {
-			if ou.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = ou.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, ou.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks(ctx, ou.sqlSave, ou.mutation, ou.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -160,16 +127,10 @@ func (ou *OrderUpdate) check() error {
 }
 
 func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   order.Table,
-			Columns: order.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: order.FieldID,
-			},
-		},
+	if err := ou.check(); err != nil {
+		return n, err
 	}
+	_spec := sqlgraph.NewUpdateSpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64))
 	if ps := ou.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -178,18 +139,10 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := ou.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: order.FieldUpdatedAt,
-		})
+		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := ou.mutation.Status(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: order.FieldStatus,
-		})
+		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
 	}
 	if ou.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -199,10 +152,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -215,10 +165,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{order.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -234,6 +181,7 @@ func (ou *OrderUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	ou.mutation.done = true
 	return n, nil
 }
 
@@ -293,6 +241,12 @@ func (ouo *OrderUpdateOne) ClearUsers() *OrderUpdateOne {
 	return ouo
 }
 
+// Where appends a list predicates to the OrderUpdate builder.
+func (ouo *OrderUpdateOne) Where(ps ...predicate.Order) *OrderUpdateOne {
+	ouo.mutation.Where(ps...)
+	return ouo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (ouo *OrderUpdateOne) Select(field string, fields ...string) *OrderUpdateOne {
@@ -302,47 +256,8 @@ func (ouo *OrderUpdateOne) Select(field string, fields ...string) *OrderUpdateOn
 
 // Save executes the query and returns the updated Order entity.
 func (ouo *OrderUpdateOne) Save(ctx context.Context) (*Order, error) {
-	var (
-		err  error
-		node *Order
-	)
 	ouo.defaults()
-	if len(ouo.hooks) == 0 {
-		if err = ouo.check(); err != nil {
-			return nil, err
-		}
-		node, err = ouo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*OrderMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = ouo.check(); err != nil {
-				return nil, err
-			}
-			ouo.mutation = mutation
-			node, err = ouo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(ouo.hooks) - 1; i >= 0; i-- {
-			if ouo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = ouo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, ouo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Order)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from OrderMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks(ctx, ouo.sqlSave, ouo.mutation, ouo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -389,16 +304,10 @@ func (ouo *OrderUpdateOne) check() error {
 }
 
 func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   order.Table,
-			Columns: order.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: order.FieldID,
-			},
-		},
+	if err := ouo.check(); err != nil {
+		return _node, err
 	}
+	_spec := sqlgraph.NewUpdateSpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64))
 	id, ok := ouo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Order.id" for update`)}
@@ -424,18 +333,10 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 		}
 	}
 	if value, ok := ouo.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: order.FieldUpdatedAt,
-		})
+		_spec.SetField(order.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := ouo.mutation.Status(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: order.FieldStatus,
-		})
+		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
 	}
 	if ouo.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -445,10 +346,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -461,10 +359,7 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 			Columns: []string{order.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -483,5 +378,6 @@ func (ouo *OrderUpdateOne) sqlSave(ctx context.Context) (_node *Order, err error
 		}
 		return nil, err
 	}
+	ouo.mutation.done = true
 	return _node, nil
 }
