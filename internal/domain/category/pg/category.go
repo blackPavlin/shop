@@ -3,13 +3,14 @@ package pg
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
 	entcategory "github.com/blackPavlin/shop/ent/category"
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
-	"go.uber.org/zap"
 )
 
 // CategoryRepository
@@ -33,7 +34,7 @@ func (r *CategoryRepository) Create(
 		Save(ctx)
 	if err != nil {
 		if pg.IsUniqueViolationErr(err) {
-			return nil, errorx.ErrAllreadyExists
+			return nil, errorx.ErrAlreadyExists
 		}
 
 		r.logger.Error("create category error", zap.Error(err))

@@ -10,8 +10,8 @@ type IDs []ID
 
 // Category
 type Category struct {
-	ID        ID
-	
+	ID ID
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 

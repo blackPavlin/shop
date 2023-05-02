@@ -30,7 +30,7 @@ var (
 	ErrInternal               = NewError(http.StatusInternalServerError, "internal server error")
 	ErrUnauthorized           = NewError(http.StatusUnauthorized, "unautorized")
 	ErrInvalidLoginOrPassword = NewError(http.StatusUnauthorized, "invalid login or password")
-	ErrAllreadyExists         = NewError(http.StatusConflict, "allready exists")
+	ErrAlreadyExists          = NewError(http.StatusConflict, "already exists")
 	ErrNotFound               = NewError(http.StatusNotFound, "not found")
 )
 

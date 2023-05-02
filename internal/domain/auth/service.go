@@ -7,12 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blackPavlin/shop/internal/config"
-	"github.com/blackPavlin/shop/internal/domain/user"
-	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/golang-jwt/jwt"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/blackPavlin/shop/internal/config"
+	"github.com/blackPavlin/shop/internal/domain/user"
+	"github.com/blackPavlin/shop/pkg/errorx"
 )
 
 //go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "auth"
@@ -84,7 +85,7 @@ func (s *AuthUseCase) Signup(ctx context.Context, props *SignupProps) (string, e
 		return "", err
 	}
 	if exist {
-		return "", errorx.ErrAllreadyExists
+		return "", errorx.ErrAlreadyExists
 	}
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(props.Password), 14)
 	if err != nil {
@@ -109,7 +110,7 @@ func (s *AuthUseCase) Signup(ctx context.Context, props *SignupProps) (string, e
 
 // ValidateToken
 func (s *AuthUseCase) ValidateToken(accessToken string) (*UserClaims, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{},func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", t.Method.Alg())
 		}

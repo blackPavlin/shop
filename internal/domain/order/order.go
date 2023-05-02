@@ -16,4 +16,4 @@ type Order struct {
 }
 
 // Props
-type Props struct {}
+type Props struct{}

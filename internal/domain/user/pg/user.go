@@ -3,13 +3,14 @@ package pg
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
 	"github.com/blackPavlin/shop/ent/predicate"
 	userent "github.com/blackPavlin/shop/ent/user"
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
-	"go.uber.org/zap"
 )
 
 // UserRepository
@@ -34,9 +35,9 @@ func (r *UserRepository) Create(ctx context.Context, props *user.Props) (*user.U
 		Save(ctx)
 	if err != nil {
 		if pg.IsUniqueViolationErr(err) {
-			return nil, errorx.ErrAllreadyExists
+			return nil, errorx.ErrAlreadyExists
 		}
-		
+
 		r.logger.Error("create user error:", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
