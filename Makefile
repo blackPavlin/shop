@@ -1,17 +1,50 @@
-.PHONY: build
-build:
-	go build -v ./app/cmd/shop
+.DEFAULT_GOAL := help
 
-.PHONY: generate	
-generate:
+vendor      := vendor
+target      := target
+bin         := $(target)/bin
+reports     := $(target)/reports
+
+## build: Compile binaries.
+go_src := $(shell find * -name *.go -not -path "$(vendor)/*" -not -path "$(target)/*")
+go_out := $(patsubst cmd/%/main.go,$(bin)/%,$(wildcard cmd/*/main.go))
+
+.PHONY: build
+build: $(go_out)
+
+$(bin)/%: cmd/%/main.go $(go_src) | $(bin)
+	@go build --trimpath -o=$@ $<
+
+$(bin):
+	@mkdir -p $@
+
+$(reports):
+	@mkdir -p $@
+
+## generate: Run generators.
+.PHONY: generate
+generate: go/generate openapi/generate
+
+.PHONY: go/generate
+go/generate:
 	go generate ./...
 
 .PHONY: openapi/generate
 openapi/generate:
 	oapi-codegen -generate types -o ./internal/transport/rest/types.gen.go -package rest ./api/openapi.v1.yaml	
 
-.PHONY: test
-test:
-	go test -v -race -timeout 30s ./...
+## tests: Run tests.
+.PHONY: test tests
+test tests: go/test
 
-.DEFAULT_GOAL := build
+.PHONY: go/test
+go/test: $(go_src) | $(reports)
+	@go test -v -covermode=atomic -coverprofile=$(reports)/cover.out ./...
+
+## help: Display available targets.
+.PHONY: help
+help: Makefile
+	@echo "Usage: make [target]"
+	@echo
+	@echo "Targets:"
+	@sed -n 's/^## //p' $< | awk -F ':' '{printf "  %-20s%s\n",$$1,$$2}'
