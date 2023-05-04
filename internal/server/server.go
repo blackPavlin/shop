@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/minio/minio-go/v7"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
 	"github.com/blackPavlin/shop/ent"
@@ -40,6 +41,7 @@ type Server struct {
 
 	database *ent.Client
 	storage  *minio.Client
+	cache    *redis.Client
 }
 
 // NewServer
@@ -48,6 +50,7 @@ func NewServer(
 	logger *zap.Logger,
 	database *ent.Client,
 	storage *minio.Client,
+	cache *redis.Client,
 ) *Server {
 	router := chi.NewRouter()
 
@@ -110,6 +113,7 @@ func NewServer(
 		router:   router,
 		database: database,
 		storage:  storage,
+		cache:    cache,
 	}
 }
 
