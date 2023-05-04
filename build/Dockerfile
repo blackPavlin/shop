@@ -11,4 +11,4 @@ RUN CGO_ENABLED=0 GOOS=linux go build -v ./cmd/shop
 
 EXPOSE 3000
 
-CMD ["./shop"]
+ENTRYPOINT ["./shop"]
