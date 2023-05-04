@@ -7,3 +7,10 @@
 # Dependency and binaries directories and files
 /vendor
 /target
+
+# Privat env files
+/configs/local.config.env
+
+# Docker volumes
+/build/pg_data
+/build/s3_data

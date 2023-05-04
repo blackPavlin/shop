@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/minio/minio-go/v7"
 	"go.uber.org/zap"
 
 	"github.com/blackPavlin/shop/ent"
@@ -28,6 +29,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/user"
 	userpg "github.com/blackPavlin/shop/internal/domain/user/pg"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller"
+	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // Server
@@ -37,10 +39,16 @@ type Server struct {
 	router *chi.Mux
 
 	database *ent.Client
+	storage  *minio.Client
 }
 
 // NewServer
-func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) *Server {
+func NewServer(
+	config *config.Config,
+	logger *zap.Logger,
+	database *ent.Client,
+	storage *minio.Client,
+) *Server {
 	router := chi.NewRouter()
 
 	router.Use(
@@ -62,6 +70,7 @@ func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) 
 	}).Handler)
 
 	// Repositories
+	txManager := pg.NewTxManager(database, logger)
 	userRepository := userpg.NewUserRepository(database, logger)
 	cartRepository := cartpg.NewCartRepository(database, logger)
 	addressRepository := addresspg.NewAddressRepository(database, logger)
@@ -73,7 +82,7 @@ func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) 
 	authService := auth.NewUseCase(logger, config.Auth, userRepository)
 	cartService := cart.NewUseCase(cartRepository, productRepository)
 	addressService := address.NewUseCase(addressRepository)
-	productService := product.NewUseCase(productRepository)
+	productService := product.NewUseCase(productRepository, txManager)
 	categoryService := category.NewUseCase(categoryRepository)
 
 	// Controllers
@@ -100,6 +109,7 @@ func NewServer(config *config.Config, logger *zap.Logger, database *ent.Client) 
 		logger:   logger,
 		router:   router,
 		database: database,
+		storage:  storage,
 	}
 }
 

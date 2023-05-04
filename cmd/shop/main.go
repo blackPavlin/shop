@@ -6,11 +6,13 @@ import (
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+
 	"github.com/blackPavlin/shop/ent"
 	"github.com/blackPavlin/shop/internal/config"
 	"github.com/blackPavlin/shop/internal/server"
 	"github.com/blackPavlin/shop/pkg/logger"
 	"github.com/blackPavlin/shop/pkg/pgutil"
+	"github.com/blackPavlin/shop/pkg/s3x"
 )
 
 func main() {
@@ -36,7 +38,12 @@ func main() {
 	driver := sql.OpenDB(dialect.Postgres, db.DB)
 	database := ent.NewClient(ent.Driver(driver))
 
-	if err := server.NewServer(config, logger, database).Run(); err != nil {
+	storage, err := s3x.NewStorage(context.Background(), config.S3)
+	if err != nil {
+		log.Fatalf("failed to connect file storage: %+v", err)
+	}
+
+	if err := server.NewServer(config, logger, database, storage).Run(); err != nil {
 		log.Fatalf("failed to shutdown server: %+v", err)
 	}
 }

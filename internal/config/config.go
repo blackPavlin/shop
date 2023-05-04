@@ -3,9 +3,11 @@ package config
 import (
 	"time"
 
+	"github.com/kelseyhightower/envconfig"
+
 	"github.com/blackPavlin/shop/pkg/logger"
 	"github.com/blackPavlin/shop/pkg/pgutil"
-	"github.com/kelseyhightower/envconfig"
+	"github.com/blackPavlin/shop/pkg/s3x"
 )
 
 // Config
@@ -14,7 +16,8 @@ type Config struct {
 	Server   *ServerConfig          `envconfig:"REST_SRV" required:"true"`
 	Cors     *CorsConfig            `envconfig:"CORS" required:"true"`
 	Postgres *pgutil.PostgresConfig `envconfig:"POSTGRES" required:"true"`
-	Auth     *AuthConfig
+	Auth     *AuthConfig            `envconfig:"AUTH" required:"true"`
+	S3       *s3x.S3Config          `envconfig:"S3" required:"true"`
 }
 
 // ServerConfig
