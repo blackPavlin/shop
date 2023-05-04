@@ -1,16 +1,33 @@
 package order
 
-// OrderService
-type OrderService interface{}
+import (
+	"github.com/blackPavlin/shop/internal/domain/product"
+	"github.com/blackPavlin/shop/pkg/repositoryx"
+)
 
-// OrderUseCase
-type OrderUseCase struct {
-	orderRepo Repository
+// Service
+type Service interface{}
+
+// UseCase
+type UseCase struct {
+	orderRepo        Repository
+	productRepo      product.Repository
+	orderProductRepo ProductRepository
+
+	txManager repositoryx.TxManager
 }
 
-// NewOrderUseCase
-func NewOrderUseCase(orderRepo Repository) *OrderUseCase {
-	return &OrderUseCase{
-		orderRepo: orderRepo,
+// NewUseCase
+func NewUseCase(
+	orderRepo Repository,
+	productRepo product.Repository,
+	orderProductRepo ProductRepository,
+	txManager repositoryx.TxManager,
+) *UseCase {
+	return &UseCase{
+		orderRepo:        orderRepo,
+		productRepo:      productRepo,
+		orderProductRepo: orderProductRepo,
+		txManager:        txManager,
 	}
 }

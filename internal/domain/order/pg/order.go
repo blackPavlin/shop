@@ -1,8 +1,9 @@
 package pg
 
 import (
-	"github.com/blackPavlin/shop/ent"
 	"go.uber.org/zap"
+
+	"github.com/blackPavlin/shop/ent"
 )
 
 // OrderRepository
@@ -13,8 +14,5 @@ type OrderRepository struct {
 
 // NewOrderRepository
 func NewOrderRepository(client *ent.Client, logger *zap.Logger) *OrderRepository {
-	return &OrderRepository{
-		client: client,
-		logger: logger,
-	}
+	return &OrderRepository{client: client, logger: logger}
 }

@@ -2,7 +2,7 @@ BEGIN;
 CREATE TYPE order_status AS ENUM (
     'CREATED',
     'ACCEPTED',
-    'CANCALLED'
+    'CANCELED'
 );
 
 CREATE TABLE orders

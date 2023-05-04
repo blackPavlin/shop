@@ -36,7 +36,7 @@ func (Order) Fields() []ent.Field {
 			Values(
 				"CREATED",
 				"ACCEPTED",
-				"CANCALLED",
+				"CANCELED",
 			).
 			Default("CREATED").
 			SchemaType(map[string]string{

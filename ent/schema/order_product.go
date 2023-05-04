@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/schema"
 )
 
-// Order holds the schema definition for the OrderProduct entity.
+// OrderProduct holds the schema definition for the OrderProduct entity.
 type OrderProduct struct {
 	ent.Schema
 }

@@ -5,6 +5,9 @@ import "time"
 // ID
 type ID int64
 
+// IDs
+type IDs []ID
+
 // Order
 type Order struct {
 	ID ID
@@ -14,6 +17,9 @@ type Order struct {
 
 	Props *Props
 }
+
+// Orders
+type Orders []Order
 
 // Props
 type Props struct{}

@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/schema"
 )
 
-// Order holds the schema definition for the ProductImage entity.
+// ProductImage holds the schema definition for the ProductImage entity.
 type ProductImage struct {
 	ent.Schema
 }
