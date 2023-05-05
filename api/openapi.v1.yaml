@@ -23,6 +23,8 @@ tags:
     description: Категория товара
   - name: Product
     description: Товар
+  - name: Image
+    description: Изображения
 paths:
   /auth/login:
     post:
@@ -40,7 +42,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'        
+                $ref: '#/components/schemas/LoginResponse'
 
   /auth/signup:
     post:
@@ -74,7 +76,7 @@ paths:
                 $ref: '#/components/schemas/User'
       security:
         - BearerAuth: []
-  
+
   /address:
     get:
       summary: Получить список адресов доставки
@@ -107,7 +109,7 @@ paths:
                 $ref: '#/components/schemas/Address'
       security:
         - BearerAuth: []
-        
+
   /cart:
     get:
       summary: Получить корзину пользователя
@@ -137,9 +139,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'    
+                $ref: '#/components/schemas/Cart'
       security:
-        - BearerAuth: []    
+        - BearerAuth: []
     patch:
       summary: Изменить количество товара в корзине
       tags:
@@ -157,7 +159,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Cart'
       security:
-        - BearerAuth: []    
+        - BearerAuth: []
     delete:
       summary: Очистить корзину
       tags:
@@ -168,10 +170,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'  
+                $ref: '#/components/schemas/Cart'
       security:
         - BearerAuth: []
-        
+
   /order:
     get:
       summary: Получить список заказов пользователя
@@ -183,9 +185,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderList'  
+                $ref: '#/components/schemas/OrderList'
       security:
-        - BearerAuth: []  
+        - BearerAuth: []
     post:
       summary: Создать заказ
       tags:
@@ -198,8 +200,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderDetailed'
       security:
-        - BearerAuth: []  
-        
+        - BearerAuth: []
+
   /order/{orderId}:
     get:
       summary: Получить детальную информацию о заказе
@@ -221,8 +223,8 @@ paths:
         name: orderId
         in: path
         required: true
-        description: ID заказа    
-  
+        description: ID заказа
+
   /category:
     get:
       summary: Получить список категорий товаров
@@ -271,8 +273,8 @@ paths:
                 $ref: '#/components/schemas/Category'
       security:
         - BearerAuth: []
-        
-  /category/{categoryId}:     
+
+  /category/{categoryId}:
     delete:
       summary: Удалить категорию
       tags:
@@ -281,7 +283,7 @@ paths:
         '200':
           description: successful operation
       security:
-        - BearerAuth: []    
+        - BearerAuth: []
     parameters:
       - schema:
           type: integer
@@ -289,8 +291,8 @@ paths:
         name: categoryId
         in: path
         required: true
-        description: ID заказа  
-  
+        description: ID заказа
+
   /product:
     get:
       summary: Получить список товаров
@@ -318,9 +320,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'  
+                $ref: '#/components/schemas/Product'
       security:
-        - BearerAuth: []  
+        - BearerAuth: []
 
   /product/{productId}:
     get:
@@ -349,29 +351,52 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'      
+                $ref: '#/components/schemas/Product'
       security:
-        - BearerAuth: []  
+        - BearerAuth: []
     parameters:
       - schema:
           type: string
         name: productId
         in: path
         required: true
-        description: ID заказа    
+        description: ID заказа
+
+  /image/upload:
+    post:
+      summary: Загрузка изображений
+      tags:
+        - Image
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadImagesRequest'
+            encoding:
+              images:
+                contentType: image/png, image/jpeg
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageList'
+      security:
+        - BearerAuth: []
 
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      
+
   schemas:
     User:
       title: Пользователь
       type: object
       required:
-        - id 
+        - id
         - name
         - email
         - phone
@@ -391,7 +416,7 @@ components:
           enum:
             - USER
             - ADMIN
-    
+
     Address:
       title: Адрес доставки
       type: object
@@ -424,13 +449,13 @@ components:
           type: integer
         postcode:
           type: integer
-  
+
     AddressList:
       title: Список адресов доставки
       type: array
       items:
         $ref: '#/components/schemas/Address'
-  
+
     Cart:
       title: Корзина покупок
       type: object
@@ -445,7 +470,7 @@ components:
           type: string
         products:
           $ref: '#/components/schemas/CartProductList'
- 
+
     CartProduct:
       title: Товар в корзине пользователя
       required:
@@ -456,31 +481,35 @@ components:
           type: string
         amount:
           type: integer
- 
+
     CartProductList:
       title: Список товаров в корзине пользователя
       type: array
       items:
         $ref: '#/components/schemas/CartProduct'
-        
+
     Order:
       title: Заказ
       type: object
       required:
         - id
         - userId
+        - status
       properties:
         id:
           type: string
         userId:
           type: string
-      
+        status:
+          type: string
+          enum: [CREATED, ACCEPTED, CANCELED]
+
     OrderList:
       title: Список заказов пользователя
       type: array
       items:
         $ref: '#/components/schemas/Order'
- 
+
     OrderDetailed:
       title: Детальная карточка заказа
       type: object
@@ -494,8 +523,8 @@ components:
         userId:
           type: string
         products:
-            $ref: '#/components/schemas/OrderProductList'
- 
+          $ref: '#/components/schemas/OrderProductList'
+
     OrderProductList:
       title: Список товаров в заказе
       type: array
@@ -513,7 +542,7 @@ components:
           type: string
         amount:
           type: integer
- 
+
     Category:
       title: Категория товара
       type: object
@@ -532,7 +561,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Category'
-        
+
     Product:
       title: Товар
       type: object
@@ -559,7 +588,7 @@ components:
         price:
           type: integer
           format: int64
-          
+
     ProductList:
       title: Список товаров
       type: array
@@ -604,8 +633,8 @@ components:
           type: string
         password:
           type: string
- 
-    CreateAddressRequest: 
+
+    CreateAddressRequest:
       title: Тело запроса для создания адреса доставки
       type: object
       required:
@@ -642,7 +671,48 @@ components:
     CreateProductRequest:
       title: Запрос для создания товара
       type: object
+      required:
+        - categoryId
+        - name
+        - description
+        - amount
+        - price
+      properties:
+        categoryId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        amount:
+          type: integer
+          format: int64
+        price:
+          type: integer
+          format: int64
 
     UpdateProductRequest:
       title:  Запрос для изменения полей товара
       type: object
+
+    Image:
+      title: B
+      type: object
+
+    ImageList:
+      title: B
+      type: array
+      items:
+        $ref: '#/components/schemas/Image'
+
+    UploadImagesRequest:
+      title: Запрос на загрузку изображений
+      type: object
+      required:
+        - images
+      properties:
+        images:
+          type: array
+          items:
+            type: string
+            format: binary

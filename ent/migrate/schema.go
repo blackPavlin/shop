@@ -96,7 +96,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"CREATED", "ACCEPTED", "CANCALLED"}, Default: "CREATED", SchemaType: map[string]string{"postgres": "order_status"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"CREATED", "ACCEPTED", "CANCELED"}, Default: "CREATED", SchemaType: map[string]string{"postgres": "order_status"}},
 		{Name: "user_id", Type: field.TypeInt64},
 	}
 	// OrdersTable holds the schema information for the "orders" table.

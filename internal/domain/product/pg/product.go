@@ -10,6 +10,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
+	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // ProductRepository
@@ -36,6 +37,9 @@ func (r *ProductRepository) Create(
 		SetPrice(props.Price).
 		Save(ctx)
 	if err != nil {
+		if pg.IsForeignKeyViolationErr(err, "product_category_fk") {
+			return nil, errorx.NewNotFoundError("category not found")
+		}
 		r.logger.Error("create product error:", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}

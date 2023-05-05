@@ -7,6 +7,15 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
+// Defines values for OrderStatus.
+const (
+	OrderStatusACCEPTED OrderStatus = "ACCEPTED"
+
+	OrderStatusCANCELED OrderStatus = "CANCELED"
+
+	OrderStatusCREATED OrderStatus = "CREATED"
+)
+
 // Defines values for UserRole.
 const (
 	UserRoleADMIN UserRole = "ADMIN"
@@ -72,7 +81,19 @@ type CreateCategoryRequest struct {
 }
 
 // CreateProductRequest defines model for CreateProductRequest.
-type CreateProductRequest map[string]interface{}
+type CreateProductRequest struct {
+	Amount      int64  `json:"amount"`
+	CategoryId  int    `json:"categoryId"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
+	Price       int64  `json:"price"`
+}
+
+// Image defines model for Image.
+type Image map[string]interface{}
+
+// ImageList defines model for ImageList.
+type ImageList []Image
 
 // LoginRequest defines model for LoginRequest.
 type LoginRequest struct {
@@ -87,9 +108,13 @@ type LoginResponse struct {
 
 // Order defines model for Order.
 type Order struct {
-	Id     string `json:"id"`
-	UserId string `json:"userId"`
+	Id     string      `json:"id"`
+	Status OrderStatus `json:"status"`
+	UserId string      `json:"userId"`
 }
+
+// OrderStatus defines model for Order.Status.
+type OrderStatus string
 
 // OrderDetailed defines model for OrderDetailed.
 type OrderDetailed struct {
@@ -133,6 +158,11 @@ type SignupRequest struct {
 
 // UpdateProductRequest defines model for UpdateProductRequest.
 type UpdateProductRequest map[string]interface{}
+
+// UploadImagesRequest defines model for UploadImagesRequest.
+type UploadImagesRequest struct {
+	Images []string `json:"images"`
+}
 
 // User defines model for User.
 type User struct {

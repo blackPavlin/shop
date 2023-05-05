@@ -72,9 +72,9 @@ const DefaultStatus = StatusCREATED
 
 // Status values.
 const (
-	StatusCREATED   Status = "CREATED"
-	StatusACCEPTED  Status = "ACCEPTED"
-	StatusCANCALLED Status = "CANCALLED"
+	StatusCREATED  Status = "CREATED"
+	StatusACCEPTED Status = "ACCEPTED"
+	StatusCANCELED Status = "CANCELED"
 )
 
 func (s Status) String() string {
@@ -84,7 +84,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusCREATED, StatusACCEPTED, StatusCANCALLED:
+	case StatusCREATED, StatusACCEPTED, StatusCANCELED:
 		return nil
 	default:
 		return fmt.Errorf("order: invalid enum value for status field: %q", s)

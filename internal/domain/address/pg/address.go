@@ -34,7 +34,6 @@ func (r *AddressRepository) Create(
 	if !ok {
 		return nil, errorx.ErrUnauthorized
 	}
-
 	row, err := r.client.Address.Create().
 		SetUserID(int64(user.ID)).
 		SetCountry(props.Country).
@@ -47,12 +46,11 @@ func (r *AddressRepository) Create(
 		Save(ctx)
 	if err != nil {
 		if pg.IsForeignKeyViolationErr(err, "address_user_fk") {
-			return nil, errorx.ErrNotFound
+			return nil, errorx.NewNotFoundError("user not found")
 		}
 		r.logger.Error("create address error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-
 	return mapDomainAddressFromRow(row), nil
 }
 

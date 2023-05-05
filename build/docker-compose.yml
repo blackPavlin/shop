@@ -5,10 +5,16 @@ services:
     build:
       context: ../
       dockerfile: build/Dockerfile
+    container_name: shop
     env_file:
       - ../configs/local.config.env
     ports:
       - "3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.shop.entrypoints=web"
+      - "traefik.http.routers.shop.rule=Host(`localhost`)"
+      - "traefik.http.routers.traefik.service=api@internal"
     depends_on:
       postgres:
         condition: service_healthy
@@ -30,7 +36,7 @@ services:
       - "5432:5432"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d shop"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d shop" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -50,8 +56,14 @@ services:
       - "9001:9001"
     restart: unless-stopped
     command: server /data -console-address ":9001"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.minio-backend.loadbalancer.server.scheme=http"
+      - "traefik.http.services.minio-backend.loadbalancer.server.port=9000"
+      - "traefik.http.services.minio-admin-backend.loadbalancer.server.scheme=http"
+      - "traefik.http.services.minio-admin-backend.loadbalancer.server.port=9001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -81,3 +93,20 @@ services:
         SPEC_URL: openapi.v1.yaml
     ports:
       - "9090:80"
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
