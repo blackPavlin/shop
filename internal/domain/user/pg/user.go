@@ -56,7 +56,7 @@ func (r *UserRepository) Get(ctx context.Context, filter *user.Filter) (*user.Us
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, errorx.ErrNotFound
+			return nil, errorx.NewNotFoundError("user not found")
 		}
 		r.logger.Error("get user error:", zap.Error(err))
 		return nil, errorx.ErrInternal

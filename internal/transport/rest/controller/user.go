@@ -3,11 +3,12 @@ package controller
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
 	"github.com/blackPavlin/shop/pkg/restx"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
 // UserController
@@ -17,9 +18,7 @@ type UserController struct {
 
 // NewUserController
 func NewUserController(userService user.UserService) *UserController {
-	return &UserController{
-		userService: userService,
-	}
+	return &UserController{userService: userService}
 }
 
 // RegisterRoutes
@@ -36,6 +35,5 @@ func (ctrl *UserController) GetUserHandler(w http.ResponseWriter, r *http.Reques
 		restx.HandleError(w, r, err)
 		return
 	}
-
 	render.Respond(w, r, mapping.CreateGetUserResponse(user))
 }

@@ -49,6 +49,21 @@ func (mr *MockRepositoryMockRecorder) Create(ctx, props interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, props)
 }
 
+// Get mocks base method.
+func (m *MockRepository) Get(ctx context.Context, filter *Filter) (*Cart, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, filter)
+	ret0, _ := ret[0].(*Cart)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockRepositoryMockRecorder) Get(ctx, filter interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), ctx, filter)
+}
+
 // Query mocks base method.
 func (m *MockRepository) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
 	m.ctrl.T.Helper()

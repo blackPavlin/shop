@@ -33,3 +33,12 @@ type Props struct {
 	Amount      int64
 	Price       int64
 }
+
+// ToInt64
+func (ids IDs) ToInt64() []int64 {
+	result := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		result = append(result, int64(id))
+	}
+	return result
+}

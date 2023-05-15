@@ -3,13 +3,16 @@ package pg
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
+	entcart "github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/cart"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"go.uber.org/zap"
+	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // CartRepository
@@ -25,19 +28,42 @@ func NewCartRepository(client *ent.Client, logger *zap.Logger) *CartRepository {
 
 // Create
 func (r *CartRepository) Create(ctx context.Context, props *cart.Props) (*cart.Cart, error) {
-	// TODO: Get UserID from ctx
-
+	userFromCtx, ok := user.GetUser(ctx)
+	if !ok {
+		return nil, errorx.ErrUnauthorized
+	}
 	row, err := r.client.Cart.Create().
-		// SetUserID(int64(crt.UserID)).
+		SetUserID(int64(userFromCtx.ID)).
 		SetProductID(int64(props.ProductID)).
 		SetAmount(props.Amount).
 		Save(ctx)
 	if err != nil {
+		if pg.IsForeignKeyViolationErr(err, "cart_user_fk") {
+			return nil, errorx.NewNotFoundError("user not found")
+		}
+		if pg.IsForeignKeyViolationErr(err, "cart_product_fk") {
+			return nil, errorx.NewNotFoundError("product not found")
+		}
 		r.logger.Error("create cart error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-
 	return mapDomainCartFromRow(row), nil
+}
+
+// Get
+func (r *CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Cart, error) {
+	row, err := r.client.Cart.
+		Query().
+		Where(makePredicates(filter)...).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errorx.NewNotFoundError("cart not found")
+		}
+		r.logger.Error("get cart error", zap.Error(err))
+		return nil, errorx.ErrInternal
+	}
+	return mapDomainCartFromRow(row), err
 }
 
 // Query
@@ -45,8 +71,10 @@ func (r *CartRepository) Query(
 	ctx context.Context,
 	criteria *cart.QueryCriteria,
 ) (*cart.QueryResult, error) {
+	if userFromCtx, ok := user.GetUser(ctx); ok {
+		criteria.Filter.UserID.Eq = user.IDs{userFromCtx.ID}
+	}
 	predicates := makePredicates(criteria.Filter)
-	// TODO: Get UserID from ctx
 	rows, err := r.client.Cart.Query().
 		Where(predicates...).
 		All(ctx)
@@ -60,9 +88,14 @@ func (r *CartRepository) Query(
 	return result, nil
 }
 
-func makePredicates(criteria *cart.Filter) []predicate.Cart {
+func makePredicates(filter *cart.Filter) []predicate.Cart {
 	predicates := make([]predicate.Cart, 0)
-	// TODO
+	if len(filter.UserID.Eq) > 0 {
+		predicates = append(predicates, entcart.UserIDIn(filter.UserID.Eq.ToInt64()...))
+	}
+	if len(filter.UserID.Neq) > 0 {
+		predicates = append(predicates, entcart.UserIDNotIn(filter.UserID.Neq.ToInt64()...))
+	}
 	return predicates
 }
 

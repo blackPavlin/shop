@@ -1,12 +1,17 @@
 package product
 
-import "context"
+import (
+	"context"
+
+	"github.com/blackPavlin/shop/internal/domain/category"
+)
 
 //go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "product"
 
 // Repository
 type Repository interface {
 	Create(ctx context.Context, props *Props) (*Product, error)
+	Get(ctx context.Context, filter *Filter) (*Product, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
@@ -25,7 +30,8 @@ type QueryResult struct {
 
 // Filter
 type Filter struct {
-	ID IDFilter
+	ID         IDFilter
+	CategoryID category.IDFilter
 }
 
 // IDFilter

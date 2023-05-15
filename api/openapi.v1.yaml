@@ -709,9 +709,9 @@ components:
       title: Запрос на загрузку изображений
       type: object
       required:
-        - images
+        - files
       properties:
-        images:
+        files:
           type: array
           items:
             type: string

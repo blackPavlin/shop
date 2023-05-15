@@ -27,8 +27,15 @@ func NewUseCase(cartRepo Repository, productRepo product.Repository) *UseCase {
 
 // Create
 func (s *UseCase) Create(ctx context.Context, props *Props) (*Cart, error) {
-	// TODO: check product count
-
+	product, err := s.productRepo.Get(ctx, &product.Filter{ID: product.IDFilter{
+		Eq: product.IDs{props.ProductID}},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if product.Props.Amount < props.Amount {
+		// todo: return error
+	}
 	return s.cartRepo.Create(ctx, props)
 }
 

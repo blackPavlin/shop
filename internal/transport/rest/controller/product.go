@@ -15,9 +15,7 @@ type ProductController struct {
 
 // NewProductController
 func NewProductController(productService product.Service) *ProductController {
-	return &ProductController{
-		productService: productService,
-	}
+	return &ProductController{productService: productService}
 }
 
 // RegisterRoutes

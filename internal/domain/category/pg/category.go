@@ -113,8 +113,14 @@ func makePredicate(criteria *category.QueryCriteria) []predicate.Category {
 	if len(criteria.Filter.ID.Eq) != 0 {
 		predicates = append(predicates, entcategory.IDIn(criteria.Filter.ID.Eq.ToInt64()...))
 	}
+	if len(criteria.Filter.ID.Neq) != 0 {
+		predicates = append(predicates, entcategory.IDNotIn(criteria.Filter.ID.Neq.ToInt64()...))
+	}
 	if len(criteria.Filter.Name.Eq) != 0 {
 		predicates = append(predicates, entcategory.NameIn(criteria.Filter.Name.Eq...))
+	}
+	if len(criteria.Filter.Name.Neq) != 0 {
+		predicates = append(predicates, entcategory.NameNotIn(criteria.Filter.Name.Neq...))
 	}
 	return predicates
 }

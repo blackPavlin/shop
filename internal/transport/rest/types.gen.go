@@ -161,7 +161,7 @@ type UpdateProductRequest map[string]interface{}
 
 // UploadImagesRequest defines model for UploadImagesRequest.
 type UploadImagesRequest struct {
-	Images []string `json:"images"`
+	Files []string `json:"files"`
 }
 
 // User defines model for User.
