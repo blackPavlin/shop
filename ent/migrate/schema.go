@@ -84,6 +84,8 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+		{Name: "name", Type: field.TypeString},
+		{Name: "original_name", Type: field.TypeString},
 	}
 	// ImagesTable holds the schema information for the "images" table.
 	ImagesTable = &schema.Table{
@@ -155,12 +157,28 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+		{Name: "image_id", Type: field.TypeInt64},
+		{Name: "product_id", Type: field.TypeInt64},
 	}
 	// ProductImagesTable holds the schema information for the "product_images" table.
 	ProductImagesTable = &schema.Table{
 		Name:       "product_images",
 		Columns:    ProductImagesColumns,
 		PrimaryKey: []*schema.Column{ProductImagesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "product_image_image_fk",
+				Columns:    []*schema.Column{ProductImagesColumns[3]},
+				RefColumns: []*schema.Column{ImagesColumns[0]},
+				OnDelete:   schema.Restrict,
+			},
+			{
+				Symbol:     "product_image_product_fk",
+				Columns:    []*schema.Column{ProductImagesColumns[4]},
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -220,6 +238,8 @@ func init() {
 	ProductsTable.Annotation = &entsql.Annotation{
 		Table: "products",
 	}
+	ProductImagesTable.ForeignKeys[0].RefTable = ImagesTable
+	ProductImagesTable.ForeignKeys[1].RefTable = ProductsTable
 	ProductImagesTable.Annotation = &entsql.Annotation{
 		Table: "product_images",
 	}

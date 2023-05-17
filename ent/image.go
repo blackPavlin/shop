@@ -20,8 +20,33 @@ type Image struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// OriginalName holds the value of the "original_name" field.
+	OriginalName string `json:"original_name,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ImageQuery when eager-loading is set.
+	Edges        ImageEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// ImageEdges holds the relations/edges for other nodes in the graph.
+type ImageEdges struct {
+	// ProductImages holds the value of the product_images edge.
+	ProductImages []*ProductImage `json:"product_images,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// ProductImagesOrErr returns the ProductImages value or an error if the edge
+// was not loaded in eager-loading.
+func (e ImageEdges) ProductImagesOrErr() ([]*ProductImage, error) {
+	if e.loadedTypes[0] {
+		return e.ProductImages, nil
+	}
+	return nil, &NotLoadedError{edge: "product_images"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -31,6 +56,8 @@ func (*Image) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case image.FieldID:
 			values[i] = new(sql.NullInt64)
+		case image.FieldName, image.FieldOriginalName:
+			values[i] = new(sql.NullString)
 		case image.FieldCreatedAt, image.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
@@ -66,6 +93,18 @@ func (i *Image) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.UpdatedAt = value.Time
 			}
+		case image.FieldName:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[j])
+			} else if value.Valid {
+				i.Name = value.String
+			}
+		case image.FieldOriginalName:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field original_name", values[j])
+			} else if value.Valid {
+				i.OriginalName = value.String
+			}
 		default:
 			i.selectValues.Set(columns[j], values[j])
 		}
@@ -77,6 +116,11 @@ func (i *Image) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (i *Image) Value(name string) (ent.Value, error) {
 	return i.selectValues.Get(name)
+}
+
+// QueryProductImages queries the "product_images" edge of the Image entity.
+func (i *Image) QueryProductImages() *ProductImageQuery {
+	return NewImageClient(i.config).QueryProductImages(i)
 }
 
 // Update returns a builder for updating this Image.
@@ -107,6 +151,12 @@ func (i *Image) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(i.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(i.Name)
+	builder.WriteString(", ")
+	builder.WriteString("original_name=")
+	builder.WriteString(i.OriginalName)
 	builder.WriteByte(')')
 	return builder.String()
 }

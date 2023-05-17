@@ -21,9 +21,7 @@ type CategoryController struct {
 
 // NewCategoryController
 func NewCategoryController(categoryService category.Service) *CategoryController {
-	return &CategoryController{
-		categoryService: categoryService,
-	}
+	return &CategoryController{categoryService: categoryService}
 }
 
 // RegisterRoutes
@@ -42,7 +40,6 @@ func (ctrl *CategoryController) GetCategoriesHandler(w http.ResponseWriter, r *h
 	if err != nil {
 		return
 	}
-
 	render.Respond(w, r, mapping.CreateGetCategoriesResponse(categories))
 }
 
@@ -57,13 +54,11 @@ func (ctrl *CategoryController) CreateCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	categ, err := ctrl.categoryService.Create(r.Context(), request.ToDomainEntity())
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
-
 	render.Status(r, http.StatusCreated)
 	render.Respond(w, r, mapping.CreateCategoryResponse(categ))
 }
@@ -79,7 +74,6 @@ func (ctrl *CategoryController) UpdateCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	categ, err := ctrl.categoryService.Update(r.Context(), category.ID(request.Id), &category.Props{
 		Name: request.Name,
 	})
@@ -87,7 +81,6 @@ func (ctrl *CategoryController) UpdateCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, err)
 		return
 	}
-
 	render.Respond(w, r, mapping.CreateCategoryResponse(categ))
 }
 
@@ -99,7 +92,6 @@ func (ctrl *CategoryController) DeleteCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	if err := ctrl.categoryService.Delete(r.Context(), category.ID(id)); err != nil {
 		restx.HandleError(w, r, err)
 		return

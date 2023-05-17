@@ -53,5 +53,12 @@ func (Product) Edges() []ent.Edge {
 			StorageKey(
 				edge.Symbol("cart_product_fk"),
 			),
+		edge.To("product_images", ProductImage.Type).
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Cascade},
+			).
+			StorageKey(
+				edge.Symbol("product_image_product_fk"),
+			),
 	}
 }

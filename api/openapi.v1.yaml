@@ -696,11 +696,23 @@ components:
       type: object
 
     Image:
-      title: B
+      title: Изображение
       type: object
+      required:
+        - id
+        - name
+        - originalName
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        originalName:
+          type: string
 
     ImageList:
-      title: B
+      title: Список изображений
       type: array
       items:
         $ref: '#/components/schemas/Image'

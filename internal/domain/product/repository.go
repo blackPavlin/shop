@@ -10,7 +10,7 @@ import (
 
 // Repository
 type Repository interface {
-	Create(ctx context.Context, props *Props) (*Product, error)
+	CreateTx(ctx context.Context, props *Props) (*Product, error)
 	Get(ctx context.Context, filter *Filter) (*Product, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }

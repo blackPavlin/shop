@@ -25,6 +25,9 @@ import (
 	cartpg "github.com/blackPavlin/shop/internal/domain/cart/pg"
 	"github.com/blackPavlin/shop/internal/domain/category"
 	categorypg "github.com/blackPavlin/shop/internal/domain/category/pg"
+	"github.com/blackPavlin/shop/internal/domain/image"
+	imagepg "github.com/blackPavlin/shop/internal/domain/image/pg"
+	imagestorage "github.com/blackPavlin/shop/internal/domain/image/storage"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	productpg "github.com/blackPavlin/shop/internal/domain/product/pg"
 	"github.com/blackPavlin/shop/internal/domain/user"
@@ -72,21 +75,27 @@ func NewServer(
 		Debug:              config.Cors.Debug,
 	}).Handler)
 
+	// Storages
+	imageStorage := imagestorage.NewStorage(storage, config.S3, logger)
+
 	// Repositories
 	txManager := pg.NewTxManager(database, logger)
 	userRepository := userpg.NewUserRepository(database, logger)
 	cartRepository := cartpg.NewCartRepository(database, logger)
 	addressRepository := addresspg.NewAddressRepository(database, logger)
 	productRepository := productpg.NewProductRepository(database, logger)
+	imageProductRepository := productpg.NewImageRepository(database, logger)
 	categoryRepository := categorypg.NewCategoryRepository(database, logger)
+	imageRepository := imagepg.NewImageRepository(database, logger)
 
 	// Services
 	userService := user.NewUserUseCase(userRepository)
 	authService := auth.NewUseCase(logger, config.Auth, userRepository)
 	cartService := cart.NewUseCase(cartRepository, productRepository)
 	addressService := address.NewUseCase(addressRepository)
-	productService := product.NewUseCase(productRepository, txManager)
+	productService := product.NewUseCase(productRepository, imageProductRepository, txManager)
 	categoryService := category.NewUseCase(categoryRepository)
+	imageService := image.NewUseCase(logger, imageRepository, imageStorage, txManager)
 
 	// Controllers
 	userController := controller.NewUserController(userService)
@@ -95,6 +104,7 @@ func NewServer(
 	addressController := controller.NewAddressController(addressService)
 	productController := controller.NewProductController(productService)
 	categoryController := controller.NewCategoryController(categoryService)
+	imageController := controller.NewImageController(imageService)
 
 	// Middlewares
 
@@ -105,6 +115,7 @@ func NewServer(
 		addressController.RegisterRoutes(r)  // /api/address
 		productController.RegisterRoutes(r)  // /api/product
 		categoryController.RegisterRoutes(r) // /api/category
+		imageController.RegisterRoutes(r)    // /api/image
 	})
 
 	return &Server{

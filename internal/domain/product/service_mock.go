@@ -49,6 +49,21 @@ func (mr *MockServiceMockRecorder) Create(ctx, props interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockService)(nil).Create), ctx, props)
 }
 
+// Get mocks base method.
+func (m *MockService) Get(ctx context.Context, filter *Filter) (*Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, filter)
+	ret0, _ := ret[0].(*Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockServiceMockRecorder) Get(ctx, filter interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockService)(nil).Get), ctx, filter)
+}
+
 // Query mocks base method.
 func (m *MockService) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
 	m.ctrl.T.Helper()

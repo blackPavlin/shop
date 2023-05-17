@@ -101,6 +101,14 @@ func init() {
 	image.DefaultUpdatedAt = imageDescUpdatedAt.Default.(func() time.Time)
 	// image.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	image.UpdateDefaultUpdatedAt = imageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// imageDescName is the schema descriptor for name field.
+	imageDescName := imageFields[0].Descriptor()
+	// image.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	image.NameValidator = imageDescName.Validators[0].(func(string) error)
+	// imageDescOriginalName is the schema descriptor for original_name field.
+	imageDescOriginalName := imageFields[1].Descriptor()
+	// image.OriginalNameValidator is a validator for the "original_name" field. It is called by the builders before save.
+	image.OriginalNameValidator = imageDescOriginalName.Validators[0].(func(string) error)
 	orderMixin := schema.Order{}.Mixin()
 	orderMixinFields0 := orderMixin[0].Fields()
 	_ = orderMixinFields0

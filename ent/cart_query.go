@@ -341,6 +341,7 @@ func (cq *CartQuery) WithProducts(opts ...func(*ProductQuery)) *CartQuery {
 //		GroupBy(cart.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
+//
 func (cq *CartQuery) GroupBy(field string, fields ...string) *CartGroupBy {
 	cq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &CartGroupBy{build: cq}
@@ -362,6 +363,7 @@ func (cq *CartQuery) GroupBy(field string, fields ...string) *CartGroupBy {
 //	client.Cart.Query().
 //		Select(cart.FieldCreatedAt).
 //		Scan(ctx, &v)
+//
 func (cq *CartQuery) Select(fields ...string) *CartSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
 	sbuild := &CartSelect{CartQuery: cq}

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/blackPavlin/shop/ent/predicate"
 )
 
@@ -62,6 +63,16 @@ func CreatedAt(v time.Time) predicate.ProductImage {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// ProductID applies equality check predicate on the "product_id" field. It's identical to ProductIDEQ.
+func ProductID(v int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldProductID, v))
+}
+
+// ImageID applies equality check predicate on the "image_id" field. It's identical to ImageIDEQ.
+func ImageID(v int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldImageID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -142,6 +153,92 @@ func UpdatedAtLT(v time.Time) predicate.ProductImage {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// ProductIDEQ applies the EQ predicate on the "product_id" field.
+func ProductIDEQ(v int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldProductID, v))
+}
+
+// ProductIDNEQ applies the NEQ predicate on the "product_id" field.
+func ProductIDNEQ(v int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNEQ(FieldProductID, v))
+}
+
+// ProductIDIn applies the In predicate on the "product_id" field.
+func ProductIDIn(vs ...int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldIn(FieldProductID, vs...))
+}
+
+// ProductIDNotIn applies the NotIn predicate on the "product_id" field.
+func ProductIDNotIn(vs ...int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNotIn(FieldProductID, vs...))
+}
+
+// ImageIDEQ applies the EQ predicate on the "image_id" field.
+func ImageIDEQ(v int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldImageID, v))
+}
+
+// ImageIDNEQ applies the NEQ predicate on the "image_id" field.
+func ImageIDNEQ(v int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNEQ(FieldImageID, v))
+}
+
+// ImageIDIn applies the In predicate on the "image_id" field.
+func ImageIDIn(vs ...int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldIn(FieldImageID, vs...))
+}
+
+// ImageIDNotIn applies the NotIn predicate on the "image_id" field.
+func ImageIDNotIn(vs ...int64) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNotIn(FieldImageID, vs...))
+}
+
+// HasProducts applies the HasEdge predicate on the "products" edge.
+func HasProducts() predicate.ProductImage {
+	return predicate.ProductImage(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ProductsTable, ProductsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProductsWith applies the HasEdge predicate on the "products" edge with a given conditions (other predicates).
+func HasProductsWith(preds ...predicate.Product) predicate.ProductImage {
+	return predicate.ProductImage(func(s *sql.Selector) {
+		step := newProductsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasImages applies the HasEdge predicate on the "images" edge.
+func HasImages() predicate.ProductImage {
+	return predicate.ProductImage(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ImagesTable, ImagesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasImagesWith applies the HasEdge predicate on the "images" edge with a given conditions (other predicates).
+func HasImagesWith(preds ...predicate.Image) predicate.ProductImage {
+	return predicate.ProductImage(func(s *sql.Selector) {
+		step := newImagesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

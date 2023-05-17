@@ -198,6 +198,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 //		Address.
 //		Query().
 //		Count(ctx)
+//
 func (c *Client) Debug() *Client {
 	if c.debug {
 		return c
@@ -773,6 +774,22 @@ func (c *ImageClient) GetX(ctx context.Context, id int64) *Image {
 	return obj
 }
 
+// QueryProductImages queries the product_images edge of a Image.
+func (c *ImageClient) QueryProductImages(i *Image) *ProductImageQuery {
+	query := (&ProductImageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(image.Table, image.FieldID, id),
+			sqlgraph.To(productimage.Table, productimage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, image.ProductImagesTable, image.ProductImagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ImageClient) Hooks() []Hook {
 	return c.hooks.Image
@@ -1175,6 +1192,22 @@ func (c *ProductClient) QueryCarts(pr *Product) *CartQuery {
 	return query
 }
 
+// QueryProductImages queries the product_images edge of a Product.
+func (c *ProductClient) QueryProductImages(pr *Product) *ProductImageQuery {
+	query := (&ProductImageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, id),
+			sqlgraph.To(productimage.Table, productimage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, product.ProductImagesTable, product.ProductImagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ProductClient) Hooks() []Hook {
 	return c.hooks.Product
@@ -1291,6 +1324,38 @@ func (c *ProductImageClient) GetX(ctx context.Context, id int64) *ProductImage {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryProducts queries the products edge of a ProductImage.
+func (c *ProductImageClient) QueryProducts(pi *ProductImage) *ProductQuery {
+	query := (&ProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pi.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(productimage.Table, productimage.FieldID, id),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, productimage.ProductsTable, productimage.ProductsColumn),
+		)
+		fromV = sqlgraph.Neighbors(pi.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryImages queries the images edge of a ProductImage.
+func (c *ProductImageClient) QueryImages(pi *ProductImage) *ImageQuery {
+	query := (&ImageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pi.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(productimage.Table, productimage.FieldID, id),
+			sqlgraph.To(image.Table, image.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, productimage.ImagesTable, productimage.ImagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(pi.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

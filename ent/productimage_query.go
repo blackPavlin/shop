@@ -10,17 +10,21 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/ent/product"
 	"github.com/blackPavlin/shop/ent/productimage"
 )
 
 // ProductImageQuery is the builder for querying ProductImage entities.
 type ProductImageQuery struct {
 	config
-	ctx        *QueryContext
-	order      []productimage.OrderOption
-	inters     []Interceptor
-	predicates []predicate.ProductImage
+	ctx          *QueryContext
+	order        []productimage.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.ProductImage
+	withProducts *ProductQuery
+	withImages   *ImageQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +59,50 @@ func (piq *ProductImageQuery) Unique(unique bool) *ProductImageQuery {
 func (piq *ProductImageQuery) Order(o ...productimage.OrderOption) *ProductImageQuery {
 	piq.order = append(piq.order, o...)
 	return piq
+}
+
+// QueryProducts chains the current query on the "products" edge.
+func (piq *ProductImageQuery) QueryProducts() *ProductQuery {
+	query := (&ProductClient{config: piq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := piq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := piq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(productimage.Table, productimage.FieldID, selector),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, productimage.ProductsTable, productimage.ProductsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(piq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryImages chains the current query on the "images" edge.
+func (piq *ProductImageQuery) QueryImages() *ImageQuery {
+	query := (&ImageClient{config: piq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := piq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := piq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(productimage.Table, productimage.FieldID, selector),
+			sqlgraph.To(image.Table, image.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, productimage.ImagesTable, productimage.ImagesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(piq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first ProductImage entity from the query.
@@ -244,15 +292,39 @@ func (piq *ProductImageQuery) Clone() *ProductImageQuery {
 		return nil
 	}
 	return &ProductImageQuery{
-		config:     piq.config,
-		ctx:        piq.ctx.Clone(),
-		order:      append([]productimage.OrderOption{}, piq.order...),
-		inters:     append([]Interceptor{}, piq.inters...),
-		predicates: append([]predicate.ProductImage{}, piq.predicates...),
+		config:       piq.config,
+		ctx:          piq.ctx.Clone(),
+		order:        append([]productimage.OrderOption{}, piq.order...),
+		inters:       append([]Interceptor{}, piq.inters...),
+		predicates:   append([]predicate.ProductImage{}, piq.predicates...),
+		withProducts: piq.withProducts.Clone(),
+		withImages:   piq.withImages.Clone(),
 		// clone intermediate query.
 		sql:  piq.sql.Clone(),
 		path: piq.path,
 	}
+}
+
+// WithProducts tells the query-builder to eager-load the nodes that are connected to
+// the "products" edge. The optional arguments are used to configure the query builder of the edge.
+func (piq *ProductImageQuery) WithProducts(opts ...func(*ProductQuery)) *ProductImageQuery {
+	query := (&ProductClient{config: piq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	piq.withProducts = query
+	return piq
+}
+
+// WithImages tells the query-builder to eager-load the nodes that are connected to
+// the "images" edge. The optional arguments are used to configure the query builder of the edge.
+func (piq *ProductImageQuery) WithImages(opts ...func(*ImageQuery)) *ProductImageQuery {
+	query := (&ImageClient{config: piq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	piq.withImages = query
+	return piq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -269,6 +341,7 @@ func (piq *ProductImageQuery) Clone() *ProductImageQuery {
 //		GroupBy(productimage.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
+//
 func (piq *ProductImageQuery) GroupBy(field string, fields ...string) *ProductImageGroupBy {
 	piq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ProductImageGroupBy{build: piq}
@@ -290,6 +363,7 @@ func (piq *ProductImageQuery) GroupBy(field string, fields ...string) *ProductIm
 //	client.ProductImage.Query().
 //		Select(productimage.FieldCreatedAt).
 //		Scan(ctx, &v)
+//
 func (piq *ProductImageQuery) Select(fields ...string) *ProductImageSelect {
 	piq.ctx.Fields = append(piq.ctx.Fields, fields...)
 	sbuild := &ProductImageSelect{ProductImageQuery: piq}
@@ -331,8 +405,12 @@ func (piq *ProductImageQuery) prepareQuery(ctx context.Context) error {
 
 func (piq *ProductImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ProductImage, error) {
 	var (
-		nodes = []*ProductImage{}
-		_spec = piq.querySpec()
+		nodes       = []*ProductImage{}
+		_spec       = piq.querySpec()
+		loadedTypes = [2]bool{
+			piq.withProducts != nil,
+			piq.withImages != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*ProductImage).scanValues(nil, columns)
@@ -340,6 +418,7 @@ func (piq *ProductImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &ProductImage{config: piq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +430,78 @@ func (piq *ProductImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := piq.withProducts; query != nil {
+		if err := piq.loadProducts(ctx, query, nodes, nil,
+			func(n *ProductImage, e *Product) { n.Edges.Products = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := piq.withImages; query != nil {
+		if err := piq.loadImages(ctx, query, nodes, nil,
+			func(n *ProductImage, e *Image) { n.Edges.Images = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (piq *ProductImageQuery) loadProducts(ctx context.Context, query *ProductQuery, nodes []*ProductImage, init func(*ProductImage), assign func(*ProductImage, *Product)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*ProductImage)
+	for i := range nodes {
+		fk := nodes[i].ProductID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(product.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "product_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (piq *ProductImageQuery) loadImages(ctx context.Context, query *ImageQuery, nodes []*ProductImage, init func(*ProductImage), assign func(*ProductImage, *Image)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*ProductImage)
+	for i := range nodes {
+		fk := nodes[i].ImageID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(image.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "image_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (piq *ProductImageQuery) sqlCount(ctx context.Context) (int, error) {
@@ -378,6 +528,12 @@ func (piq *ProductImageQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != productimage.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if piq.withProducts != nil {
+			_spec.Node.AddColumnOnce(productimage.FieldProductID)
+		}
+		if piq.withImages != nil {
+			_spec.Node.AddColumnOnce(productimage.FieldImageID)
 		}
 	}
 	if ps := piq.predicates; len(ps) > 0 {

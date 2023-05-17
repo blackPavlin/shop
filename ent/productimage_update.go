@@ -11,7 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/ent/product"
 	"github.com/blackPavlin/shop/ent/productimage"
 )
 
@@ -34,9 +36,55 @@ func (piu *ProductImageUpdate) SetUpdatedAt(t time.Time) *ProductImageUpdate {
 	return piu
 }
 
+// SetProductID sets the "product_id" field.
+func (piu *ProductImageUpdate) SetProductID(i int64) *ProductImageUpdate {
+	piu.mutation.SetProductID(i)
+	return piu
+}
+
+// SetImageID sets the "image_id" field.
+func (piu *ProductImageUpdate) SetImageID(i int64) *ProductImageUpdate {
+	piu.mutation.SetImageID(i)
+	return piu
+}
+
+// SetProductsID sets the "products" edge to the Product entity by ID.
+func (piu *ProductImageUpdate) SetProductsID(id int64) *ProductImageUpdate {
+	piu.mutation.SetProductsID(id)
+	return piu
+}
+
+// SetProducts sets the "products" edge to the Product entity.
+func (piu *ProductImageUpdate) SetProducts(p *Product) *ProductImageUpdate {
+	return piu.SetProductsID(p.ID)
+}
+
+// SetImagesID sets the "images" edge to the Image entity by ID.
+func (piu *ProductImageUpdate) SetImagesID(id int64) *ProductImageUpdate {
+	piu.mutation.SetImagesID(id)
+	return piu
+}
+
+// SetImages sets the "images" edge to the Image entity.
+func (piu *ProductImageUpdate) SetImages(i *Image) *ProductImageUpdate {
+	return piu.SetImagesID(i.ID)
+}
+
 // Mutation returns the ProductImageMutation object of the builder.
 func (piu *ProductImageUpdate) Mutation() *ProductImageMutation {
 	return piu.mutation
+}
+
+// ClearProducts clears the "products" edge to the Product entity.
+func (piu *ProductImageUpdate) ClearProducts() *ProductImageUpdate {
+	piu.mutation.ClearProducts()
+	return piu
+}
+
+// ClearImages clears the "images" edge to the Image entity.
+func (piu *ProductImageUpdate) ClearImages() *ProductImageUpdate {
+	piu.mutation.ClearImages()
+	return piu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -75,7 +123,21 @@ func (piu *ProductImageUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (piu *ProductImageUpdate) check() error {
+	if _, ok := piu.mutation.ProductsID(); piu.mutation.ProductsCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ProductImage.products"`)
+	}
+	if _, ok := piu.mutation.ImagesID(); piu.mutation.ImagesCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ProductImage.images"`)
+	}
+	return nil
+}
+
 func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := piu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(productimage.Table, productimage.Columns, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
 	if ps := piu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -86,6 +148,64 @@ func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := piu.mutation.UpdatedAt(); ok {
 		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if piu.mutation.ProductsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ProductsTable,
+			Columns: []string{productimage.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := piu.mutation.ProductsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ProductsTable,
+			Columns: []string{productimage.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if piu.mutation.ImagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ImagesTable,
+			Columns: []string{productimage.ImagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := piu.mutation.ImagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ImagesTable,
+			Columns: []string{productimage.ImagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, piu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -113,9 +233,55 @@ func (piuo *ProductImageUpdateOne) SetUpdatedAt(t time.Time) *ProductImageUpdate
 	return piuo
 }
 
+// SetProductID sets the "product_id" field.
+func (piuo *ProductImageUpdateOne) SetProductID(i int64) *ProductImageUpdateOne {
+	piuo.mutation.SetProductID(i)
+	return piuo
+}
+
+// SetImageID sets the "image_id" field.
+func (piuo *ProductImageUpdateOne) SetImageID(i int64) *ProductImageUpdateOne {
+	piuo.mutation.SetImageID(i)
+	return piuo
+}
+
+// SetProductsID sets the "products" edge to the Product entity by ID.
+func (piuo *ProductImageUpdateOne) SetProductsID(id int64) *ProductImageUpdateOne {
+	piuo.mutation.SetProductsID(id)
+	return piuo
+}
+
+// SetProducts sets the "products" edge to the Product entity.
+func (piuo *ProductImageUpdateOne) SetProducts(p *Product) *ProductImageUpdateOne {
+	return piuo.SetProductsID(p.ID)
+}
+
+// SetImagesID sets the "images" edge to the Image entity by ID.
+func (piuo *ProductImageUpdateOne) SetImagesID(id int64) *ProductImageUpdateOne {
+	piuo.mutation.SetImagesID(id)
+	return piuo
+}
+
+// SetImages sets the "images" edge to the Image entity.
+func (piuo *ProductImageUpdateOne) SetImages(i *Image) *ProductImageUpdateOne {
+	return piuo.SetImagesID(i.ID)
+}
+
 // Mutation returns the ProductImageMutation object of the builder.
 func (piuo *ProductImageUpdateOne) Mutation() *ProductImageMutation {
 	return piuo.mutation
+}
+
+// ClearProducts clears the "products" edge to the Product entity.
+func (piuo *ProductImageUpdateOne) ClearProducts() *ProductImageUpdateOne {
+	piuo.mutation.ClearProducts()
+	return piuo
+}
+
+// ClearImages clears the "images" edge to the Image entity.
+func (piuo *ProductImageUpdateOne) ClearImages() *ProductImageUpdateOne {
+	piuo.mutation.ClearImages()
+	return piuo
 }
 
 // Where appends a list predicates to the ProductImageUpdate builder.
@@ -167,7 +333,21 @@ func (piuo *ProductImageUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (piuo *ProductImageUpdateOne) check() error {
+	if _, ok := piuo.mutation.ProductsID(); piuo.mutation.ProductsCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ProductImage.products"`)
+	}
+	if _, ok := piuo.mutation.ImagesID(); piuo.mutation.ImagesCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ProductImage.images"`)
+	}
+	return nil
+}
+
 func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductImage, err error) {
+	if err := piuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(productimage.Table, productimage.Columns, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
 	id, ok := piuo.mutation.ID()
 	if !ok {
@@ -195,6 +375,64 @@ func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductI
 	}
 	if value, ok := piuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if piuo.mutation.ProductsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ProductsTable,
+			Columns: []string{productimage.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := piuo.mutation.ProductsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ProductsTable,
+			Columns: []string{productimage.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if piuo.mutation.ImagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ImagesTable,
+			Columns: []string{productimage.ImagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := piuo.mutation.ImagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   productimage.ImagesTable,
+			Columns: []string{productimage.ImagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &ProductImage{config: piuo.config}
 	_spec.Assign = _node.assignValues

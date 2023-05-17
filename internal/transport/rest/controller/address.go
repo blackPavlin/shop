@@ -20,9 +20,7 @@ type AddressController struct {
 
 // NewAddressController
 func NewAddressController(addressService address.Service) *AddressController {
-	return &AddressController{
-		addressService: addressService,
-	}
+	return &AddressController{addressService: addressService}
 }
 
 // RegisterRoutes
@@ -40,7 +38,6 @@ func (ctrl *AddressController) GetAddressesHandler(w http.ResponseWriter, r *htt
 		restx.HandleError(w, r, err)
 		return
 	}
-
 	render.Respond(w, r, mapping.CreateAddressesResponse(addresses))
 }
 
@@ -51,18 +48,15 @@ func (ctrl *AddressController) CreateAddressHandler(w http.ResponseWriter, r *ht
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	if err := request.Validate(); err != nil {
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	addr, err := ctrl.addressService.Create(r.Context(), request.ToDomainEntity())
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
-
 	render.Status(r, http.StatusCreated)
 	render.Respond(w, r, mapping.CreateAddressResponse(addr))
 }

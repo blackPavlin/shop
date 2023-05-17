@@ -15,17 +15,19 @@ import (
 	"github.com/blackPavlin/shop/ent/category"
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/ent/product"
+	"github.com/blackPavlin/shop/ent/productimage"
 )
 
 // ProductQuery is the builder for querying Product entities.
 type ProductQuery struct {
 	config
-	ctx            *QueryContext
-	order          []product.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Product
-	withCategories *CategoryQuery
-	withCarts      *CartQuery
+	ctx               *QueryContext
+	order             []product.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.Product
+	withCategories    *CategoryQuery
+	withCarts         *CartQuery
+	withProductImages *ProductImageQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -99,6 +101,28 @@ func (pq *ProductQuery) QueryCarts() *CartQuery {
 			sqlgraph.From(product.Table, product.FieldID, selector),
 			sqlgraph.To(cart.Table, cart.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.CartsTable, product.CartsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProductImages chains the current query on the "product_images" edge.
+func (pq *ProductQuery) QueryProductImages() *ProductImageQuery {
+	query := (&ProductImageClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, selector),
+			sqlgraph.To(productimage.Table, productimage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, product.ProductImagesTable, product.ProductImagesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -293,13 +317,14 @@ func (pq *ProductQuery) Clone() *ProductQuery {
 		return nil
 	}
 	return &ProductQuery{
-		config:         pq.config,
-		ctx:            pq.ctx.Clone(),
-		order:          append([]product.OrderOption{}, pq.order...),
-		inters:         append([]Interceptor{}, pq.inters...),
-		predicates:     append([]predicate.Product{}, pq.predicates...),
-		withCategories: pq.withCategories.Clone(),
-		withCarts:      pq.withCarts.Clone(),
+		config:            pq.config,
+		ctx:               pq.ctx.Clone(),
+		order:             append([]product.OrderOption{}, pq.order...),
+		inters:            append([]Interceptor{}, pq.inters...),
+		predicates:        append([]predicate.Product{}, pq.predicates...),
+		withCategories:    pq.withCategories.Clone(),
+		withCarts:         pq.withCarts.Clone(),
+		withProductImages: pq.withProductImages.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -328,6 +353,17 @@ func (pq *ProductQuery) WithCarts(opts ...func(*CartQuery)) *ProductQuery {
 	return pq
 }
 
+// WithProductImages tells the query-builder to eager-load the nodes that are connected to
+// the "product_images" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProductQuery) WithProductImages(opts ...func(*ProductImageQuery)) *ProductQuery {
+	query := (&ProductImageClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withProductImages = query
+	return pq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -342,6 +378,7 @@ func (pq *ProductQuery) WithCarts(opts ...func(*CartQuery)) *ProductQuery {
 //		GroupBy(product.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
+//
 func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy {
 	pq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ProductGroupBy{build: pq}
@@ -363,6 +400,7 @@ func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy 
 //	client.Product.Query().
 //		Select(product.FieldCreatedAt).
 //		Scan(ctx, &v)
+//
 func (pq *ProductQuery) Select(fields ...string) *ProductSelect {
 	pq.ctx.Fields = append(pq.ctx.Fields, fields...)
 	sbuild := &ProductSelect{ProductQuery: pq}
@@ -406,9 +444,10 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	var (
 		nodes       = []*Product{}
 		_spec       = pq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			pq.withCategories != nil,
 			pq.withCarts != nil,
+			pq.withProductImages != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -439,6 +478,13 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 		if err := pq.loadCarts(ctx, query, nodes,
 			func(n *Product) { n.Edges.Carts = []*Cart{} },
 			func(n *Product, e *Cart) { n.Edges.Carts = append(n.Edges.Carts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withProductImages; query != nil {
+		if err := pq.loadProductImages(ctx, query, nodes,
+			func(n *Product) { n.Edges.ProductImages = []*ProductImage{} },
+			func(n *Product, e *ProductImage) { n.Edges.ProductImages = append(n.Edges.ProductImages, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -489,6 +535,36 @@ func (pq *ProductQuery) loadCarts(ctx context.Context, query *CartQuery, nodes [
 	}
 	query.Where(predicate.Cart(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(product.CartsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ProductID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "product_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (pq *ProductQuery) loadProductImages(ctx context.Context, query *ProductImageQuery, nodes []*Product, init func(*Product), assign func(*Product, *ProductImage)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*Product)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(productimage.FieldProductID)
+	}
+	query.Where(predicate.ProductImage(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(product.ProductImagesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

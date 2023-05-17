@@ -27,11 +27,17 @@ func NewProductRepository(client *ent.Client, logger *zap.Logger) *ProductReposi
 }
 
 // Create
-func (r *ProductRepository) Create(
+func (r *ProductRepository) CreateTx(
 	ctx context.Context,
 	props *product.Props,
 ) (*product.Product, error) {
-	row, err := r.client.Product.Create().
+	tx := ent.TxFromContext(ctx)
+	if tx == nil {
+		r.logger.Error("using tx in non tx context", zap.Error(errorx.ErrInternal))
+		return nil, errorx.ErrInternal
+	}
+	client := tx.Client()
+	row, err := client.Product.Create().
 		SetCategoryID(int64(props.CategoryID)).
 		SetName(props.Name).
 		SetDescription(props.Description).
@@ -40,7 +46,7 @@ func (r *ProductRepository) Create(
 		Save(ctx)
 	if err != nil {
 		if pg.IsForeignKeyViolationErr(err, "product_category_fk") {
-			return nil, errorx.NewNotFoundError("category not found")
+			return nil, errorx.ErrNotFound
 		}
 		r.logger.Error("create product error:", zap.Error(err))
 		return nil, errorx.ErrInternal
@@ -49,14 +55,17 @@ func (r *ProductRepository) Create(
 }
 
 // Get
-func (r *ProductRepository) Get(ctx context.Context, filter *product.Filter) (*product.Product, error) {
+func (r *ProductRepository) Get(
+	ctx context.Context,
+	filter *product.Filter,
+) (*product.Product, error) {
 	row, err := r.client.Product.
 		Query().
 		Where(makePredicates(filter)...).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, errorx.NewNotFoundError("product not found")
+			return nil, errorx.ErrNotFound
 		}
 		r.logger.Error("get product error", zap.Error(err))
 		return nil, errorx.ErrInternal
@@ -117,10 +126,16 @@ func makePredicates(filter *product.Filter) []predicate.Product {
 		predicates = append(predicates, entproduct.IDNotIn(filter.ID.Neq.ToInt64()...))
 	}
 	if len(filter.CategoryID.Eq) > 0 {
-		predicates = append(predicates, entproduct.CategoryIDIn(filter.CategoryID.Eq.ToInt64()...))
+		predicates = append(
+			predicates,
+			entproduct.CategoryIDIn(filter.CategoryID.Eq.ToInt64()...),
+		)
 	}
 	if len(filter.CategoryID.Neq) > 0 {
-		predicates = append(predicates, entproduct.CategoryIDNotIn(filter.CategoryID.Neq.ToInt64()...))
+		predicates = append(
+			predicates,
+			entproduct.CategoryIDNotIn(filter.CategoryID.Neq.ToInt64()...),
+		)
 	}
 	return predicates
 }

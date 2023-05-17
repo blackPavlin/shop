@@ -20,9 +20,7 @@ type AuthController struct {
 
 // NewAuthController
 func NewAuthController(authService auth.Service) *AuthController {
-	return &AuthController{
-		authService: authService,
-	}
+	return &AuthController{authService: authService}
 }
 
 // RegisterRoutes
@@ -40,18 +38,15 @@ func (ctrl *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request)
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	if err := request.Validate(); err != nil {
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	token, err := ctrl.authService.Login(r.Context(), request.ToDomainEntity())
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
-
 	render.Status(r, http.StatusCreated)
 	render.Respond(w, r, mapping.CreateLoginResponse(token))
 }
@@ -63,17 +58,14 @@ func (ctrl *AuthController) SignupHandler(w http.ResponseWriter, r *http.Request
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	if err := request.Validate(); err != nil {
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-
 	token, err := ctrl.authService.Signup(r.Context(), request.ToDomainEntity())
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
-
 	render.Respond(w, r, mapping.CreateLoginResponse(token))
 }

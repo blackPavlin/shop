@@ -32,6 +32,8 @@ const (
 	EdgeCategories = "categories"
 	// EdgeCarts holds the string denoting the carts edge name in mutations.
 	EdgeCarts = "carts"
+	// EdgeProductImages holds the string denoting the product_images edge name in mutations.
+	EdgeProductImages = "product_images"
 	// Table holds the table name of the product in the database.
 	Table = "products"
 	// CategoriesTable is the table that holds the categories relation/edge.
@@ -48,6 +50,13 @@ const (
 	CartsInverseTable = "carts"
 	// CartsColumn is the table column denoting the carts relation/edge.
 	CartsColumn = "product_id"
+	// ProductImagesTable is the table that holds the product_images relation/edge.
+	ProductImagesTable = "product_images"
+	// ProductImagesInverseTable is the table name for the ProductImage entity.
+	// It exists in this package in order to avoid circular dependency with the "productimage" package.
+	ProductImagesInverseTable = "product_images"
+	// ProductImagesColumn is the table column denoting the product_images relation/edge.
+	ProductImagesColumn = "product_id"
 )
 
 // Columns holds all SQL columns for product fields.
@@ -152,6 +161,20 @@ func ByCarts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCartsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByProductImagesCount orders the results by product_images count.
+func ByProductImagesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProductImagesStep(), opts...)
+	}
+}
+
+// ByProductImages orders the results by product_images terms.
+func ByProductImages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProductImagesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCategoriesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -164,5 +187,12 @@ func newCartsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CartsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CartsTable, CartsColumn),
+	)
+}
+func newProductImagesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProductImagesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ProductImagesTable, ProductImagesColumn),
 	)
 }

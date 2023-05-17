@@ -2297,15 +2297,20 @@ func (m *CategoryMutation) ResetEdge(name string) error {
 // ImageMutation represents an operation that mutates the Image nodes in the graph.
 type ImageMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Image, error)
-	predicates    []predicate.Image
+	op                    Op
+	typ                   string
+	id                    *int64
+	created_at            *time.Time
+	updated_at            *time.Time
+	name                  *string
+	original_name         *string
+	clearedFields         map[string]struct{}
+	product_images        map[int64]struct{}
+	removedproduct_images map[int64]struct{}
+	clearedproduct_images bool
+	done                  bool
+	oldValue              func(context.Context) (*Image, error)
+	predicates            []predicate.Image
 }
 
 var _ ent.Mutation = (*ImageMutation)(nil)
@@ -2478,6 +2483,132 @@ func (m *ImageMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetName sets the "name" field.
+func (m *ImageMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ImageMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Image entity.
+// If the Image object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImageMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ImageMutation) ResetName() {
+	m.name = nil
+}
+
+// SetOriginalName sets the "original_name" field.
+func (m *ImageMutation) SetOriginalName(s string) {
+	m.original_name = &s
+}
+
+// OriginalName returns the value of the "original_name" field in the mutation.
+func (m *ImageMutation) OriginalName() (r string, exists bool) {
+	v := m.original_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOriginalName returns the old "original_name" field's value of the Image entity.
+// If the Image object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImageMutation) OldOriginalName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOriginalName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOriginalName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOriginalName: %w", err)
+	}
+	return oldValue.OriginalName, nil
+}
+
+// ResetOriginalName resets all changes to the "original_name" field.
+func (m *ImageMutation) ResetOriginalName() {
+	m.original_name = nil
+}
+
+// AddProductImageIDs adds the "product_images" edge to the ProductImage entity by ids.
+func (m *ImageMutation) AddProductImageIDs(ids ...int64) {
+	if m.product_images == nil {
+		m.product_images = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.product_images[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProductImages clears the "product_images" edge to the ProductImage entity.
+func (m *ImageMutation) ClearProductImages() {
+	m.clearedproduct_images = true
+}
+
+// ProductImagesCleared reports if the "product_images" edge to the ProductImage entity was cleared.
+func (m *ImageMutation) ProductImagesCleared() bool {
+	return m.clearedproduct_images
+}
+
+// RemoveProductImageIDs removes the "product_images" edge to the ProductImage entity by IDs.
+func (m *ImageMutation) RemoveProductImageIDs(ids ...int64) {
+	if m.removedproduct_images == nil {
+		m.removedproduct_images = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.product_images, ids[i])
+		m.removedproduct_images[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProductImages returns the removed IDs of the "product_images" edge to the ProductImage entity.
+func (m *ImageMutation) RemovedProductImagesIDs() (ids []int64) {
+	for id := range m.removedproduct_images {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProductImagesIDs returns the "product_images" edge IDs in the mutation.
+func (m *ImageMutation) ProductImagesIDs() (ids []int64) {
+	for id := range m.product_images {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProductImages resets all changes to the "product_images" edge.
+func (m *ImageMutation) ResetProductImages() {
+	m.product_images = nil
+	m.clearedproduct_images = false
+	m.removedproduct_images = nil
+}
+
 // Where appends a list predicates to the ImageMutation builder.
 func (m *ImageMutation) Where(ps ...predicate.Image) {
 	m.predicates = append(m.predicates, ps...)
@@ -2512,12 +2643,18 @@ func (m *ImageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ImageMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 4)
 	if m.created_at != nil {
 		fields = append(fields, image.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, image.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, image.FieldName)
+	}
+	if m.original_name != nil {
+		fields = append(fields, image.FieldOriginalName)
 	}
 	return fields
 }
@@ -2531,6 +2668,10 @@ func (m *ImageMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case image.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case image.FieldName:
+		return m.Name()
+	case image.FieldOriginalName:
+		return m.OriginalName()
 	}
 	return nil, false
 }
@@ -2544,6 +2685,10 @@ func (m *ImageMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldCreatedAt(ctx)
 	case image.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case image.FieldName:
+		return m.OldName(ctx)
+	case image.FieldOriginalName:
+		return m.OldOriginalName(ctx)
 	}
 	return nil, fmt.Errorf("unknown Image field %s", name)
 }
@@ -2566,6 +2711,20 @@ func (m *ImageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case image.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case image.FieldOriginalName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOriginalName(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Image field %s", name)
@@ -2622,55 +2781,97 @@ func (m *ImageMutation) ResetField(name string) error {
 	case image.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case image.FieldName:
+		m.ResetName()
+		return nil
+	case image.FieldOriginalName:
+		m.ResetOriginalName()
+		return nil
 	}
 	return fmt.Errorf("unknown Image field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ImageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.product_images != nil {
+		edges = append(edges, image.EdgeProductImages)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ImageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case image.EdgeProductImages:
+		ids := make([]ent.Value, 0, len(m.product_images))
+		for id := range m.product_images {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ImageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedproduct_images != nil {
+		edges = append(edges, image.EdgeProductImages)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ImageMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case image.EdgeProductImages:
+		ids := make([]ent.Value, 0, len(m.removedproduct_images))
+		for id := range m.removedproduct_images {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ImageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedproduct_images {
+		edges = append(edges, image.EdgeProductImages)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ImageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case image.EdgeProductImages:
+		return m.clearedproduct_images
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ImageMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Image unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ImageMutation) ResetEdge(name string) error {
+	switch name {
+	case image.EdgeProductImages:
+		m.ResetProductImages()
+		return nil
+	}
 	return fmt.Errorf("unknown Image edge %s", name)
 }
 
@@ -3614,26 +3815,29 @@ func (m *OrderProductMutation) ResetEdge(name string) error {
 // ProductMutation represents an operation that mutates the Product nodes in the graph.
 type ProductMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *int64
-	created_at        *time.Time
-	updated_at        *time.Time
-	name              *string
-	description       *string
-	amount            *int64
-	addamount         *int64
-	price             *int64
-	addprice          *int64
-	clearedFields     map[string]struct{}
-	categories        *int64
-	clearedcategories bool
-	carts             map[int64]struct{}
-	removedcarts      map[int64]struct{}
-	clearedcarts      bool
-	done              bool
-	oldValue          func(context.Context) (*Product, error)
-	predicates        []predicate.Product
+	op                    Op
+	typ                   string
+	id                    *int64
+	created_at            *time.Time
+	updated_at            *time.Time
+	name                  *string
+	description           *string
+	amount                *int64
+	addamount             *int64
+	price                 *int64
+	addprice              *int64
+	clearedFields         map[string]struct{}
+	categories            *int64
+	clearedcategories     bool
+	carts                 map[int64]struct{}
+	removedcarts          map[int64]struct{}
+	clearedcarts          bool
+	product_images        map[int64]struct{}
+	removedproduct_images map[int64]struct{}
+	clearedproduct_images bool
+	done                  bool
+	oldValue              func(context.Context) (*Product, error)
+	predicates            []predicate.Product
 }
 
 var _ ent.Mutation = (*ProductMutation)(nil)
@@ -4132,6 +4336,60 @@ func (m *ProductMutation) ResetCarts() {
 	m.removedcarts = nil
 }
 
+// AddProductImageIDs adds the "product_images" edge to the ProductImage entity by ids.
+func (m *ProductMutation) AddProductImageIDs(ids ...int64) {
+	if m.product_images == nil {
+		m.product_images = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.product_images[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProductImages clears the "product_images" edge to the ProductImage entity.
+func (m *ProductMutation) ClearProductImages() {
+	m.clearedproduct_images = true
+}
+
+// ProductImagesCleared reports if the "product_images" edge to the ProductImage entity was cleared.
+func (m *ProductMutation) ProductImagesCleared() bool {
+	return m.clearedproduct_images
+}
+
+// RemoveProductImageIDs removes the "product_images" edge to the ProductImage entity by IDs.
+func (m *ProductMutation) RemoveProductImageIDs(ids ...int64) {
+	if m.removedproduct_images == nil {
+		m.removedproduct_images = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.product_images, ids[i])
+		m.removedproduct_images[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProductImages returns the removed IDs of the "product_images" edge to the ProductImage entity.
+func (m *ProductMutation) RemovedProductImagesIDs() (ids []int64) {
+	for id := range m.removedproduct_images {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProductImagesIDs returns the "product_images" edge IDs in the mutation.
+func (m *ProductMutation) ProductImagesIDs() (ids []int64) {
+	for id := range m.product_images {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProductImages resets all changes to the "product_images" edge.
+func (m *ProductMutation) ResetProductImages() {
+	m.product_images = nil
+	m.clearedproduct_images = false
+	m.removedproduct_images = nil
+}
+
 // Where appends a list predicates to the ProductMutation builder.
 func (m *ProductMutation) Where(ps ...predicate.Product) {
 	m.predicates = append(m.predicates, ps...)
@@ -4403,12 +4661,15 @@ func (m *ProductMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ProductMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.categories != nil {
 		edges = append(edges, product.EdgeCategories)
 	}
 	if m.carts != nil {
 		edges = append(edges, product.EdgeCarts)
+	}
+	if m.product_images != nil {
+		edges = append(edges, product.EdgeProductImages)
 	}
 	return edges
 }
@@ -4427,15 +4688,24 @@ func (m *ProductMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case product.EdgeProductImages:
+		ids := make([]ent.Value, 0, len(m.product_images))
+		for id := range m.product_images {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ProductMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedcarts != nil {
 		edges = append(edges, product.EdgeCarts)
+	}
+	if m.removedproduct_images != nil {
+		edges = append(edges, product.EdgeProductImages)
 	}
 	return edges
 }
@@ -4450,18 +4720,27 @@ func (m *ProductMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case product.EdgeProductImages:
+		ids := make([]ent.Value, 0, len(m.removedproduct_images))
+		for id := range m.removedproduct_images {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ProductMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedcategories {
 		edges = append(edges, product.EdgeCategories)
 	}
 	if m.clearedcarts {
 		edges = append(edges, product.EdgeCarts)
+	}
+	if m.clearedproduct_images {
+		edges = append(edges, product.EdgeProductImages)
 	}
 	return edges
 }
@@ -4474,6 +4753,8 @@ func (m *ProductMutation) EdgeCleared(name string) bool {
 		return m.clearedcategories
 	case product.EdgeCarts:
 		return m.clearedcarts
+	case product.EdgeProductImages:
+		return m.clearedproduct_images
 	}
 	return false
 }
@@ -4499,6 +4780,9 @@ func (m *ProductMutation) ResetEdge(name string) error {
 	case product.EdgeCarts:
 		m.ResetCarts()
 		return nil
+	case product.EdgeProductImages:
+		m.ResetProductImages()
+		return nil
 	}
 	return fmt.Errorf("unknown Product edge %s", name)
 }
@@ -4506,15 +4790,19 @@ func (m *ProductMutation) ResetEdge(name string) error {
 // ProductImageMutation represents an operation that mutates the ProductImage nodes in the graph.
 type ProductImageMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*ProductImage, error)
-	predicates    []predicate.ProductImage
+	op              Op
+	typ             string
+	id              *int64
+	created_at      *time.Time
+	updated_at      *time.Time
+	clearedFields   map[string]struct{}
+	products        *int64
+	clearedproducts bool
+	images          *int64
+	clearedimages   bool
+	done            bool
+	oldValue        func(context.Context) (*ProductImage, error)
+	predicates      []predicate.ProductImage
 }
 
 var _ ent.Mutation = (*ProductImageMutation)(nil)
@@ -4687,6 +4975,156 @@ func (m *ProductImageMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetProductID sets the "product_id" field.
+func (m *ProductImageMutation) SetProductID(i int64) {
+	m.products = &i
+}
+
+// ProductID returns the value of the "product_id" field in the mutation.
+func (m *ProductImageMutation) ProductID() (r int64, exists bool) {
+	v := m.products
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProductID returns the old "product_id" field's value of the ProductImage entity.
+// If the ProductImage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProductImageMutation) OldProductID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProductID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProductID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProductID: %w", err)
+	}
+	return oldValue.ProductID, nil
+}
+
+// ResetProductID resets all changes to the "product_id" field.
+func (m *ProductImageMutation) ResetProductID() {
+	m.products = nil
+}
+
+// SetImageID sets the "image_id" field.
+func (m *ProductImageMutation) SetImageID(i int64) {
+	m.images = &i
+}
+
+// ImageID returns the value of the "image_id" field in the mutation.
+func (m *ProductImageMutation) ImageID() (r int64, exists bool) {
+	v := m.images
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImageID returns the old "image_id" field's value of the ProductImage entity.
+// If the ProductImage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProductImageMutation) OldImageID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImageID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImageID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImageID: %w", err)
+	}
+	return oldValue.ImageID, nil
+}
+
+// ResetImageID resets all changes to the "image_id" field.
+func (m *ProductImageMutation) ResetImageID() {
+	m.images = nil
+}
+
+// SetProductsID sets the "products" edge to the Product entity by id.
+func (m *ProductImageMutation) SetProductsID(id int64) {
+	m.products = &id
+}
+
+// ClearProducts clears the "products" edge to the Product entity.
+func (m *ProductImageMutation) ClearProducts() {
+	m.clearedproducts = true
+}
+
+// ProductsCleared reports if the "products" edge to the Product entity was cleared.
+func (m *ProductImageMutation) ProductsCleared() bool {
+	return m.clearedproducts
+}
+
+// ProductsID returns the "products" edge ID in the mutation.
+func (m *ProductImageMutation) ProductsID() (id int64, exists bool) {
+	if m.products != nil {
+		return *m.products, true
+	}
+	return
+}
+
+// ProductsIDs returns the "products" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ProductsID instead. It exists only for internal usage by the builders.
+func (m *ProductImageMutation) ProductsIDs() (ids []int64) {
+	if id := m.products; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetProducts resets all changes to the "products" edge.
+func (m *ProductImageMutation) ResetProducts() {
+	m.products = nil
+	m.clearedproducts = false
+}
+
+// SetImagesID sets the "images" edge to the Image entity by id.
+func (m *ProductImageMutation) SetImagesID(id int64) {
+	m.images = &id
+}
+
+// ClearImages clears the "images" edge to the Image entity.
+func (m *ProductImageMutation) ClearImages() {
+	m.clearedimages = true
+}
+
+// ImagesCleared reports if the "images" edge to the Image entity was cleared.
+func (m *ProductImageMutation) ImagesCleared() bool {
+	return m.clearedimages
+}
+
+// ImagesID returns the "images" edge ID in the mutation.
+func (m *ProductImageMutation) ImagesID() (id int64, exists bool) {
+	if m.images != nil {
+		return *m.images, true
+	}
+	return
+}
+
+// ImagesIDs returns the "images" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ImagesID instead. It exists only for internal usage by the builders.
+func (m *ProductImageMutation) ImagesIDs() (ids []int64) {
+	if id := m.images; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetImages resets all changes to the "images" edge.
+func (m *ProductImageMutation) ResetImages() {
+	m.images = nil
+	m.clearedimages = false
+}
+
 // Where appends a list predicates to the ProductImageMutation builder.
 func (m *ProductImageMutation) Where(ps ...predicate.ProductImage) {
 	m.predicates = append(m.predicates, ps...)
@@ -4721,12 +5159,18 @@ func (m *ProductImageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProductImageMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 4)
 	if m.created_at != nil {
 		fields = append(fields, productimage.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, productimage.FieldUpdatedAt)
+	}
+	if m.products != nil {
+		fields = append(fields, productimage.FieldProductID)
+	}
+	if m.images != nil {
+		fields = append(fields, productimage.FieldImageID)
 	}
 	return fields
 }
@@ -4740,6 +5184,10 @@ func (m *ProductImageMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case productimage.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case productimage.FieldProductID:
+		return m.ProductID()
+	case productimage.FieldImageID:
+		return m.ImageID()
 	}
 	return nil, false
 }
@@ -4753,6 +5201,10 @@ func (m *ProductImageMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldCreatedAt(ctx)
 	case productimage.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case productimage.FieldProductID:
+		return m.OldProductID(ctx)
+	case productimage.FieldImageID:
+		return m.OldImageID(ctx)
 	}
 	return nil, fmt.Errorf("unknown ProductImage field %s", name)
 }
@@ -4776,6 +5228,20 @@ func (m *ProductImageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case productimage.FieldProductID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProductID(v)
+		return nil
+	case productimage.FieldImageID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImageID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ProductImage field %s", name)
 }
@@ -4783,13 +5249,16 @@ func (m *ProductImageMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ProductImageMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ProductImageMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -4831,25 +5300,47 @@ func (m *ProductImageMutation) ResetField(name string) error {
 	case productimage.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case productimage.FieldProductID:
+		m.ResetProductID()
+		return nil
+	case productimage.FieldImageID:
+		m.ResetImageID()
+		return nil
 	}
 	return fmt.Errorf("unknown ProductImage field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ProductImageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.products != nil {
+		edges = append(edges, productimage.EdgeProducts)
+	}
+	if m.images != nil {
+		edges = append(edges, productimage.EdgeImages)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ProductImageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case productimage.EdgeProducts:
+		if id := m.products; id != nil {
+			return []ent.Value{*id}
+		}
+	case productimage.EdgeImages:
+		if id := m.images; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ProductImageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -4861,25 +5352,53 @@ func (m *ProductImageMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ProductImageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.clearedproducts {
+		edges = append(edges, productimage.EdgeProducts)
+	}
+	if m.clearedimages {
+		edges = append(edges, productimage.EdgeImages)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ProductImageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case productimage.EdgeProducts:
+		return m.clearedproducts
+	case productimage.EdgeImages:
+		return m.clearedimages
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ProductImageMutation) ClearEdge(name string) error {
+	switch name {
+	case productimage.EdgeProducts:
+		m.ClearProducts()
+		return nil
+	case productimage.EdgeImages:
+		m.ClearImages()
+		return nil
+	}
 	return fmt.Errorf("unknown ProductImage unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ProductImageMutation) ResetEdge(name string) error {
+	switch name {
+	case productimage.EdgeProducts:
+		m.ResetProducts()
+		return nil
+	case productimage.EdgeImages:
+		m.ResetImages()
+		return nil
+	}
 	return fmt.Errorf("unknown ProductImage edge %s", name)
 }
 

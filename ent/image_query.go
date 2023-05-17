@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,15 +13,17 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/ent/productimage"
 )
 
 // ImageQuery is the builder for querying Image entities.
 type ImageQuery struct {
 	config
-	ctx        *QueryContext
-	order      []image.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Image
+	ctx               *QueryContext
+	order             []image.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.Image
+	withProductImages *ProductImageQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +58,28 @@ func (iq *ImageQuery) Unique(unique bool) *ImageQuery {
 func (iq *ImageQuery) Order(o ...image.OrderOption) *ImageQuery {
 	iq.order = append(iq.order, o...)
 	return iq
+}
+
+// QueryProductImages chains the current query on the "product_images" edge.
+func (iq *ImageQuery) QueryProductImages() *ProductImageQuery {
+	query := (&ProductImageClient{config: iq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := iq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := iq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(image.Table, image.FieldID, selector),
+			sqlgraph.To(productimage.Table, productimage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, image.ProductImagesTable, image.ProductImagesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Image entity from the query.
@@ -244,15 +269,27 @@ func (iq *ImageQuery) Clone() *ImageQuery {
 		return nil
 	}
 	return &ImageQuery{
-		config:     iq.config,
-		ctx:        iq.ctx.Clone(),
-		order:      append([]image.OrderOption{}, iq.order...),
-		inters:     append([]Interceptor{}, iq.inters...),
-		predicates: append([]predicate.Image{}, iq.predicates...),
+		config:            iq.config,
+		ctx:               iq.ctx.Clone(),
+		order:             append([]image.OrderOption{}, iq.order...),
+		inters:            append([]Interceptor{}, iq.inters...),
+		predicates:        append([]predicate.Image{}, iq.predicates...),
+		withProductImages: iq.withProductImages.Clone(),
 		// clone intermediate query.
 		sql:  iq.sql.Clone(),
 		path: iq.path,
 	}
+}
+
+// WithProductImages tells the query-builder to eager-load the nodes that are connected to
+// the "product_images" edge. The optional arguments are used to configure the query builder of the edge.
+func (iq *ImageQuery) WithProductImages(opts ...func(*ProductImageQuery)) *ImageQuery {
+	query := (&ProductImageClient{config: iq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	iq.withProductImages = query
+	return iq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -269,6 +306,7 @@ func (iq *ImageQuery) Clone() *ImageQuery {
 //		GroupBy(image.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
+//
 func (iq *ImageQuery) GroupBy(field string, fields ...string) *ImageGroupBy {
 	iq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ImageGroupBy{build: iq}
@@ -290,6 +328,7 @@ func (iq *ImageQuery) GroupBy(field string, fields ...string) *ImageGroupBy {
 //	client.Image.Query().
 //		Select(image.FieldCreatedAt).
 //		Scan(ctx, &v)
+//
 func (iq *ImageQuery) Select(fields ...string) *ImageSelect {
 	iq.ctx.Fields = append(iq.ctx.Fields, fields...)
 	sbuild := &ImageSelect{ImageQuery: iq}
@@ -331,8 +370,11 @@ func (iq *ImageQuery) prepareQuery(ctx context.Context) error {
 
 func (iq *ImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Image, error) {
 	var (
-		nodes = []*Image{}
-		_spec = iq.querySpec()
+		nodes       = []*Image{}
+		_spec       = iq.querySpec()
+		loadedTypes = [1]bool{
+			iq.withProductImages != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Image).scanValues(nil, columns)
@@ -340,6 +382,7 @@ func (iq *ImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Image,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Image{config: iq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +394,45 @@ func (iq *ImageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Image,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := iq.withProductImages; query != nil {
+		if err := iq.loadProductImages(ctx, query, nodes,
+			func(n *Image) { n.Edges.ProductImages = []*ProductImage{} },
+			func(n *Image, e *ProductImage) { n.Edges.ProductImages = append(n.Edges.ProductImages, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (iq *ImageQuery) loadProductImages(ctx context.Context, query *ProductImageQuery, nodes []*Image, init func(*Image), assign func(*Image, *ProductImage)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*Image)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(productimage.FieldImageID)
+	}
+	query.Where(predicate.ProductImage(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(image.ProductImagesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ImageID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "image_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (iq *ImageQuery) sqlCount(ctx context.Context) (int, error) {

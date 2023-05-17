@@ -39,10 +39,10 @@ func (r *CartRepository) Create(ctx context.Context, props *cart.Props) (*cart.C
 		Save(ctx)
 	if err != nil {
 		if pg.IsForeignKeyViolationErr(err, "cart_user_fk") {
-			return nil, errorx.NewNotFoundError("user not found")
+			return nil, errorx.ErrNotFound
 		}
 		if pg.IsForeignKeyViolationErr(err, "cart_product_fk") {
-			return nil, errorx.NewNotFoundError("product not found")
+			return nil, errorx.ErrNotFound
 		}
 		r.logger.Error("create cart error", zap.Error(err))
 		return nil, errorx.ErrInternal
@@ -58,7 +58,7 @@ func (r *CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Ca
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, errorx.NewNotFoundError("cart not found")
+			return nil, errorx.ErrNotFound
 		}
 		r.logger.Error("get cart error", zap.Error(err))
 		return nil, errorx.ErrInternal

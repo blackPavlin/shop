@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,30 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldProductID holds the string denoting the product_id field in the database.
+	FieldProductID = "product_id"
+	// FieldImageID holds the string denoting the image_id field in the database.
+	FieldImageID = "image_id"
+	// EdgeProducts holds the string denoting the products edge name in mutations.
+	EdgeProducts = "products"
+	// EdgeImages holds the string denoting the images edge name in mutations.
+	EdgeImages = "images"
 	// Table holds the table name of the productimage in the database.
 	Table = "product_images"
+	// ProductsTable is the table that holds the products relation/edge.
+	ProductsTable = "product_images"
+	// ProductsInverseTable is the table name for the Product entity.
+	// It exists in this package in order to avoid circular dependency with the "product" package.
+	ProductsInverseTable = "products"
+	// ProductsColumn is the table column denoting the products relation/edge.
+	ProductsColumn = "product_id"
+	// ImagesTable is the table that holds the images relation/edge.
+	ImagesTable = "product_images"
+	// ImagesInverseTable is the table name for the Image entity.
+	// It exists in this package in order to avoid circular dependency with the "image" package.
+	ImagesInverseTable = "images"
+	// ImagesColumn is the table column denoting the images relation/edge.
+	ImagesColumn = "image_id"
 )
 
 // Columns holds all SQL columns for productimage fields.
@@ -26,6 +49,8 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldProductID,
+	FieldImageID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -63,4 +88,42 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByProductID orders the results by the product_id field.
+func ByProductID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProductID, opts...).ToFunc()
+}
+
+// ByImageID orders the results by the image_id field.
+func ByImageID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldImageID, opts...).ToFunc()
+}
+
+// ByProductsField orders the results by products field.
+func ByProductsField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProductsStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByImagesField orders the results by images field.
+func ByImagesField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newImagesStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newProductsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProductsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ProductsTable, ProductsColumn),
+	)
+}
+func newImagesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ImagesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ImagesTable, ImagesColumn),
+	)
 }

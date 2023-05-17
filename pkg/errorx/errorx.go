@@ -38,8 +38,3 @@ var (
 func NewBadRequestError(msg string) *Error {
 	return NewError(http.StatusBadRequest, msg)
 }
-
-// NewNotFoundError
-func NewNotFoundError(msg string) *Error {
-	return NewError(http.StatusNotExtended, msg)
-}

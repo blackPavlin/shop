@@ -30,23 +30,23 @@ func (r *AddressRepository) Create(
 	ctx context.Context,
 	props *address.Props,
 ) (*address.Address, error) {
-	user, ok := user.GetUser(ctx)
+	userFromCtx, ok := user.GetUser(ctx)
 	if !ok {
 		return nil, errorx.ErrUnauthorized
 	}
 	row, err := r.client.Address.Create().
-		SetUserID(int64(user.ID)).
+		SetUserID(int64(userFromCtx.ID)).
 		SetCountry(props.Country).
 		SetCity(props.City).
-		SetFlat(*props.Flat). // TODO: WTF???
+		SetFlat(*props.Flat).
 		SetHouse(props.House).
-		SetLetter(*props.Letter). // TODO: WTF???
+		SetLetter(*props.Letter).
 		SetPostcode(props.Postcode).
 		SetStreet(props.Street).
 		Save(ctx)
 	if err != nil {
 		if pg.IsForeignKeyViolationErr(err, "address_user_fk") {
-			return nil, errorx.NewNotFoundError("user not found")
+			return nil, errorx.ErrNotFound
 		}
 		r.logger.Error("create address error", zap.Error(err))
 		return nil, errorx.ErrInternal
@@ -59,9 +59,10 @@ func (r *AddressRepository) Get(
 	ctx context.Context,
 	filter *address.Filter,
 ) (*address.Address, error) {
+	if userFromCtx, ok := user.GetUser(ctx); ok {
+		filter.UserID.Eq = user.IDs{userFromCtx.ID}
+	}
 	predicate := makePredicates(filter)
-	// TODO: Get UserID from ctx
-
 	row, err := r.client.Address.Query().
 		Where(predicate...).
 		First(ctx)
@@ -81,9 +82,10 @@ func (r *AddressRepository) Query(
 	ctx context.Context,
 	criteria *address.QueryCriteria,
 ) (address.Addresses, error) {
+	if userFromCtx, ok := user.GetUser(ctx); ok {
+		criteria.Filter.UserID.Eq = user.IDs{userFromCtx.ID}
+	}
 	predicate := makePredicates(criteria.Filter)
-	// TODO: Get UserID from ctx
-
 	rows, err := r.client.Address.Query().
 		Where(predicate...).
 		All(ctx)
@@ -91,7 +93,6 @@ func (r *AddressRepository) Query(
 		r.logger.Error("query address error:", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-
 	return mapDomainAddressesFromRows(rows), nil
 }
 
@@ -113,9 +114,9 @@ func mapDomainAddressFromRow(row *ent.Address) *address.Address {
 		Props: &address.Props{
 			City:     row.City,
 			Country:  row.Country,
-			Flat:     &row.Flat, // TODO: WTF???
+			Flat:     &row.Flat,
 			House:    row.House,
-			Letter:   &row.Letter, // TODO: WTF???
+			Letter:   &row.Letter,
 			Postcode: row.Postcode,
 			Street:   row.Street,
 		},

@@ -103,3 +103,56 @@ func (s *AuthServiceSuite) TestSignup() {
 		s.T().Run(tt.name, test(tt.prepare, tt.args, tt.want))
 	}
 }
+
+func (s *AuthServiceSuite) TestLogin() {
+	type args struct {
+		ctx   context.Context
+		props *auth.LoginProps
+	}
+	type want struct {
+		res string
+		err error
+	}
+	test := func(prepare func(ctx context.Context) context.Context, args args, want want) func(t *testing.T) {
+		return func(t *testing.T) {
+			t.Helper()
+			args.ctx = prepare(args.ctx)
+			got, err := s.authService.Login(args.ctx, args.props)
+			s.Equal(want.res, got)
+			s.True(errors.Is(err, want.err))
+		}
+	}
+	loginProps1 := &auth.LoginProps{
+		Email:    gofakeit.Email(),
+		Password: gofakeit.Password(true, true, true, true, true, 4),
+	}
+	tests := []struct {
+		name    string
+		prepare func(ctx context.Context) context.Context
+		args    args
+		want    want
+	}{
+		{
+			name: "invalid login",
+			prepare: func(ctx context.Context) context.Context {
+				s.userRepo.EXPECT().
+					Get(ctx, &user.Filter{
+						Email: user.EmailFilter{Eq: []string{loginProps1.Email}},
+					}).Return(nil, errorx.ErrNotFound)
+				return ctx
+			},
+			args: args{
+				ctx:   context.Background(),
+				props: loginProps1,
+			},
+			want: want{
+				res: "",
+				err: errorx.ErrInvalidLoginOrPassword,
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		s.T().Run(tt.name, test(tt.prepare, tt.args, tt.want))
+	}
+}

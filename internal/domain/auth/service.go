@@ -27,9 +27,8 @@ type Service interface {
 
 // UseCase
 type UseCase struct {
-	logger *zap.Logger
-	config *config.AuthConfig
-
+	logger   *zap.Logger
+	config   *config.AuthConfig
 	userRepo user.Repository
 }
 
@@ -55,7 +54,7 @@ func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) 
 		if errors.Is(err, errorx.ErrNotFound) {
 			return "", errorx.ErrInvalidLoginOrPassword
 		}
-		return "", err
+		return "", errorx.ErrInternal
 	}
 	if err := bcrypt.CompareHashAndPassword(
 		[]byte(user.Props.Password),
@@ -116,7 +115,7 @@ func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error
 func (s *UseCase) ValidateToken(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", t.Method.Alg())
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())
 		}
 		return []byte(s.config.SigningKey), nil
 	})

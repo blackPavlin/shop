@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/image"
+	"github.com/blackPavlin/shop/ent/productimage"
 )
 
 // ImageCreate is the builder for creating a Image entity.
@@ -46,6 +47,33 @@ func (ic *ImageCreate) SetNillableUpdatedAt(t *time.Time) *ImageCreate {
 		ic.SetUpdatedAt(*t)
 	}
 	return ic
+}
+
+// SetName sets the "name" field.
+func (ic *ImageCreate) SetName(s string) *ImageCreate {
+	ic.mutation.SetName(s)
+	return ic
+}
+
+// SetOriginalName sets the "original_name" field.
+func (ic *ImageCreate) SetOriginalName(s string) *ImageCreate {
+	ic.mutation.SetOriginalName(s)
+	return ic
+}
+
+// AddProductImageIDs adds the "product_images" edge to the ProductImage entity by IDs.
+func (ic *ImageCreate) AddProductImageIDs(ids ...int64) *ImageCreate {
+	ic.mutation.AddProductImageIDs(ids...)
+	return ic
+}
+
+// AddProductImages adds the "product_images" edges to the ProductImage entity.
+func (ic *ImageCreate) AddProductImages(p ...*ProductImage) *ImageCreate {
+	ids := make([]int64, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ic.AddProductImageIDs(ids...)
 }
 
 // Mutation returns the ImageMutation object of the builder.
@@ -101,6 +129,22 @@ func (ic *ImageCreate) check() error {
 	if _, ok := ic.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Image.updated_at"`)}
 	}
+	if _, ok := ic.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Image.name"`)}
+	}
+	if v, ok := ic.mutation.Name(); ok {
+		if err := image.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Image.name": %w`, err)}
+		}
+	}
+	if _, ok := ic.mutation.OriginalName(); !ok {
+		return &ValidationError{Name: "original_name", err: errors.New(`ent: missing required field "Image.original_name"`)}
+	}
+	if v, ok := ic.mutation.OriginalName(); ok {
+		if err := image.OriginalNameValidator(v); err != nil {
+			return &ValidationError{Name: "original_name", err: fmt.Errorf(`ent: validator failed for field "Image.original_name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -134,6 +178,30 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.UpdatedAt(); ok {
 		_spec.SetField(image.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := ic.mutation.Name(); ok {
+		_spec.SetField(image.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := ic.mutation.OriginalName(); ok {
+		_spec.SetField(image.FieldOriginalName, field.TypeString, value)
+		_node.OriginalName = value
+	}
+	if nodes := ic.mutation.ProductImagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   image.ProductImagesTable,
+			Columns: []string{image.ProductImagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

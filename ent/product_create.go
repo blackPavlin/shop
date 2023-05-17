@@ -13,6 +13,7 @@ import (
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
 	"github.com/blackPavlin/shop/ent/product"
+	"github.com/blackPavlin/shop/ent/productimage"
 )
 
 // ProductCreate is the builder for creating a Product entity.
@@ -120,6 +121,21 @@ func (pc *ProductCreate) AddCarts(c ...*Cart) *ProductCreate {
 		ids[i] = c[i].ID
 	}
 	return pc.AddCartIDs(ids...)
+}
+
+// AddProductImageIDs adds the "product_images" edge to the ProductImage entity by IDs.
+func (pc *ProductCreate) AddProductImageIDs(ids ...int64) *ProductCreate {
+	pc.mutation.AddProductImageIDs(ids...)
+	return pc
+}
+
+// AddProductImages adds the "product_images" edges to the ProductImage entity.
+func (pc *ProductCreate) AddProductImages(p ...*ProductImage) *ProductCreate {
+	ids := make([]int64, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pc.AddProductImageIDs(ids...)
 }
 
 // Mutation returns the ProductMutation object of the builder.
@@ -285,6 +301,22 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cart.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.ProductImagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   product.ProductImagesTable,
+			Columns: []string{product.ProductImagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

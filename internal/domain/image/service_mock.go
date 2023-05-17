@@ -35,13 +35,16 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // BulkCreate mocks base method.
-func (m *MockService) BulkCreate(ctx context.Context) {
+func (m *MockService) BulkCreate(ctx context.Context, props []*StorageProps) (Images, error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "BulkCreate", ctx)
+	ret := m.ctrl.Call(m, "BulkCreate", ctx, props)
+	ret0, _ := ret[0].(Images)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // BulkCreate indicates an expected call of BulkCreate.
-func (mr *MockServiceMockRecorder) BulkCreate(ctx interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) BulkCreate(ctx, props interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockService)(nil).BulkCreate), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockService)(nil).BulkCreate), ctx, props)
 }
