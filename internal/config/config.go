@@ -7,7 +7,6 @@ import (
 
 	"github.com/blackPavlin/shop/pkg/logger"
 	"github.com/blackPavlin/shop/pkg/pgutil"
-	"github.com/blackPavlin/shop/pkg/redisx"
 	"github.com/blackPavlin/shop/pkg/s3x"
 )
 
@@ -19,7 +18,6 @@ type Config struct {
 	Postgres *pgutil.PostgresConfig `envconfig:"POSTGRES" required:"true"`
 	Auth     *AuthConfig            `envconfig:"AUTH" required:"true"`
 	S3       *s3x.S3Config          `envconfig:"S3" required:"true"`
-	Redis    *redisx.RedisConfig    `envconfig:"REDIS" required:"true"`
 }
 
 // ServerConfig

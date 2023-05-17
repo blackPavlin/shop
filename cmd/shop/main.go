@@ -12,7 +12,6 @@ import (
 	"github.com/blackPavlin/shop/internal/server"
 	"github.com/blackPavlin/shop/pkg/logger"
 	"github.com/blackPavlin/shop/pkg/pgutil"
-	"github.com/blackPavlin/shop/pkg/redisx"
 	"github.com/blackPavlin/shop/pkg/s3x"
 )
 
@@ -44,12 +43,7 @@ func main() {
 		log.Fatalf("failed to connect file storage: %+v", err)
 	}
 
-	cache, err := redisx.NewClient(context.Background(), config.Redis)
-	if err != nil {
-		log.Fatalf("failed to connect cache service: %+v", err)
-	}
-
-	if err := server.NewServer(config, logger, database, storage, cache).Run(); err != nil {
+	if err := server.NewServer(config, logger, database, storage).Run(); err != nil {
 		log.Fatalf("failed to shutdown server: %+v", err)
 	}
 }
