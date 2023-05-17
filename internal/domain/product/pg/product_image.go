@@ -3,27 +3,28 @@ package pg
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
 	"github.com/blackPavlin/shop/ent/predicate"
 	entproductimage "github.com/blackPavlin/shop/ent/productimage"
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"go.uber.org/zap"
 )
 
-// ImageRepository
+// ImageRepository ...
 type ImageRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewImageRepository
+// NewImageRepository ...
 func NewImageRepository(client *ent.Client, logger *zap.Logger) *ImageRepository {
 	return &ImageRepository{client: client, logger: logger}
 }
 
-// BulkCreateTx
+// BulkCreateTx ...
 func (r *ImageRepository) BulkCreateTx(
 	ctx context.Context,
 	images product.Images,
@@ -48,7 +49,7 @@ func (r *ImageRepository) BulkCreateTx(
 	return mapDomainImagesFromRows(rows), nil
 }
 
-// Query
+// Query ...
 func (r *ImageRepository) Query(
 	ctx context.Context,
 	criteria *product.ImageQueryCriteria,

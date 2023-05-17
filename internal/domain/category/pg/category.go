@@ -13,18 +13,18 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// CategoryRepository
+// CategoryRepository ...
 type CategoryRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewCategoryRepository
+// NewCategoryRepository ...
 func NewCategoryRepository(client *ent.Client, logger *zap.Logger) *CategoryRepository {
 	return &CategoryRepository{client: client, logger: logger}
 }
 
-// Create
+// Create ...
 func (r *CategoryRepository) Create(
 	ctx context.Context,
 	props *category.Props,
@@ -43,7 +43,7 @@ func (r *CategoryRepository) Create(
 	return mapDomainCategoryFromRow(row), nil
 }
 
-// Query
+// Query ...
 func (r *CategoryRepository) Query(
 	ctx context.Context,
 	criteria *category.QueryCriteria,
@@ -60,7 +60,7 @@ func (r *CategoryRepository) Query(
 	return mapDomainCategoriesFromRows(rows), nil
 }
 
-// Get
+// Get ...
 func (r *CategoryRepository) Get(
 	ctx context.Context,
 	filter *category.Filter,
@@ -79,7 +79,7 @@ func (r *CategoryRepository) Get(
 	return mapDomainCategoryFromRow(row), err
 }
 
-// Update
+// Update ...
 func (r *CategoryRepository) Update(
 	ctx context.Context,
 	id category.ID,

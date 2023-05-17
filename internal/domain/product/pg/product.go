@@ -15,18 +15,18 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// ProductRepository
+// ProductRepository ...
 type ProductRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewProductRepository
+// NewProductRepository ...
 func NewProductRepository(client *ent.Client, logger *zap.Logger) *ProductRepository {
 	return &ProductRepository{client: client, logger: logger}
 }
 
-// Create
+// CreateTx ...
 func (r *ProductRepository) CreateTx(
 	ctx context.Context,
 	props *product.Props,
@@ -54,7 +54,7 @@ func (r *ProductRepository) CreateTx(
 	return mapDomainProductFromRow(row), nil
 }
 
-// Get
+// Get ...
 func (r *ProductRepository) Get(
 	ctx context.Context,
 	filter *product.Filter,
@@ -73,7 +73,7 @@ func (r *ProductRepository) Get(
 	return mapDomainProductFromRow(row), err
 }
 
-// Query
+// Query ...
 func (r *ProductRepository) Query(
 	ctx context.Context,
 	criteria *product.QueryCriteria,

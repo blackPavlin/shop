@@ -3,24 +3,42 @@ package pg
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/ent"
+	entimage "github.com/blackPavlin/shop/ent/image"
+	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"go.uber.org/zap"
 )
 
-// ImageRepository
+// ImageRepository ...
 type ImageRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewImageRepository
+// NewImageRepository ...
 func NewImageRepository(client *ent.Client, logger *zap.Logger) *ImageRepository {
 	return &ImageRepository{client: client, logger: logger}
 }
 
-// BulkCreateTx
+// Get ...
+func (r *ImageRepository) Get(ctx context.Context, filter *image.Filter) (*image.Image, error) {
+	row, err := r.client.Image.Query().
+		Where(makePredicates(filter)...).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errorx.ErrNotFound
+		}
+		r.logger.Error("get image error", zap.Error(err))
+		return nil, errorx.ErrInternal
+	}
+	return mapDomainImageFromRow(row), nil
+}
+
+// BulkCreateTx ...
 func (r *ImageRepository) BulkCreateTx(
 	ctx context.Context,
 	images image.Images,
@@ -56,6 +74,17 @@ func mapImagesToCreateBuilders(
 		builders = append(builders, builder)
 	}
 	return builders
+}
+
+func makePredicates(filter *image.Filter) []predicate.Image {
+	predicates := make([]predicate.Image, 0)
+	if len(filter.ID.Eq) > 0 {
+		predicates = append(predicates, entimage.IDIn(filter.ID.Eq.ToInt64()...))
+	}
+	if len(filter.ID.Neq) > 0 {
+		predicates = append(predicates, entimage.IDNotIn(filter.ID.Neq.ToInt64()...))
+	}
+	return predicates
 }
 
 func mapDomainImageFromRow(row *ent.Image) *image.Image {
