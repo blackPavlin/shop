@@ -7,7 +7,7 @@ require (
 	github.com/brianvoe/gofakeit/v6 v6.23.0
 	github.com/deepmap/oapi-codegen v1.13.0
 	github.com/dmarkham/enumer v1.5.8
-	github.com/go-chi/chi/v5 v5.0.8
+	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
