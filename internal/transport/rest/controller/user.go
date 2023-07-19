@@ -8,22 +8,28 @@ import (
 
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
+	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 	"github.com/blackPavlin/shop/pkg/restx"
 )
 
 // UserController
 type UserController struct {
-	userService user.UserService
+	userService    user.UserService
+	authMiddleware *middleware.AuthMiddleware
 }
 
 // NewUserController
-func NewUserController(userService user.UserService) *UserController {
-	return &UserController{userService: userService}
+func NewUserController(
+	userService user.UserService,
+	authMiddleware *middleware.AuthMiddleware,
+) *UserController {
+	return &UserController{userService, authMiddleware}
 }
 
 // RegisterRoutes
 func (ctrl *UserController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/user", func(r chi.Router) {
+		r.Use(ctrl.authMiddleware.Authorization)
 		r.Get("/", ctrl.GetUserHandler)
 	})
 }

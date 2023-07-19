@@ -9,6 +9,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/address"
 	"github.com/blackPavlin/shop/internal/transport/rest"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
+	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/restx"
 )
@@ -16,16 +17,21 @@ import (
 // AddressController
 type AddressController struct {
 	addressService address.Service
+	authMiddleware *middleware.AuthMiddleware
 }
 
 // NewAddressController
-func NewAddressController(addressService address.Service) *AddressController {
-	return &AddressController{addressService: addressService}
+func NewAddressController(
+	addressService address.Service,
+	authMiddleware *middleware.AuthMiddleware,
+) *AddressController {
+	return &AddressController{addressService, authMiddleware}
 }
 
 // RegisterRoutes
 func (ctrl *AddressController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/address", func(r chi.Router) {
+		r.Use(ctrl.authMiddleware.Authorization)
 		r.Get("/", ctrl.GetAddressesHandler)
 		r.Post("/", ctrl.CreateAddressHandler)
 	})

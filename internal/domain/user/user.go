@@ -18,6 +18,9 @@ type IDs []ID
 // Role
 type Role uint8
 
+// Roles
+type Roles []Role
+
 // User
 type User struct {
 	ID   ID

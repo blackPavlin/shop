@@ -6,25 +6,33 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/blackPavlin/shop/internal/domain/product"
+	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 )
 
 // ProductController
 type ProductController struct {
 	productService product.Service
+	authMiddleware *middleware.AuthMiddleware
 }
 
 // NewProductController
-func NewProductController(productService product.Service) *ProductController {
-	return &ProductController{productService: productService}
+func NewProductController(
+	productService product.Service,
+	authMiddleware *middleware.AuthMiddleware,
+) *ProductController {
+	return &ProductController{productService, authMiddleware}
 }
 
 // RegisterRoutes
 func (ctrl *ProductController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/product", func(r chi.Router) {
 		r.Get("/", ctrl.GetProductsHandler)
-		r.Post("/", ctrl.CreateProductHandler)
 		r.Get("/:id", ctrl.GetProductHandler)
-		r.Patch("/:id", ctrl.UpdateProductHandler)
+		r.Group(func(r chi.Router) {
+			r.Use(ctrl.authMiddleware.Authorization)
+			r.Post("/", ctrl.CreateProductHandler)
+			r.Patch("/:id", ctrl.UpdateProductHandler)
+		})
 	})
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/transport/rest"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
+	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/restx"
 )
@@ -17,20 +18,27 @@ import (
 // CategoryController
 type CategoryController struct {
 	categoryService category.Service
+	authMiddleware  *middleware.AuthMiddleware
 }
 
 // NewCategoryController
-func NewCategoryController(categoryService category.Service) *CategoryController {
-	return &CategoryController{categoryService: categoryService}
+func NewCategoryController(
+	categoryService category.Service,
+	authMiddleware *middleware.AuthMiddleware,
+) *CategoryController {
+	return &CategoryController{categoryService, authMiddleware}
 }
 
 // RegisterRoutes
 func (ctrl *CategoryController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/category", func(r chi.Router) {
 		r.Get("/", ctrl.GetCategoriesHandler)
-		r.Post("/", ctrl.CreateCategoryHandler)
-		r.Patch("/", ctrl.UpdateCategoryHandler)
-		r.Delete("/{categoryID}", ctrl.DeleteCategoryHandler)
+		r.Group(func(r chi.Router) {
+			r.Use(ctrl.authMiddleware.Authorization)
+			r.Post("/", ctrl.CreateCategoryHandler)
+			r.Patch("/", ctrl.UpdateCategoryHandler)
+			r.Delete("/{categoryID}", ctrl.DeleteCategoryHandler)
+		})
 	})
 }
 

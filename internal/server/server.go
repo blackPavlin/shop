@@ -32,6 +32,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/user"
 	userpg "github.com/blackPavlin/shop/internal/domain/user/pg"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller"
+	restmiddleware "github.com/blackPavlin/shop/internal/transport/rest/middleware"
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
@@ -94,16 +95,17 @@ func NewServer(
 	categoryService := category.NewUseCase(categoryRepository)
 	imageService := image.NewUseCase(logger, imageRepository, imageStorage, txManager)
 
-	// Controllers
-	userController := controller.NewUserController(userService)
-	authController := controller.NewAuthController(authService)
-	cartController := controller.NewCartController(cartService)
-	addressController := controller.NewAddressController(addressService)
-	productController := controller.NewProductController(productService)
-	categoryController := controller.NewCategoryController(categoryService)
-	imageController := controller.NewImageController(imageService)
-
 	// Middlewares
+	authMiddleware := restmiddleware.NewAuthMiddleware(authService)
+
+	// Controllers
+	userController := controller.NewUserController(userService, authMiddleware)
+	authController := controller.NewAuthController(authService)
+	cartController := controller.NewCartController(cartService, authMiddleware)
+	addressController := controller.NewAddressController(addressService, authMiddleware)
+	productController := controller.NewProductController(productService, authMiddleware)
+	categoryController := controller.NewCategoryController(categoryService, authMiddleware)
+	imageController := controller.NewImageController(imageService)
 
 	router.Route("/api", func(r chi.Router) {
 		userController.RegisterRoutes(r)     // /api/user
