@@ -1,3 +1,4 @@
+// Package pg contains implementations for cart repositories
 package pg
 
 import (
@@ -15,18 +16,18 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// CartRepository
+// CartRepository pg repository implementation.
 type CartRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewCartRepository
+// NewCartRepository create instance of CartRepository.
 func NewCartRepository(client *ent.Client, logger *zap.Logger) *CartRepository {
 	return &CartRepository{client: client, logger: logger}
 }
 
-// Create
+// Create cart in db.
 func (r *CartRepository) Create(ctx context.Context, props *cart.Props) (*cart.Cart, error) {
 	userFromCtx, ok := user.GetUser(ctx)
 	if !ok {
@@ -50,7 +51,7 @@ func (r *CartRepository) Create(ctx context.Context, props *cart.Props) (*cart.C
 	return mapDomainCartFromRow(row), nil
 }
 
-// Get
+// Get cart from db.
 func (r *CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Cart, error) {
 	row, err := r.client.Cart.
 		Query().
@@ -66,7 +67,7 @@ func (r *CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Ca
 	return mapDomainCartFromRow(row), err
 }
 
-// Query
+// Query carts from db based on criteria.
 func (r *CartRepository) Query(
 	ctx context.Context,
 	criteria *cart.QueryCriteria,

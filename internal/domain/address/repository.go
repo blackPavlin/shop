@@ -8,25 +8,25 @@ import (
 
 //go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "address"
 
-// Repository
+// Repository represents address repository.
 type Repository interface {
 	Create(ctx context.Context, props *Props) (*Address, error)
 	Get(ctx context.Context, filter *Filter) (*Address, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (Addresses, error)
 }
 
-// QueryCriteria
+// QueryCriteria represents a criteria for address query.
 type QueryCriteria struct {
 	Filter *Filter
 }
 
-// Filter
+// Filter represents address filter.
 type Filter struct {
 	ID     IDFilter
 	UserID user.IDFilter
 }
 
-// IDFilter
+// IDFilter represents ID filter.
 type IDFilter struct {
 	Eq  IDs
 	Neq IDs

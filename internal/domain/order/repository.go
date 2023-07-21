@@ -8,30 +8,30 @@ import (
 
 //go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "order"
 
-// Repository
+// Repository represents order repository.
 type Repository interface {
 	Create(ctx context.Context) (*Order, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
-// QueryCriteria
+// QueryCriteria represents criteria for service query.
 type QueryCriteria struct {
 	Filter Filter
 }
 
-// Filter
+// Filter represents order filter.
 type Filter struct {
 	ID     IDFilter
 	UserID user.IDFilter
 }
 
-// IDFilter
+// IDFilter represents ID filter.
 type IDFilter struct {
 	Eq  IDs
 	Neq IDs
 }
 
-// QueryResult
+// QueryResult represents a result for order query.
 type QueryResult struct {
 	Items Orders
 }

@@ -4,13 +4,13 @@ import (
 	"time"
 )
 
-// ID
+// ID represents an id for image.
 type ID int64
 
-// IDs
+// IDs defines a slice of ID.
 type IDs []ID
 
-// Image
+// Image represents the image.
 type Image struct {
 	ID ID
 
@@ -20,16 +20,16 @@ type Image struct {
 	Props *Props
 }
 
-// Images
+// Images slice Image.
 type Images []*Image
 
-// Props
+// Props represents image editable fields.
 type Props struct {
 	Name         string
 	OriginalName string
 }
 
-// ToInt64
+// ToInt64 convert slice of IDs to slice int64.
 func (ids IDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {

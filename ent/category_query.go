@@ -306,7 +306,6 @@ func (cq *CategoryQuery) WithProducts(opts ...func(*ProductQuery)) *CategoryQuer
 //		GroupBy(category.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (cq *CategoryQuery) GroupBy(field string, fields ...string) *CategoryGroupBy {
 	cq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &CategoryGroupBy{build: cq}
@@ -328,7 +327,6 @@ func (cq *CategoryQuery) GroupBy(field string, fields ...string) *CategoryGroupB
 //	client.Category.Query().
 //		Select(category.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (cq *CategoryQuery) Select(fields ...string) *CategorySelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
 	sbuild := &CategorySelect{CategoryQuery: cq}

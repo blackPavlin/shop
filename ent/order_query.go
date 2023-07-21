@@ -305,7 +305,6 @@ func (oq *OrderQuery) WithUsers(opts ...func(*UserQuery)) *OrderQuery {
 //		GroupBy(order.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (oq *OrderQuery) GroupBy(field string, fields ...string) *OrderGroupBy {
 	oq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &OrderGroupBy{build: oq}
@@ -327,7 +326,6 @@ func (oq *OrderQuery) GroupBy(field string, fields ...string) *OrderGroupBy {
 //	client.Order.Query().
 //		Select(order.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (oq *OrderQuery) Select(fields ...string) *OrderSelect {
 	oq.ctx.Fields = append(oq.ctx.Fields, fields...)
 	sbuild := &OrderSelect{OrderQuery: oq}

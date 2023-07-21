@@ -378,7 +378,6 @@ func (pq *ProductQuery) WithProductImages(opts ...func(*ProductImageQuery)) *Pro
 //		GroupBy(product.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy {
 	pq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ProductGroupBy{build: pq}
@@ -400,7 +399,6 @@ func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy 
 //	client.Product.Query().
 //		Select(product.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (pq *ProductQuery) Select(fields ...string) *ProductSelect {
 	pq.ctx.Fields = append(pq.ctx.Fields, fields...)
 	sbuild := &ProductSelect{ProductQuery: pq}

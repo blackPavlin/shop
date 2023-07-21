@@ -306,7 +306,6 @@ func (iq *ImageQuery) WithProductImages(opts ...func(*ProductImageQuery)) *Image
 //		GroupBy(image.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (iq *ImageQuery) GroupBy(field string, fields ...string) *ImageGroupBy {
 	iq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ImageGroupBy{build: iq}
@@ -328,7 +327,6 @@ func (iq *ImageQuery) GroupBy(field string, fields ...string) *ImageGroupBy {
 //	client.Image.Query().
 //		Select(image.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (iq *ImageQuery) Select(fields ...string) *ImageSelect {
 	iq.ctx.Fields = append(iq.ctx.Fields, fields...)
 	sbuild := &ImageSelect{ImageQuery: iq}

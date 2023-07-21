@@ -11,31 +11,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockUserService is a mock of UserService interface.
-type MockUserService struct {
+// MockService is a mock of Service interface.
+type MockService struct {
 	ctrl     *gomock.Controller
-	recorder *MockUserServiceMockRecorder
+	recorder *MockServiceMockRecorder
 }
 
-// MockUserServiceMockRecorder is the mock recorder for MockUserService.
-type MockUserServiceMockRecorder struct {
-	mock *MockUserService
+// MockServiceMockRecorder is the mock recorder for MockService.
+type MockServiceMockRecorder struct {
+	mock *MockService
 }
 
-// NewMockUserService creates a new mock instance.
-func NewMockUserService(ctrl *gomock.Controller) *MockUserService {
-	mock := &MockUserService{ctrl: ctrl}
-	mock.recorder = &MockUserServiceMockRecorder{mock}
+// NewMockService creates a new mock instance.
+func NewMockService(ctrl *gomock.Controller) *MockService {
+	mock := &MockService{ctrl: ctrl}
+	mock.recorder = &MockServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
+func (m *MockService) EXPECT() *MockServiceMockRecorder {
 	return m.recorder
 }
 
 // Create mocks base method.
-func (m *MockUserService) Create(ctx context.Context, props *Props) (*User, error) {
+func (m *MockService) Create(ctx context.Context, props *Props) (*User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, props)
 	ret0, _ := ret[0].(*User)
@@ -44,13 +44,13 @@ func (m *MockUserService) Create(ctx context.Context, props *Props) (*User, erro
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockUserServiceMockRecorder) Create(ctx, props interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) Create(ctx, props interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUserService)(nil).Create), ctx, props)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockService)(nil).Create), ctx, props)
 }
 
 // Get mocks base method.
-func (m *MockUserService) Get(ctx context.Context, filter *Filter) (*User, error) {
+func (m *MockService) Get(ctx context.Context, filter *Filter) (*User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", ctx, filter)
 	ret0, _ := ret[0].(*User)
@@ -59,7 +59,7 @@ func (m *MockUserService) Get(ctx context.Context, filter *Filter) (*User, error
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockUserServiceMockRecorder) Get(ctx, filter interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) Get(ctx, filter interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockUserService)(nil).Get), ctx, filter)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockService)(nil).Get), ctx, filter)
 }

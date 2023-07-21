@@ -8,24 +8,24 @@ import (
 
 //go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "cart"
 
-// Repository
+// Repository represents cart repository.
 type Repository interface {
 	Create(ctx context.Context, props *Props) (*Cart, error)
 	Get(ctx context.Context, filter *Filter) (*Cart, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
-// QueryCriteria
+// QueryCriteria  represents a criteria for cart query.
 type QueryCriteria struct {
 	Filter *Filter
 }
 
-// Filter
+// Filter represents cart filter.
 type Filter struct {
 	UserID user.IDFilter
 }
 
-// QueryResult
+// QueryResult represents a result for cart query.
 type QueryResult struct {
 	Items Carts
 }

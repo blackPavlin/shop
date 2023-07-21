@@ -1,3 +1,4 @@
+// Package product contains product oriented logic.
 package product
 
 import (
@@ -6,13 +7,13 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/category"
 )
 
-// ID
+// ID represents an id for product.
 type ID int64
 
-// IDs
+// IDs defines a slice of ID.
 type IDs []ID
 
-// Product
+// Product represents the product.
 type Product struct {
 	ID ID
 
@@ -22,10 +23,10 @@ type Product struct {
 	Props *Props
 }
 
-// Products
+// Products slice of Product.
 type Products []*Product
 
-// Props
+// Props is a user-defined product properties.
 type Props struct {
 	CategoryID  category.ID
 	Name        string
@@ -35,7 +36,7 @@ type Props struct {
 	Images      Images
 }
 
-// ToInt64
+// ToInt64 convert slice of IDs to slice int64.
 func (ids IDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {

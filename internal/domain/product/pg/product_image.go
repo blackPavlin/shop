@@ -11,20 +11,21 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
+	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// ImageRepository ...
+// ImageRepository pg repository implementation.
 type ImageRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewImageRepository ...
+// NewImageRepository create instance of ImageRepository.
 func NewImageRepository(client *ent.Client, logger *zap.Logger) *ImageRepository {
 	return &ImageRepository{client: client, logger: logger}
 }
 
-// BulkCreateTx ...
+// BulkCreateTx create product images in db with transaction.
 func (r *ImageRepository) BulkCreateTx(
 	ctx context.Context,
 	images product.Images,
@@ -42,14 +43,19 @@ func (r *ImageRepository) BulkCreateTx(
 		CreateBulk(mapImagesToCreateBuilders(client, images)...).
 		Save(ctx)
 	if err != nil {
-		// todo: IsForeignKeyViolationErr
+		if pg.IsForeignKeyViolationErr(err, "product_image_product_fk") {
+			return nil, errorx.ErrNotFound
+		}
+		if pg.IsForeignKeyViolationErr(err, "product_image_image_fk") {
+			return nil, errorx.ErrNotFound
+		}
 		r.logger.Error("bulk create product images error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
 	return mapDomainImagesFromRows(rows), nil
 }
 
-// Query ...
+// Query product images from db.
 func (r *ImageRepository) Query(
 	ctx context.Context,
 	criteria *product.ImageQueryCriteria,

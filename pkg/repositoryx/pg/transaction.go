@@ -10,18 +10,18 @@ import (
 	"github.com/blackPavlin/shop/ent"
 )
 
-// TxManager
+// TxManager pg transaction manager implementation.
 type TxManager struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewTxManager
+// NewTxManager create instance of TxManager.
 func NewTxManager(client *ent.Client, logger *zap.Logger) *TxManager {
 	return &TxManager{client: client, logger: logger}
 }
 
-// RunTransaction
+// RunTransaction exec repository method in transaction.
 func (p *TxManager) RunTransaction(
 	ctx context.Context,
 	options *sql.TxOptions,

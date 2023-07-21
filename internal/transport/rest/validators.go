@@ -1,12 +1,13 @@
 package rest
 
 import (
-	"github.com/blackPavlin/shop/pkg/errorx"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
+
+	"github.com/blackPavlin/shop/pkg/errorx"
 )
 
-// Validate
+// Validate body of LoginRequest.
 func (r LoginRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Email, validation.Required, is.EmailFormat),
@@ -17,7 +18,7 @@ func (r LoginRequest) Validate() error {
 	return nil
 }
 
-// Validate
+// Validate body of SignupRequest.
 func (r SignupRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Email, validation.Required, is.EmailFormat),
@@ -30,7 +31,7 @@ func (r SignupRequest) Validate() error {
 	return nil
 }
 
-// Validate
+// Validate body of CreateAddressRequest.
 func (r CreateAddressRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.City, validation.Required),
@@ -44,7 +45,7 @@ func (r CreateAddressRequest) Validate() error {
 	return nil
 }
 
-// Validate
+// Validate body of Category.
 func (r Category) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Id, validation.Required),
@@ -55,7 +56,7 @@ func (r Category) Validate() error {
 	return nil
 }
 
-// Validate
+// Validate body of CreateCategoryRequest.
 func (r CreateCategoryRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Name, validation.Required),

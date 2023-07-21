@@ -13,17 +13,17 @@ import (
 	"github.com/blackPavlin/shop/pkg/restx"
 )
 
-// AuthController
+// AuthController represents auth controller.
 type AuthController struct {
 	authService auth.Service
 }
 
-// NewAuthController
+// NewAuthController create instance of AuthController.
 func NewAuthController(authService auth.Service) *AuthController {
 	return &AuthController{authService: authService}
 }
 
-// RegisterRoutes
+// RegisterRoutes register routes to the specified router.
 func (ctrl *AuthController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/auth", func(r chi.Router) {
 		r.Post("/login", ctrl.LoginHandler)
@@ -31,7 +31,7 @@ func (ctrl *AuthController) RegisterRoutes(r chi.Router) chi.Router {
 	})
 }
 
-// Login
+// LoginHandler define handler for POST /api/auth/login.
 func (ctrl *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	request := &rest.LoginRequest{}
 	if err := render.DecodeJSON(r.Body, request); err != nil {
@@ -51,7 +51,7 @@ func (ctrl *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request)
 	render.Respond(w, r, mapping.CreateLoginResponse(token))
 }
 
-// Signup
+// SignupHandler define handler for POST /api/auth/signup.
 func (ctrl *AuthController) SignupHandler(w http.ResponseWriter, r *http.Request) {
 	request := &rest.SignupRequest{}
 	if err := render.DecodeJSON(r.Body, request); err != nil {

@@ -4,7 +4,7 @@ import "context"
 
 //go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "category"
 
-// Repository
+// Repository represents category repository.
 type Repository interface {
 	Create(ctx context.Context, props *Props) (*Category, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (Categories, error)
@@ -13,24 +13,24 @@ type Repository interface {
 	Delete(ctx context.Context, id ID) error
 }
 
-// QueryCriteria
+// QueryCriteria represents a criteria for category query.
 type QueryCriteria struct {
 	Filter Filter
 }
 
-// Filter
+// Filter represents category filter.
 type Filter struct {
 	ID   IDFilter
 	Name NameFilter
 }
 
-// IDFilter
+// IDFilter represents ID filter.
 type IDFilter struct {
 	Eq  IDs
 	Neq IDs
 }
 
-// NameFilter
+// NameFilter represents name filter.
 type NameFilter struct {
 	Eq  []string
 	Neq []string

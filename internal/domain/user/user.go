@@ -1,3 +1,4 @@
+// Package user contains user oriented logic.
 package user
 
 import "time"
@@ -9,19 +10,19 @@ const (
 	RoleAdmin             // ADMIN
 )
 
-// ID
+// ID represents an id for user.
 type ID int64
 
-// IDs
+// IDs defines a slice of ID.
 type IDs []ID
 
-// Role
+// Role represents an user`s roles.
 type Role uint8
 
-// Roles
+// Roles defines a slice of Role.
 type Roles []Role
 
-// User
+// User represents the user.
 type User struct {
 	ID   ID
 	Role Role
@@ -32,6 +33,7 @@ type User struct {
 	Props *Props
 }
 
+// Props represents user editable fields.
 type Props struct {
 	Email    string
 	Name     string
@@ -39,7 +41,7 @@ type Props struct {
 	Password string
 }
 
-// ToInt64
+// ToInt64 convert slice of IDs to slice int64.
 func (ids IDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {

@@ -5,13 +5,13 @@ import (
 	"github.com/blackPavlin/shop/internal/transport/rest"
 )
 
-// CreateGetUserResponse
-func CreateGetUserResponse(user *user.User) rest.User {
+// CreateGetUserResponse transform domain entity to rest response.
+func CreateGetUserResponse(u *user.User) rest.User {
 	return rest.User{
-		Id:    int64(user.ID),
-		Role:  rest.UserRole(user.Role.String()),
-		Email: user.Props.Email,
-		Name:  user.Props.Name,
-		Phone: user.Props.Phone,
+		Id:    int64(u.ID),
+		Role:  rest.UserRole(u.Role.String()),
+		Email: u.Props.Email,
+		Name:  u.Props.Name,
+		Phone: u.Props.Phone,
 	}
 }

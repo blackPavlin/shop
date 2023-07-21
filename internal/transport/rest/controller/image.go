@@ -4,34 +4,37 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/restx"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
-// ImageController
+const maxFileSize = 5 << 20
+
+// ImageController represents image controller.
 type ImageController struct {
 	imageService image.Service
 }
 
-// NewImageController
+// NewImageController create instance of ImageController.
 func NewImageController(imageService image.Service) *ImageController {
 	return &ImageController{imageService: imageService}
 }
 
-// RegisterRoutes
+// RegisterRoutes register routes to the specified router.
 func (ctrl *ImageController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/image", func(r chi.Router) {
 		r.Post("/upload", ctrl.UploadImageHandler)
 	})
 }
 
-// UploadImageHandler
+// UploadImageHandler define handler for POST /api/image/upload.
 func (ctrl *ImageController) UploadImageHandler(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(5 << 20); err != nil {
+	if err := r.ParseMultipartForm(maxFileSize); err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}

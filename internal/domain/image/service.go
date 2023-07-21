@@ -7,20 +7,21 @@ import (
 	"mime"
 	"path/filepath"
 
-	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+
+	"github.com/blackPavlin/shop/pkg/errorx"
+	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
 //go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "image"
 
-// Service
+// Service represents image use cases.
 type Service interface {
 	BulkCreate(ctx context.Context, props []*StorageProps) (Images, error)
 }
 
-// UseCase
+// UseCase represents image service.
 type UseCase struct {
 	logger *zap.Logger
 
@@ -29,7 +30,7 @@ type UseCase struct {
 	txManager    repositoryx.TxManager
 }
 
-// NewUseCase
+// NewUseCase create instance of UseCase.
 func NewUseCase(
 	logger *zap.Logger,
 	imageRepo Repository,
@@ -44,7 +45,7 @@ func NewUseCase(
 	}
 }
 
-// BulkCreate
+// BulkCreate images.
 func (s *UseCase) BulkCreate(ctx context.Context, props []*StorageProps) (Images, error) {
 	if len(props) == 0 {
 		return nil, nil
@@ -73,17 +74,17 @@ func (s *UseCase) BulkCreate(ctx context.Context, props []*StorageProps) (Images
 	err = s.txManager.RunTransaction(ctx, &sql.TxOptions{}, func(ctx context.Context) error {
 		images, err = s.imageRepo.BulkCreateTx(ctx, images)
 		if err != nil {
-			return err
+			return fmt.Errorf("bulkCreate images error: %w", err)
 		}
 		for _, prop := range props {
 			if err := s.imageStorage.Upload(ctx, prop); err != nil {
-				return err
+				return fmt.Errorf("upload images error: %w", err)
 			}
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("bulkCreate images transaction error: %w", err)
 	}
 	return images, nil
 }

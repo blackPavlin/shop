@@ -1,3 +1,4 @@
+// Package order contains user order oriented logic.
 package order
 
 import "time"
@@ -10,16 +11,16 @@ const (
 	StatusCanceled               // CANCELED
 )
 
-// ID
+// ID represents an id for order.
 type ID int64
 
-// IDs
+// IDs defines a slice of ID.
 type IDs []ID
 
-// Status
+// Status represents order's status.
 type Status uint8
 
-// Order
+// Order represents the order.
 type Order struct {
 	ID ID
 
@@ -29,8 +30,17 @@ type Order struct {
 	Props *Props
 }
 
-// Orders
+// Orders slice of Order.
 type Orders []Order
 
-// Props
+// Props represents order editable fields.
 type Props struct{}
+
+// ToInt64 convert slice of IDs to slice int64.
+func (ids IDs) ToInt64() []int64 {
+	result := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		result = append(result, int64(id))
+	}
+	return result
+}

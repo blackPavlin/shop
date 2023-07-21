@@ -1,3 +1,4 @@
+// Package pg contains implementations for image repositories
 package pg
 
 import (
@@ -12,18 +13,18 @@ import (
 	"github.com/blackPavlin/shop/pkg/errorx"
 )
 
-// ImageRepository ...
+// ImageRepository pg repository implementation.
 type ImageRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewImageRepository ...
+// NewImageRepository create instance of ImageRepository.
 func NewImageRepository(client *ent.Client, logger *zap.Logger) *ImageRepository {
 	return &ImageRepository{client: client, logger: logger}
 }
 
-// Get ...
+// Get image from db.
 func (r *ImageRepository) Get(ctx context.Context, filter *image.Filter) (*image.Image, error) {
 	row, err := r.client.Image.Query().
 		Where(makePredicates(filter)...).
@@ -38,7 +39,7 @@ func (r *ImageRepository) Get(ctx context.Context, filter *image.Filter) (*image
 	return mapDomainImageFromRow(row), nil
 }
 
-// BulkCreateTx ...
+// BulkCreateTx images in db.
 func (r *ImageRepository) BulkCreateTx(
 	ctx context.Context,
 	images image.Images,

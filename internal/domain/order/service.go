@@ -5,10 +5,10 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
-// Service
+// Service represents order use cases.
 type Service interface{}
 
-// UseCase
+// UseCase represents order service.
 type UseCase struct {
 	orderRepo        Repository
 	productRepo      product.Repository
@@ -17,7 +17,7 @@ type UseCase struct {
 	txManager repositoryx.TxManager
 }
 
-// NewUseCase
+// NewUseCase  create instance of UseCase.
 func NewUseCase(
 	orderRepo Repository,
 	productRepo product.Repository,

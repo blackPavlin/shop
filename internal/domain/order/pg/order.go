@@ -1,3 +1,4 @@
+// Package pg contains implementations for order repositories
 package pg
 
 import (
@@ -6,13 +7,13 @@ import (
 	"github.com/blackPavlin/shop/ent"
 )
 
-// OrderRepository
+// OrderRepository pg repository implementation.
 type OrderRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewOrderRepository
+// NewOrderRepository create instance of OrderRepository.
 func NewOrderRepository(client *ent.Client, logger *zap.Logger) *OrderRepository {
 	return &OrderRepository{client: client, logger: logger}
 }

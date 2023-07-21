@@ -5,20 +5,20 @@ import (
 	"github.com/blackPavlin/shop/internal/transport/rest"
 )
 
-// CreateUploadImageResponse
-func CreateUploadImageResponse(image *image.Image) rest.Image {
+// CreateUploadImageResponse transform domain entity to rest response.
+func CreateUploadImageResponse(img *image.Image) rest.Image {
 	return rest.Image{
-		Id:           int64(image.ID),
-		Name:         image.Props.Name,
-		OriginalName: image.Props.OriginalName,
+		Id:           int64(img.ID),
+		Name:         img.Props.Name,
+		OriginalName: img.Props.OriginalName,
 	}
 }
 
-// CreateUploadImagesResponse
+// CreateUploadImagesResponse transform domain entity to rest response.
 func CreateUploadImagesResponse(images image.Images) rest.ImageList {
 	result := make(rest.ImageList, 0, len(images))
-	for _, image := range images {
-		result = append(result, CreateUploadImageResponse(image))
+	for _, img := range images {
+		result = append(result, CreateUploadImageResponse(img))
 	}
 	return result
 }

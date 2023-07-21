@@ -1,8 +1,11 @@
 package category
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
-// Service
+// Service represents category use cases.
 type Service interface {
 	Create(ctx context.Context, props *Props) (*Category, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (Categories, error)
@@ -10,32 +13,47 @@ type Service interface {
 	Delete(ctx context.Context, id ID) error
 }
 
-// UseCase
+// UseCase represents category service.
 type UseCase struct {
 	categoryRepo Repository
 }
 
-// NewUseCase
+// NewUseCase create instance of UseCase.
 func NewUseCase(categoryRepo Repository) *UseCase {
 	return &UseCase{categoryRepo: categoryRepo}
 }
 
-// Create
+// Create category.
 func (s *UseCase) Create(ctx context.Context, props *Props) (*Category, error) {
-	return s.categoryRepo.Create(ctx, props)
+	result, err := s.categoryRepo.Create(ctx, props)
+	if err != nil {
+		return nil, fmt.Errorf("create category error: %w", err)
+	}
+	return result, nil
 }
 
-// Query
+// Query categories.
 func (s *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (Categories, error) {
-	return s.categoryRepo.Query(ctx, criteria)
+	result, err := s.categoryRepo.Query(ctx, criteria)
+	if err != nil {
+		return nil, fmt.Errorf("query categories error: %w", err)
+	}
+	return result, nil
 }
 
-// Update
+// Update category.
 func (s *UseCase) Update(ctx context.Context, id ID, props *Props) (*Category, error) {
-	return s.categoryRepo.Update(ctx, id, props)
+	result, err := s.categoryRepo.Update(ctx, id, props)
+	if err != nil {
+		return nil, fmt.Errorf("update category error: %w", err)
+	}
+	return result, nil
 }
 
-// Delete
+// Delete category.
 func (s *UseCase) Delete(ctx context.Context, id ID) error {
-	return s.categoryRepo.Delete(ctx, id)
+	if err := s.categoryRepo.Delete(ctx, id); err != nil {
+		return fmt.Errorf("delete category error: %w", err)
+	}
+	return nil
 }

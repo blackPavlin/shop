@@ -1,14 +1,15 @@
+// Package address contains user address oriented logic.
 package address
 
 import "github.com/blackPavlin/shop/internal/domain/user"
 
-// ID
+// ID represents an id for address.
 type ID int64
 
-// IDs
+// IDs defines a slice of ID.
 type IDs []ID
 
-// Address
+// Address represents the address.
 type Address struct {
 	ID     ID
 	UserID user.ID
@@ -16,10 +17,10 @@ type Address struct {
 	Props *Props
 }
 
-// Addresses
+// Addresses slice of Address.
 type Addresses []*Address
 
-// Props
+// Props represents address editable fields.
 type Props struct {
 	City     string
 	Country  string
@@ -30,7 +31,7 @@ type Props struct {
 	Street   string
 }
 
-// ToInt64
+// ToInt64 convert slice of IDs to slice int64.
 func (ids IDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {

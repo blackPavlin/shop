@@ -1,3 +1,4 @@
+// Package pg contains implementations for product repositories
 package pg
 
 import (
@@ -15,18 +16,18 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// ProductRepository ...
+// ProductRepository pg repository implementation.
 type ProductRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewProductRepository ...
+// NewProductRepository create instance of ProductRepository.
 func NewProductRepository(client *ent.Client, logger *zap.Logger) *ProductRepository {
 	return &ProductRepository{client: client, logger: logger}
 }
 
-// CreateTx ...
+// CreateTx product in db with transaction.
 func (r *ProductRepository) CreateTx(
 	ctx context.Context,
 	props *product.Props,
@@ -54,7 +55,7 @@ func (r *ProductRepository) CreateTx(
 	return mapDomainProductFromRow(row), nil
 }
 
-// Get ...
+// Get product from db.
 func (r *ProductRepository) Get(
 	ctx context.Context,
 	filter *product.Filter,
@@ -73,7 +74,7 @@ func (r *ProductRepository) Get(
 	return mapDomainProductFromRow(row), err
 }
 
-// Query ...
+// Query products from db.
 func (r *ProductRepository) Query(
 	ctx context.Context,
 	criteria *product.QueryCriteria,
@@ -88,12 +89,12 @@ func (r *ProductRepository) Query(
 	g.Go(func() error {
 		rows, err = r.client.Product.Query().
 			Where(predicates...).
-			Limit(criteria.Pagination.Limit).
-			Offset(criteria.Pagination.Offset).
+			Limit(int(criteria.Pagination.Limit)).
+			Offset(int(criteria.Pagination.Offset)).
 			All(ctx)
 		if err != nil {
 			r.logger.Error("query products count error:", zap.Error(err))
-			return err
+			return errorx.ErrInternal
 		}
 		return nil
 	})
@@ -103,7 +104,7 @@ func (r *ProductRepository) Query(
 			Count(ctx)
 		if err != nil {
 			r.logger.Error("get products count error:", zap.Error(err))
-			return err
+			return errorx.ErrInternal
 		}
 		return nil
 	})
@@ -139,8 +140,6 @@ func makePredicates(filter *product.Filter) []predicate.Product {
 	}
 	return predicates
 }
-
-func makeOrderings() {}
 
 func mapDomainProductFromRow(row *ent.Product) *product.Product {
 	return &product.Product{

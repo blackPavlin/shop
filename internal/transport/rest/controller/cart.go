@@ -9,21 +9,21 @@ import (
 	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 )
 
-// CartController
+// CartController represents cart controller.
 type CartController struct {
 	cartService    cart.Service
-	authMiddleware *middleware.AuthMiddleware
+	authMiddleware *middleware.Middleware
 }
 
-// NewCartController
+// NewCartController create instance of CartController.
 func NewCartController(
 	cartService cart.Service,
-	authMiddleware *middleware.AuthMiddleware,
+	authMiddleware *middleware.Middleware,
 ) *CartController {
 	return &CartController{cartService, authMiddleware}
 }
 
-// RegisterRoutes
+// RegisterRoutes register routes to the specified router.
 func (ctrl *CartController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/cart", func(r chi.Router) {
 		r.Use(ctrl.authMiddleware.Authorization)
@@ -34,14 +34,14 @@ func (ctrl *CartController) RegisterRoutes(r chi.Router) chi.Router {
 	})
 }
 
-// GetCartHandler
+// GetCartHandler define handler for GET /api/cart.
 func (ctrl *CartController) GetCartHandler(w http.ResponseWriter, r *http.Request) {}
 
-// AddProductHandler
+// AddProductHandler define handler for POST /api/cart.
 func (ctrl *CartController) AddProductHandler(w http.ResponseWriter, r *http.Request) {}
 
-// UpdateProductHandler
+// UpdateProductHandler define handler for PATCH /api/cart.
 func (ctrl *CartController) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {}
 
-// DeleteProductHandler
+// DeleteProductHandler define handler for DELETE /api/cart.
 func (ctrl *CartController) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {}

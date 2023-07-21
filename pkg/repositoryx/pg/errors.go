@@ -7,13 +7,13 @@ import (
 	"github.com/jackc/pgerrcode"
 )
 
-// IsUniqueViolationErr
+// IsUniqueViolationErr tells if given error is a postgres unique violation error "23505".
 func IsUniqueViolationErr(err error) bool {
 	var pgErr *pgconn.PgError
 	return errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation
 }
 
-// IsForeignKeyViolationErr
+// IsForeignKeyViolationErr tells if given error is a postgres foreign key violation error "23503" of a given fk.
 func IsForeignKeyViolationErr(err error, fkName string) bool {
 	var pgErr *pgconn.PgError
 	return errors.As(err, &pgErr) &&

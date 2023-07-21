@@ -1,7 +1,9 @@
+// Package pg contains implementations for user repositories.
 package pg
 
 import (
 	"context"
+	"fmt"
 
 	"go.uber.org/zap"
 
@@ -13,7 +15,7 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// UserRepository
+// UserRepository pg repository implementation.
 type UserRepository struct {
 	client *ent.Client
 	logger *zap.Logger
@@ -24,7 +26,7 @@ func NewUserRepository(client *ent.Client, logger *zap.Logger) *UserRepository {
 	return &UserRepository{client: client, logger: logger}
 }
 
-// Create
+// Create user in db.
 func (r *UserRepository) Create(ctx context.Context, props *user.Props) (*user.User, error) {
 	row, err := r.client.User.Create().
 		SetName(props.Name).
@@ -97,7 +99,7 @@ func makeUserPredicate(criteria *user.QueryCriteria) []predicate.User {
 func mapDomainUserFromRow(row *ent.User) (*user.User, error) {
 	role, err := user.RoleString(string(row.Role))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("convertation user role error: %w", err)
 	}
 	return &user.User{
 		ID:        user.ID(row.ID),

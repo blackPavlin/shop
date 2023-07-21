@@ -1,18 +1,20 @@
+// Package config contains application configs.
 package config
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/blackPavlin/shop/pkg/logger"
 	"github.com/blackPavlin/shop/pkg/pgutil"
 	"github.com/blackPavlin/shop/pkg/s3x"
+	"github.com/blackPavlin/shop/pkg/zapx"
 )
 
-// Config
+// Config is application configuration.
 type Config struct {
-	Logger   *logger.LoggerConfig
+	Logger   *zapx.Config
 	Server   *ServerConfig          `envconfig:"REST_SRV" required:"true"`
 	Cors     *CorsConfig            `envconfig:"CORS" required:"true"`
 	Postgres *pgutil.PostgresConfig `envconfig:"POSTGRES" required:"true"`
@@ -20,7 +22,7 @@ type Config struct {
 	S3       *s3x.S3Config          `envconfig:"S3" required:"true"`
 }
 
-// ServerConfig
+// ServerConfig is HTTP server configuration.
 type ServerConfig struct {
 	Address      string        `envconfig:"ADDRESS" required:"true"`
 	ReadTimeout  time.Duration `envconfig:"READ_TIMEOUT" required:"true"`
@@ -28,7 +30,7 @@ type ServerConfig struct {
 	IdleTimeout  time.Duration `envconfig:"IDLE_TIMEOUT" required:"true"`
 }
 
-// CorsConfig
+// CorsConfig defines parameters for CORS related request handler.
 type CorsConfig struct {
 	AllowedOrigins     []string `envconfig:"ALLOWED_ORIGINS" required:"true"`
 	AllowedMethods     []string `envconfig:"ALLOWED_METHODS" required:"true"`
@@ -40,17 +42,17 @@ type CorsConfig struct {
 	Debug              bool     `envconfig:"DEBUG" required:"true"`
 }
 
-// AuthConfig
+// AuthConfig is authentication configuration.
 type AuthConfig struct {
 	ExpiresIn  int    `envconfig:"EXPIRES_IN" required:"true"`
 	SigningKey string `envconfig:"SIGNING_KEY" required:"true"`
 }
 
-// NewConfig
+// NewConfig create application config.
 func NewConfig() (*Config, error) {
 	config := &Config{}
 	if err := envconfig.Process("", config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read config error: %w", err)
 	}
 	return config, nil
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/category"
 )
 
-// ToDomainEntity
+// ToDomainEntity transforms api template into domain entity.
 func (r LoginRequest) ToDomainEntity() *auth.LoginProps {
 	return &auth.LoginProps{
 		Email:    r.Email,
@@ -14,7 +14,7 @@ func (r LoginRequest) ToDomainEntity() *auth.LoginProps {
 	}
 }
 
-// ToDomainEntity
+// ToDomainEntity transforms api template into domain entity.
 func (r SignupRequest) ToDomainEntity() *auth.SignupProps {
 	return &auth.SignupProps{
 		Email:    r.Email,
@@ -24,7 +24,7 @@ func (r SignupRequest) ToDomainEntity() *auth.SignupProps {
 	}
 }
 
-// ToDomainEntity
+// ToDomainEntity transforms api template into domain entity.
 func (r CreateAddressRequest) ToDomainEntity() *address.Props {
 	return &address.Props{
 		City:     r.City,
@@ -37,7 +37,7 @@ func (r CreateAddressRequest) ToDomainEntity() *address.Props {
 	}
 }
 
-// ToDomainEntity
+// ToDomainEntity transforms api template into domain entity.
 func (r CreateCategoryRequest) ToDomainEntity() *category.Props {
 	return &category.Props{
 		Name: r.Name,

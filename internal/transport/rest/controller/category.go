@@ -15,21 +15,21 @@ import (
 	"github.com/blackPavlin/shop/pkg/restx"
 )
 
-// CategoryController
+// CategoryController represents category controller.
 type CategoryController struct {
 	categoryService category.Service
-	authMiddleware  *middleware.AuthMiddleware
+	authMiddleware  *middleware.Middleware
 }
 
-// NewCategoryController
+// NewCategoryController create instance of CategoryController.
 func NewCategoryController(
 	categoryService category.Service,
-	authMiddleware *middleware.AuthMiddleware,
+	authMiddleware *middleware.Middleware,
 ) *CategoryController {
 	return &CategoryController{categoryService, authMiddleware}
 }
 
-// RegisterRoutes
+// RegisterRoutes register routes to the specified router.
 func (ctrl *CategoryController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/category", func(r chi.Router) {
 		r.Get("/", ctrl.GetCategoriesHandler)
@@ -42,7 +42,7 @@ func (ctrl *CategoryController) RegisterRoutes(r chi.Router) chi.Router {
 	})
 }
 
-// GetCategoriesHandler
+// GetCategoriesHandler define handler for GET /api/category.
 func (ctrl *CategoryController) GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	categories, err := ctrl.categoryService.Query(r.Context(), &category.QueryCriteria{})
 	if err != nil {
@@ -51,7 +51,7 @@ func (ctrl *CategoryController) GetCategoriesHandler(w http.ResponseWriter, r *h
 	render.Respond(w, r, mapping.CreateGetCategoriesResponse(categories))
 }
 
-// CreateCategoryHandler
+// CreateCategoryHandler define handler for POST /api/category.
 func (ctrl *CategoryController) CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	request := &rest.CreateCategoryRequest{}
 	if err := render.DecodeJSON(r.Body, request); err != nil {
@@ -71,7 +71,7 @@ func (ctrl *CategoryController) CreateCategoryHandler(w http.ResponseWriter, r *
 	render.Respond(w, r, mapping.CreateCategoryResponse(categ))
 }
 
-// UpdateCategoryHandler
+// UpdateCategoryHandler define handler for PATCH /api/category.
 func (ctrl *CategoryController) UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	request := &rest.Category{}
 	if err := render.DecodeJSON(r.Body, request); err != nil {
@@ -92,7 +92,7 @@ func (ctrl *CategoryController) UpdateCategoryHandler(w http.ResponseWriter, r *
 	render.Respond(w, r, mapping.CreateCategoryResponse(categ))
 }
 
-// DeleteCategoryHandler
+// DeleteCategoryHandler define handler for DELETE /api/category/{categoryId}.
 func (ctrl *CategoryController) DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	categoryID := chi.URLParam(r, "categoryID")
 	id, err := strconv.Atoi(categoryID)

@@ -18,36 +18,30 @@ import (
 
 //go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "auth"
 
-// Service
+const passwordCost = 14
+
+// Service represents auth use cases.
 type Service interface {
 	Login(ctx context.Context, props *LoginProps) (string, error)
 	Signup(ctx context.Context, props *SignupProps) (string, error)
 	ValidateToken(accessToken string) (*UserClaims, error)
 }
 
-// UseCase
+// UseCase represents auth service.
 type UseCase struct {
 	logger   *zap.Logger
 	config   *config.AuthConfig
 	userRepo user.Repository
 }
 
-// NewUseCase
-func NewUseCase(
-	logger *zap.Logger,
-	config *config.AuthConfig,
-	userRepo user.Repository,
-) *UseCase {
-	return &UseCase{
-		logger:   logger,
-		config:   config,
-		userRepo: userRepo,
-	}
+// NewUseCase create instance of UseCase.
+func NewUseCase(logger *zap.Logger, conf *config.AuthConfig, userRepo user.Repository) *UseCase {
+	return &UseCase{logger, conf, userRepo}
 }
 
-// Login
+// Login user.
 func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) {
-	user, err := s.userRepo.Get(ctx, &user.Filter{Email: user.EmailFilter{
+	usr, err := s.userRepo.Get(ctx, &user.Filter{Email: user.EmailFilter{
 		Eq: []string{strings.ToLower(props.Email)}},
 	})
 	if err != nil {
@@ -57,7 +51,7 @@ func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) 
 		return "", errorx.ErrInternal
 	}
 	if err := bcrypt.CompareHashAndPassword(
-		[]byte(user.Props.Password),
+		[]byte(usr.Props.Password),
 		[]byte(props.Password),
 	); err != nil {
 		return "", errorx.ErrInvalidLoginOrPassword
@@ -67,30 +61,31 @@ func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) 
 			ExpiresAt: time.Now().Add(time.Duration(s.config.ExpiresIn) * time.Second).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		UserID:   user.ID,
-		UserRole: user.Role,
+		UserID:   usr.ID,
+		UserRole: usr.Role,
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(
 		[]byte(s.config.SigningKey),
 	)
 	if err != nil {
-		return "", err
+		s.logger.Error("sign auth token error:", zap.Error(err))
+		return "", errorx.ErrInternal
 	}
 	return token, nil
 }
 
-// Signup
+// Signup user.
 func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error) {
 	exist, err := s.userRepo.Exist(ctx, &user.Filter{Email: user.EmailFilter{
 		Eq: []string{strings.ToLower(props.Email)}},
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("check exists user error: %w", err)
 	}
 	if exist {
 		return "", errorx.ErrAlreadyExists
 	}
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(props.Password), 14)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(props.Password), passwordCost)
 	if err != nil {
 		s.logger.Error("generate password hash error:", zap.Error(err))
 		return "", errorx.ErrInternal
@@ -102,7 +97,7 @@ func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error
 		Password: string(passwordHash),
 	}
 	if _, err := s.userRepo.Create(ctx, userProps); err != nil {
-		return "", err
+		return "", fmt.Errorf("create user error: %w", err)
 	}
 	loginProps := &LoginProps{
 		Email:    props.Email,
@@ -111,7 +106,7 @@ func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error
 	return s.Login(ctx, loginProps)
 }
 
-// ValidateToken
+// ValidateToken check and parse authorization token.
 func (s *UseCase) ValidateToken(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {

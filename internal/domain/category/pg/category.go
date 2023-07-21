@@ -1,3 +1,4 @@
+// Package pg contains implementations for category repositories
 package pg
 
 import (
@@ -13,18 +14,18 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// CategoryRepository ...
+// CategoryRepository pg repository implementation.
 type CategoryRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewCategoryRepository ...
+// NewCategoryRepository create instance of CategoryRepository.
 func NewCategoryRepository(client *ent.Client, logger *zap.Logger) *CategoryRepository {
 	return &CategoryRepository{client: client, logger: logger}
 }
 
-// Create ...
+// Create category in db.
 func (r *CategoryRepository) Create(
 	ctx context.Context,
 	props *category.Props,
@@ -43,7 +44,7 @@ func (r *CategoryRepository) Create(
 	return mapDomainCategoryFromRow(row), nil
 }
 
-// Query ...
+// Query categories from db based on criteria.
 func (r *CategoryRepository) Query(
 	ctx context.Context,
 	criteria *category.QueryCriteria,
@@ -60,7 +61,7 @@ func (r *CategoryRepository) Query(
 	return mapDomainCategoriesFromRows(rows), nil
 }
 
-// Get ...
+// Get category from db.
 func (r *CategoryRepository) Get(
 	ctx context.Context,
 	filter *category.Filter,
@@ -79,7 +80,7 @@ func (r *CategoryRepository) Get(
 	return mapDomainCategoryFromRow(row), err
 }
 
-// Update ...
+// Update category in db.
 func (r *CategoryRepository) Update(
 	ctx context.Context,
 	id category.ID,
@@ -96,7 +97,7 @@ func (r *CategoryRepository) Update(
 	return mapDomainCategoryFromRow(row), err
 }
 
-// Delete
+// Delete category in db.
 func (r *CategoryRepository) Delete(ctx context.Context, id category.ID) error {
 	err := r.client.Category.
 		DeleteOneID(int64(id)).

@@ -1,14 +1,15 @@
+// Package category contains product category oriented logic.
 package category
 
 import "time"
 
-// ID
+// ID represents an id for category.
 type ID int64
 
-// IDs
+// IDs defines a slice of ID.
 type IDs []ID
 
-// Category
+// Category represents the category.
 type Category struct {
 	ID ID
 
@@ -18,15 +19,15 @@ type Category struct {
 	Props *Props
 }
 
-// Categories
+// Categories slice of Category.
 type Categories []*Category
 
-// Props
+// Props represents category editable fields.
 type Props struct {
 	Name string
 }
 
-// ToInt64
+// ToInt64 convert slice of IDs to slice int64.
 func (ids IDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {

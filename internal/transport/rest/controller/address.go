@@ -14,21 +14,21 @@ import (
 	"github.com/blackPavlin/shop/pkg/restx"
 )
 
-// AddressController
+// AddressController represents address controller.
 type AddressController struct {
 	addressService address.Service
-	authMiddleware *middleware.AuthMiddleware
+	authMiddleware *middleware.Middleware
 }
 
-// NewAddressController
+// NewAddressController create instance of AddressController.
 func NewAddressController(
 	addressService address.Service,
-	authMiddleware *middleware.AuthMiddleware,
+	authMiddleware *middleware.Middleware,
 ) *AddressController {
 	return &AddressController{addressService, authMiddleware}
 }
 
-// RegisterRoutes
+// RegisterRoutes register routes to the specified router.
 func (ctrl *AddressController) RegisterRoutes(r chi.Router) chi.Router {
 	return r.Route("/address", func(r chi.Router) {
 		r.Use(ctrl.authMiddleware.Authorization)
@@ -37,7 +37,7 @@ func (ctrl *AddressController) RegisterRoutes(r chi.Router) chi.Router {
 	})
 }
 
-// GetAddressesHandler
+// GetAddressesHandler define handler for GET /api/address.
 func (ctrl *AddressController) GetAddressesHandler(w http.ResponseWriter, r *http.Request) {
 	addresses, err := ctrl.addressService.Query(r.Context(), &address.QueryCriteria{})
 	if err != nil {
@@ -47,7 +47,7 @@ func (ctrl *AddressController) GetAddressesHandler(w http.ResponseWriter, r *htt
 	render.Respond(w, r, mapping.CreateAddressesResponse(addresses))
 }
 
-// CreateAddressHandler
+// CreateAddressHandler define handler for POST /api/address.
 func (ctrl *AddressController) CreateAddressHandler(w http.ResponseWriter, r *http.Request) {
 	request := &rest.CreateAddressRequest{}
 	if err := render.DecodeJSON(r.Body, request); err != nil {

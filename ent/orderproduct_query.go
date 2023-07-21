@@ -269,7 +269,6 @@ func (opq *OrderProductQuery) Clone() *OrderProductQuery {
 //		GroupBy(orderproduct.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (opq *OrderProductQuery) GroupBy(field string, fields ...string) *OrderProductGroupBy {
 	opq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &OrderProductGroupBy{build: opq}
@@ -291,7 +290,6 @@ func (opq *OrderProductQuery) GroupBy(field string, fields ...string) *OrderProd
 //	client.OrderProduct.Query().
 //		Select(orderproduct.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (opq *OrderProductQuery) Select(fields ...string) *OrderProductSelect {
 	opq.ctx.Fields = append(opq.ctx.Fields, fields...)
 	sbuild := &OrderProductSelect{OrderProductQuery: opq}

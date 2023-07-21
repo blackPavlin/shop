@@ -1,3 +1,4 @@
+// Package pg contains implementations for address repositories.
 package pg
 
 import (
@@ -14,18 +15,18 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// AddressRepository
+// AddressRepository pg repository implementation.
 type AddressRepository struct {
 	client *ent.Client
 	logger *zap.Logger
 }
 
-// NewAddressRepository
+// NewAddressRepository create instance of AddressRepository.
 func NewAddressRepository(client *ent.Client, logger *zap.Logger) *AddressRepository {
 	return &AddressRepository{client: client, logger: logger}
 }
 
-// Create
+// Create address in db.
 func (r *AddressRepository) Create(
 	ctx context.Context,
 	props *address.Props,
@@ -54,7 +55,7 @@ func (r *AddressRepository) Create(
 	return mapDomainAddressFromRow(row), nil
 }
 
-// Get
+// Get address from db.
 func (r *AddressRepository) Get(
 	ctx context.Context,
 	filter *address.Filter,
@@ -62,9 +63,9 @@ func (r *AddressRepository) Get(
 	if userFromCtx, ok := user.GetUser(ctx); ok {
 		filter.UserID.Eq = user.IDs{userFromCtx.ID}
 	}
-	predicate := makePredicates(filter)
+	predicates := makePredicates(filter)
 	row, err := r.client.Address.Query().
-		Where(predicate...).
+		Where(predicates...).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -77,7 +78,7 @@ func (r *AddressRepository) Get(
 	return mapDomainAddressFromRow(row), nil
 }
 
-// Query
+// Query addresses from db based on criteria.
 func (r *AddressRepository) Query(
 	ctx context.Context,
 	criteria *address.QueryCriteria,
@@ -85,9 +86,9 @@ func (r *AddressRepository) Query(
 	if userFromCtx, ok := user.GetUser(ctx); ok {
 		criteria.Filter.UserID.Eq = user.IDs{userFromCtx.ID}
 	}
-	predicate := makePredicates(criteria.Filter)
+	predicates := makePredicates(criteria.Filter)
 	rows, err := r.client.Address.Query().
-		Where(predicate...).
+		Where(predicates...).
 		All(ctx)
 	if err != nil {
 		r.logger.Error("query address error:", zap.Error(err))

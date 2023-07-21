@@ -38,11 +38,17 @@ paths:
               $ref: "#/components/schemas/LoginRequest"
       responses:
         '200':
-          description: successful operation
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
 
   /auth/signup:
     post:
@@ -56,11 +62,17 @@ paths:
               $ref: '#/components/schemas/SignupRequest'
       responses:
         '201':
-          description: successful operation
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '409':
+          $ref: "#/components/responses/Conflict"
+        '500':
+          $ref: "#/components/responses/InternalError"
 
   /user:
     get:
@@ -69,11 +81,15 @@ paths:
         - User
       responses:
         '200':
-          description: successful operation
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
       security:
         - BearerAuth: []
 
@@ -84,11 +100,15 @@ paths:
         - Address
       responses:
         '200':
-          description: successful operation
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddressList'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
       security:
         - BearerAuth: []
     post:
@@ -102,11 +122,17 @@ paths:
               $ref: '#/components/schemas/CreateAddressRequest'
       responses:
         '201':
-          description: successful operation
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Address'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
       security:
         - BearerAuth: []
 
@@ -391,7 +417,52 @@ components:
       type: http
       scheme: bearer
 
+  responses:
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Conflict:
+      description: Resource Already Exist
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    InternalError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
   schemas:
+    Error:
+      title: Ошибка
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
     User:
       title: Пользователь
       type: object
@@ -530,7 +601,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/OrderProduct'
- 
+
     OrderProduct:
       title: Товар в заказе
       type: object

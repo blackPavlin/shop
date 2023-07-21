@@ -1,3 +1,4 @@
+// Package pgutil contains utilities for working with Postgres.
 package pgutil
 
 import (
@@ -5,11 +6,12 @@ import (
 	"fmt"
 	"time"
 
+	// pgx driver.
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 )
 
-// PostgresConfig
+// PostgresConfig is a Postgres configuration.
 type PostgresConfig struct {
 	Host                 string        `envconfig:"HOST" required:"true"`
 	Port                 int           `envconfig:"PORT" required:"true"`
@@ -26,8 +28,7 @@ type PostgresConfig struct {
 	ApplicationName      string        `envconfig:"APPLICATION_NAME" required:"true"`
 }
 
-// ToDataSourceName
-func (p *PostgresConfig) ToDataSourceName() string {
+func (p *PostgresConfig) toDataSourceName() string {
 	return fmt.Sprintf(`host=%s port=%d user=%s password=%s dbname=%s 
 			sslmode=%s prefer_simple_protocol=%s statement_cache_mode=%s application_name=%s`,
 		p.Host, p.Port, p.User, p.Password, p.DatabaseName, p.SSLMode, p.PreferSimpleProtocol,
@@ -35,11 +36,11 @@ func (p *PostgresConfig) ToDataSourceName() string {
 	)
 }
 
-// NewDatabase
+// NewDatabase creates database connection and checks it.
 func NewDatabase(ctx context.Context, config *PostgresConfig) (*sqlx.DB, error) {
-	db, err := sqlx.ConnectContext(ctx, "pgx", config.ToDataSourceName())
+	db, err := sqlx.ConnectContext(ctx, "pgx", config.toDataSourceName())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("connect to database error: %w", err)
 	}
 
 	db.SetMaxOpenConns(config.MaxOpenConns)
@@ -48,8 +49,7 @@ func NewDatabase(ctx context.Context, config *PostgresConfig) (*sqlx.DB, error) 
 	db.SetConnMaxIdleTime(config.ConnMaxIdleTime)
 
 	if err := db.PingContext(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ping database error: %w", err)
 	}
-
 	return db, nil
 }

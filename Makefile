@@ -27,11 +27,11 @@ generate: go/generate openapi/generate
 
 .PHONY: go/generate
 go/generate:
-	go generate ./...
+	@go generate ./...
 
 .PHONY: openapi/generate
 openapi/generate:
-	oapi-codegen -generate types -o ./internal/transport/rest/types.gen.go -package rest ./api/openapi.v1.yaml	
+	@oapi-codegen -generate types -o ./internal/transport/rest/types.gen.go -package rest ./api/openapi.v1.yaml
 
 ## tests: Run tests.
 .PHONY: test tests
@@ -40,6 +40,14 @@ test tests: go/test
 .PHONY: go/test
 go/test: $(go_src) | $(reports)
 	@go test -v -covermode=atomic -coverprofile=$(reports)/cover.out ./...
+
+## lint: Run static analysis.
+.PHONY: lint
+lint: go/lint
+
+.PHONY: go/lint
+go/lint:
+	@golangci-lint run
 
 ## help: Display available targets.
 .PHONY: help

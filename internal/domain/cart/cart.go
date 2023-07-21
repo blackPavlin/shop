@@ -1,3 +1,4 @@
+// Package cart contains user cart oriented logic.
 package cart
 
 import (
@@ -7,10 +8,13 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/user"
 )
 
-// ID
+// ID represents an id for cart.
 type ID int64
 
-// Cart
+// IDs defines a slice of ID.
+type IDs []ID
+
+// Cart represents the cart.
 type Cart struct {
 	ID     ID
 	UserID user.ID
@@ -21,10 +25,10 @@ type Cart struct {
 	Props *Props
 }
 
-// Carts
+// Carts slice of Cart.
 type Carts []*Cart
 
-// Props
+// Props represents cart editable fields.
 type Props struct {
 	ProductID product.ID
 	Amount    int64

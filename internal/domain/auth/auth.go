@@ -1,3 +1,4 @@
+// Package auth contains authorization oriented logic.
 package auth
 
 import (
@@ -6,20 +7,20 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/user"
 )
 
-// UserClaims
+// UserClaims represents jwt claims.
 type UserClaims struct {
 	jwt.StandardClaims
 	UserID   user.ID   `json:"userId"`
 	UserRole user.Role `json:"userRole"`
 }
 
-// LoginProps
+// LoginProps represents login props.
 type LoginProps struct {
 	Email    string
 	Password string
 }
 
-// SignupProps
+// SignupProps represents signup props.
 type SignupProps struct {
 	Email    string
 	Name     string

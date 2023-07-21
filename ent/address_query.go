@@ -305,7 +305,6 @@ func (aq *AddressQuery) WithUsers(opts ...func(*UserQuery)) *AddressQuery {
 //		GroupBy(address.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (aq *AddressQuery) GroupBy(field string, fields ...string) *AddressGroupBy {
 	aq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &AddressGroupBy{build: aq}
@@ -327,7 +326,6 @@ func (aq *AddressQuery) GroupBy(field string, fields ...string) *AddressGroupBy 
 //	client.Address.Query().
 //		Select(address.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (aq *AddressQuery) Select(fields ...string) *AddressSelect {
 	aq.ctx.Fields = append(aq.ctx.Fields, fields...)
 	sbuild := &AddressSelect{AddressQuery: aq}

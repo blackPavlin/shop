@@ -1,7 +1,10 @@
+// Package server contains implementations for http server.
 package server
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +39,7 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
-// Server
+// Server represents http server.
 type Server struct {
 	config *config.Config
 	logger *zap.Logger
@@ -46,9 +49,9 @@ type Server struct {
 	storage  *minio.Client
 }
 
-// NewServer
+// NewServer create instance of http server.
 func NewServer(
-	config *config.Config,
+	conf *config.Config,
 	logger *zap.Logger,
 	database *ent.Client,
 	storage *minio.Client,
@@ -63,18 +66,18 @@ func NewServer(
 	)
 
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:     config.Cors.AllowedOrigins,
-		AllowedMethods:     config.Cors.AllowedMethods,
-		AllowedHeaders:     config.Cors.AllowedHeaders,
-		ExposedHeaders:     config.Cors.ExposedHeaders,
-		AllowCredentials:   config.Cors.AllowCredentials,
-		MaxAge:             config.Cors.MaxAge,
-		OptionsPassthrough: config.Cors.OptionsPassthrough,
-		Debug:              config.Cors.Debug,
+		AllowedOrigins:     conf.Cors.AllowedOrigins,
+		AllowedMethods:     conf.Cors.AllowedMethods,
+		AllowedHeaders:     conf.Cors.AllowedHeaders,
+		ExposedHeaders:     conf.Cors.ExposedHeaders,
+		AllowCredentials:   conf.Cors.AllowCredentials,
+		MaxAge:             conf.Cors.MaxAge,
+		OptionsPassthrough: conf.Cors.OptionsPassthrough,
+		Debug:              conf.Cors.Debug,
 	}).Handler)
 
 	// Storages
-	imageStorage := imagestorage.NewStorage(storage, config.S3, logger)
+	imageStorage := imagestorage.NewStorage(storage, conf.S3, logger)
 
 	// Repositories
 	txManager := pg.NewTxManager(database, logger)
@@ -87,8 +90,8 @@ func NewServer(
 	imageRepository := imagepg.NewImageRepository(database, logger)
 
 	// Services
-	userService := user.NewUserUseCase(userRepository)
-	authService := auth.NewUseCase(logger, config.Auth, userRepository)
+	userService := user.NewUseCase(userRepository)
+	authService := auth.NewUseCase(logger, conf.Auth, userRepository)
 	cartService := cart.NewUseCase(cartRepository, productRepository)
 	addressService := address.NewUseCase(addressRepository)
 	productService := product.NewUseCase(productRepository, imageProductRepository, txManager)
@@ -96,7 +99,7 @@ func NewServer(
 	imageService := image.NewUseCase(logger, imageRepository, imageStorage, txManager)
 
 	// Middlewares
-	authMiddleware := restmiddleware.NewAuthMiddleware(authService)
+	authMiddleware := restmiddleware.NewMiddleware(authService)
 
 	// Controllers
 	userController := controller.NewUserController(userService, authMiddleware)
@@ -117,16 +120,10 @@ func NewServer(
 		imageController.RegisterRoutes(r)    // /api/image
 	})
 
-	return &Server{
-		config:   config,
-		logger:   logger,
-		router:   router,
-		database: database,
-		storage:  storage,
-	}
+	return &Server{conf, logger, router, database, storage}
 }
 
-// Run
+// Run http server.
 func (s *Server) Run() error {
 	server := http.Server{
 		Addr:         s.config.Server.Address,
@@ -135,18 +132,18 @@ func (s *Server) Run() error {
 		IdleTimeout:  s.config.Server.IdleTimeout,
 		Handler:      s.router,
 	}
-
 	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("failed to start server: %+v", err)
 		}
 	}()
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
-	return server.Shutdown(ctx)
+	if err := server.Shutdown(ctx); err != nil {
+		return fmt.Errorf("shutdown server error: %w", err)
+	}
+	return nil
 }

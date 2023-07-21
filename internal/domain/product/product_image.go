@@ -6,13 +6,13 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/image"
 )
 
-// ImageID
+// ImageID represents an id for product image.
 type ImageID int64
 
-// ImageIDs
+// ImageIDs defines a slice of ImageID.
 type ImageIDs []ImageID
 
-// Image
+// Image represents the product image.
 type Image struct {
 	ID ImageID
 
@@ -22,16 +22,16 @@ type Image struct {
 	Props *ImageProps
 }
 
-// Images
+// Images slice of Product.
 type Images []*Image
 
-// ImageProps
+// ImageProps represents product image editable fields.
 type ImageProps struct {
 	ProductID ID
 	ImageID   image.ID
 }
 
-// ToInt64
+// ToInt64 convert slice of IDs to slice int64.
 func (ids ImageIDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {
