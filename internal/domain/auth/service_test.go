@@ -122,9 +122,23 @@ func (s *AuthServiceSuite) TestLogin() {
 			s.True(errors.Is(err, want.err))
 		}
 	}
-	loginProps1 := &auth.LoginProps{
-		Email:    gofakeit.Email(),
-		Password: gofakeit.Password(true, true, true, true, true, 4),
+	testUser := &user.User{
+		ID:   1,
+		Role: user.RoleUser,
+		Props: &user.Props{
+			Email:    "user@user.com",
+			Name:     "testUser",
+			Phone:    "80000000000",
+			Password: "$2a$14$VftkClux8ptrh/lZBU99ROtOs5vq1rLFEpbOxuqrbqPUOSHGCEVA.",
+		},
+	}
+	invalidLoginProps := &auth.LoginProps{
+		Email:    "some@email.com",
+		Password: "password123",
+	}
+	invalidPasswordProps := &auth.LoginProps{
+		Email:    testUser.Props.Email,
+		Password: "password123",
 	}
 	tests := []struct {
 		name    string
@@ -137,13 +151,33 @@ func (s *AuthServiceSuite) TestLogin() {
 			prepare: func(ctx context.Context) context.Context {
 				s.userRepo.EXPECT().
 					Get(ctx, &user.Filter{
-						Email: user.EmailFilter{Eq: []string{loginProps1.Email}},
-					}).Return(nil, errorx.ErrNotFound)
+						Email: user.EmailFilter{Eq: []string{invalidLoginProps.Email}},
+					}).
+					Return(nil, errorx.ErrNotFound)
 				return ctx
 			},
 			args: args{
 				ctx:   context.Background(),
-				props: loginProps1,
+				props: invalidLoginProps,
+			},
+			want: want{
+				res: "",
+				err: errorx.ErrInvalidLoginOrPassword,
+			},
+		},
+		{
+			name: "invalid password",
+			prepare: func(ctx context.Context) context.Context {
+				s.userRepo.EXPECT().
+					Get(ctx, &user.Filter{
+						Email: user.EmailFilter{Eq: []string{invalidPasswordProps.Email}},
+					}).
+					Return(testUser, nil)
+				return ctx
+			},
+			args: args{
+				ctx:   context.Background(),
+				props: invalidPasswordProps,
 			},
 			want: want{
 				res: "",
