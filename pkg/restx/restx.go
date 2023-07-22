@@ -2,40 +2,18 @@
 package restx
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
 
-	"github.com/go-chi/render"
-
-	"github.com/blackPavlin/shop/pkg/errorx"
+	"github.com/go-chi/chi/v5"
 )
 
-// ErrorResponse is error struct for response.
-type ErrorResponse struct {
-	HTTPStatusCode int    `json:"-"`
-	Message        string `json:"message"`
-}
-
-// Render http error response.
-func (e ErrorResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	render.Status(r, e.HTTPStatusCode)
-	return nil
-}
-
-// HandleError return in response the rendered error.
-func HandleError(w http.ResponseWriter, r *http.Request, err error) {
-	var serviceError *errorx.Error
-
-	if errors.As(err, &serviceError) {
-		_ = render.Render(w, r, ErrorResponse{
-			HTTPStatusCode: serviceError.Code(),
-			Message:        serviceError.Error(),
-		})
-		return
+// GetIDFromURLParams return id as an int64 from get params by its name.
+func GetIDFromURLParams(r *http.Request, paramName string) (int64, error) {
+	id, err := strconv.ParseInt(chi.URLParam(r, paramName), 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed parse id from url: %w", err)
 	}
-	render.Status(r, http.StatusInternalServerError)
-	_ = render.Render(w, r, ErrorResponse{
-		HTTPStatusCode: http.StatusInternalServerError,
-		Message:        "internal server error",
-	})
+	return id, nil
 }

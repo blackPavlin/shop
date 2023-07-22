@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -62,13 +61,13 @@ func (ctrl *CategoryController) CreateCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	categ, err := ctrl.categoryService.Create(r.Context(), request.ToDomainEntity())
+	c, err := ctrl.categoryService.Create(r.Context(), request.ToDomainEntity())
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
 	render.Status(r, http.StatusCreated)
-	render.Respond(w, r, mapping.CreateCategoryResponse(categ))
+	render.Respond(w, r, mapping.CreateCategoryResponse(c))
 }
 
 // UpdateCategoryHandler define handler for PATCH /api/category.
@@ -82,25 +81,24 @@ func (ctrl *CategoryController) UpdateCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	categ, err := ctrl.categoryService.Update(r.Context(), category.ID(request.Id), &category.Props{
+	c, err := ctrl.categoryService.Update(r.Context(), category.ID(request.Id), &category.Props{
 		Name: request.Name,
 	})
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
-	render.Respond(w, r, mapping.CreateCategoryResponse(categ))
+	render.Respond(w, r, mapping.CreateCategoryResponse(c))
 }
 
 // DeleteCategoryHandler define handler for DELETE /api/category/{categoryId}.
 func (ctrl *CategoryController) DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
-	categoryID := chi.URLParam(r, "categoryID")
-	id, err := strconv.Atoi(categoryID)
+	categoryID, err := restx.GetIDFromURLParams(r, "categoryID")
 	if err != nil {
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	if err := ctrl.categoryService.Delete(r.Context(), category.ID(id)); err != nil {
+	if err := ctrl.categoryService.Delete(r.Context(), category.ID(categoryID)); err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
