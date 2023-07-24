@@ -63,9 +63,8 @@ func (r *AddressRepository) Get(
 	if userFromCtx, ok := user.GetUser(ctx); ok {
 		filter.UserID.Eq = user.IDs{userFromCtx.ID}
 	}
-	predicates := makePredicates(filter)
 	row, err := r.client.Address.Query().
-		Where(predicates...).
+		Where(makePredicates(filter)...).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -86,9 +85,8 @@ func (r *AddressRepository) Query(
 	if userFromCtx, ok := user.GetUser(ctx); ok {
 		criteria.Filter.UserID.Eq = user.IDs{userFromCtx.ID}
 	}
-	predicates := makePredicates(criteria.Filter)
 	rows, err := r.client.Address.Query().
-		Where(predicates...).
+		Where(makePredicates(criteria.Filter)...).
 		All(ctx)
 	if err != nil {
 		r.logger.Error("query address error:", zap.Error(err))

@@ -52,9 +52,11 @@ func (r *UserRepository) Create(ctx context.Context, props *user.Props) (*user.U
 
 // Get user from db.
 func (r *UserRepository) Get(ctx context.Context, filter *user.Filter) (*user.User, error) {
-	predicates := makeUserPredicate(&user.QueryCriteria{Filter: filter})
+	if userFromCtx, ok := user.GetUser(ctx); ok {
+		filter.ID.Eq = user.IDs{userFromCtx.ID}
+	}
 	row, err := r.client.User.Query().
-		Where(predicates...).
+		Where(makeUserPredicate(filter)...).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -74,9 +76,8 @@ func (r *UserRepository) Get(ctx context.Context, filter *user.Filter) (*user.Us
 
 // Exist user in db.
 func (r *UserRepository) Exist(ctx context.Context, filter *user.Filter) (bool, error) {
-	predicates := makeUserPredicate(&user.QueryCriteria{Filter: filter})
 	exist, err := r.client.User.Query().
-		Where(predicates...).
+		Where(makeUserPredicate(filter)...).
 		Exist(ctx)
 	if err != nil {
 		r.logger.Error("exist user error:", zap.Error(err))
@@ -85,13 +86,13 @@ func (r *UserRepository) Exist(ctx context.Context, filter *user.Filter) (bool, 
 	return exist, nil
 }
 
-func makeUserPredicate(criteria *user.QueryCriteria) []predicate.User {
+func makeUserPredicate(filter *user.Filter) []predicate.User {
 	predicates := make([]predicate.User, 0)
-	if len(criteria.Filter.ID.Eq) > 0 {
-		predicates = append(predicates, entuser.IDIn(criteria.Filter.ID.Eq.ToInt64()...))
+	if len(filter.ID.Eq) > 0 {
+		predicates = append(predicates, entuser.IDIn(filter.ID.Eq.ToInt64()...))
 	}
-	if len(criteria.Filter.Email.Eq) > 0 {
-		predicates = append(predicates, entuser.EmailIn(criteria.Filter.Email.Eq...))
+	if len(filter.Email.Eq) > 0 {
+		predicates = append(predicates, entuser.EmailIn(filter.Email.Eq...))
 	}
 	return predicates
 }

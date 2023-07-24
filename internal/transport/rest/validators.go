@@ -49,7 +49,7 @@ func (r CreateAddressRequest) Validate() error {
 func (r Category) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Id, validation.Required),
-		validation.Field(&r.Name, validation.Required),
+		validation.Field(&r.Name, validation.Required, validation.Length(1, 50)),
 	); err != nil {
 		return errorx.NewBadRequestError(err.Error())
 	}
@@ -59,7 +59,21 @@ func (r Category) Validate() error {
 // Validate body of CreateCategoryRequest.
 func (r CreateCategoryRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
+		validation.Field(&r.Name, validation.Required, validation.Length(1, 50)),
+	); err != nil {
+		return errorx.NewBadRequestError(err.Error())
+	}
+	return nil
+}
+
+// Validate body of CreateProductRequest.
+func (r CreateProductRequest) Validate() error {
+	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Name, validation.Required),
+		validation.Field(&r.Description, validation.Required),
+		validation.Field(&r.CategoryId, validation.Required),
+		validation.Field(&r.Price, validation.Required, validation.Min(0)),
+		validation.Field(&r.Amount, validation.Required, validation.Min(0)),
 	); err != nil {
 		return errorx.NewBadRequestError(err.Error())
 	}

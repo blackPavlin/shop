@@ -56,19 +56,8 @@ func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) 
 	); err != nil {
 		return "", errorx.ErrInvalidLoginOrPassword
 	}
-	claims := &UserClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Duration(s.config.ExpiresIn) * time.Second).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-		UserID:   usr.ID,
-		UserRole: usr.Role,
-	}
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(
-		[]byte(s.config.SigningKey),
-	)
+	token, err := s.SignToken(usr)
 	if err != nil {
-		s.logger.Error("sign auth token error:", zap.Error(err))
 		return "", errorx.ErrInternal
 	}
 	return token, nil
@@ -104,6 +93,26 @@ func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error
 		Password: props.Password,
 	}
 	return s.Login(ctx, loginProps)
+}
+
+// SignToken sign authorization token.
+func (s *UseCase) SignToken(usr *user.User) (string, error) {
+	claims := &UserClaims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Duration(s.config.ExpiresIn) * time.Second).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		UserID:   usr.ID,
+		UserRole: usr.Role,
+	}
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(
+		[]byte(s.config.SigningKey),
+	)
+	if err != nil {
+		s.logger.Error("sign auth token error:", zap.Error(err))
+		return "", errorx.ErrInternal
+	}
+	return token, nil
 }
 
 // ValidateToken check and parse authorization token.
