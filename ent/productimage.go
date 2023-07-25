@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/product"
 	"github.com/blackPavlin/shop/ent/productimage"
 )
@@ -25,8 +24,8 @@ type ProductImage struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID int64 `json:"product_id,omitempty"`
-	// ImageID holds the value of the "image_id" field.
-	ImageID int64 `json:"image_id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductImageQuery when eager-loading is set.
 	Edges        ProductImageEdges `json:"edges"`
@@ -37,11 +36,9 @@ type ProductImage struct {
 type ProductImageEdges struct {
 	// Products holds the value of the products edge.
 	Products *Product `json:"products,omitempty"`
-	// Images holds the value of the images edge.
-	Images *Image `json:"images,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // ProductsOrErr returns the Products value or an error if the edge
@@ -57,26 +54,15 @@ func (e ProductImageEdges) ProductsOrErr() (*Product, error) {
 	return nil, &NotLoadedError{edge: "products"}
 }
 
-// ImagesOrErr returns the Images value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProductImageEdges) ImagesOrErr() (*Image, error) {
-	if e.loadedTypes[1] {
-		if e.Images == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: image.Label}
-		}
-		return e.Images, nil
-	}
-	return nil, &NotLoadedError{edge: "images"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*ProductImage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case productimage.FieldID, productimage.FieldProductID, productimage.FieldImageID:
+		case productimage.FieldID, productimage.FieldProductID:
 			values[i] = new(sql.NullInt64)
+		case productimage.FieldName:
+			values[i] = new(sql.NullString)
 		case productimage.FieldCreatedAt, productimage.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
@@ -118,11 +104,11 @@ func (pi *ProductImage) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pi.ProductID = value.Int64
 			}
-		case productimage.FieldImageID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field image_id", values[i])
+		case productimage.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				pi.ImageID = value.Int64
+				pi.Name = value.String
 			}
 		default:
 			pi.selectValues.Set(columns[i], values[i])
@@ -140,11 +126,6 @@ func (pi *ProductImage) Value(name string) (ent.Value, error) {
 // QueryProducts queries the "products" edge of the ProductImage entity.
 func (pi *ProductImage) QueryProducts() *ProductQuery {
 	return NewProductImageClient(pi.config).QueryProducts(pi)
-}
-
-// QueryImages queries the "images" edge of the ProductImage entity.
-func (pi *ProductImage) QueryImages() *ImageQuery {
-	return NewProductImageClient(pi.config).QueryImages(pi)
 }
 
 // Update returns a builder for updating this ProductImage.
@@ -179,8 +160,8 @@ func (pi *ProductImage) String() string {
 	builder.WriteString("product_id=")
 	builder.WriteString(fmt.Sprintf("%v", pi.ProductID))
 	builder.WriteString(", ")
-	builder.WriteString("image_id=")
-	builder.WriteString(fmt.Sprintf("%v", pi.ImageID))
+	builder.WriteString("name=")
+	builder.WriteString(pi.Name)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -8,9 +8,9 @@ import (
 // CreateUploadImageResponse transform domain entity to rest response.
 func CreateUploadImageResponse(img *product.Image) rest.Image {
 	return rest.Image{
-		Id:           int64(img.ID),
-		// todo: product_id
-		Name:         img.Props.Name,
+		Id:        int64(img.ID),
+		ProductId: int64(img.Props.ProductID),
+		Name:      img.Props.Name,
 	}
 }
 

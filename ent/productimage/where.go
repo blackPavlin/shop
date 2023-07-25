@@ -70,9 +70,9 @@ func ProductID(v int64) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldEQ(FieldProductID, v))
 }
 
-// ImageID applies equality check predicate on the "image_id" field. It's identical to ImageIDEQ.
-func ImageID(v int64) predicate.ProductImage {
-	return predicate.ProductImage(sql.FieldEQ(FieldImageID, v))
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldName, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -175,24 +175,69 @@ func ProductIDNotIn(vs ...int64) predicate.ProductImage {
 	return predicate.ProductImage(sql.FieldNotIn(FieldProductID, vs...))
 }
 
-// ImageIDEQ applies the EQ predicate on the "image_id" field.
-func ImageIDEQ(v int64) predicate.ProductImage {
-	return predicate.ProductImage(sql.FieldEQ(FieldImageID, v))
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEQ(FieldName, v))
 }
 
-// ImageIDNEQ applies the NEQ predicate on the "image_id" field.
-func ImageIDNEQ(v int64) predicate.ProductImage {
-	return predicate.ProductImage(sql.FieldNEQ(FieldImageID, v))
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNEQ(FieldName, v))
 }
 
-// ImageIDIn applies the In predicate on the "image_id" field.
-func ImageIDIn(vs ...int64) predicate.ProductImage {
-	return predicate.ProductImage(sql.FieldIn(FieldImageID, vs...))
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldIn(FieldName, vs...))
 }
 
-// ImageIDNotIn applies the NotIn predicate on the "image_id" field.
-func ImageIDNotIn(vs ...int64) predicate.ProductImage {
-	return predicate.ProductImage(sql.FieldNotIn(FieldImageID, vs...))
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldNotIn(FieldName, vs...))
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldGT(FieldName, v))
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldGTE(FieldName, v))
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldLT(FieldName, v))
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldLTE(FieldName, v))
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldContains(FieldName, v))
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldHasPrefix(FieldName, v))
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldHasSuffix(FieldName, v))
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.ProductImage {
+	return predicate.ProductImage(sql.FieldContainsFold(FieldName, v))
 }
 
 // HasProducts applies the HasEdge predicate on the "products" edge.
@@ -210,29 +255,6 @@ func HasProducts() predicate.ProductImage {
 func HasProductsWith(preds ...predicate.Product) predicate.ProductImage {
 	return predicate.ProductImage(func(s *sql.Selector) {
 		step := newProductsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasImages applies the HasEdge predicate on the "images" edge.
-func HasImages() predicate.ProductImage {
-	return predicate.ProductImage(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ImagesTable, ImagesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasImagesWith applies the HasEdge predicate on the "images" edge with a given conditions (other predicates).
-func HasImagesWith(preds ...predicate.Image) predicate.ProductImage {
-	return predicate.ProductImage(func(s *sql.Selector) {
-		step := newImagesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

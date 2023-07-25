@@ -79,20 +79,6 @@ var (
 		Columns:    CategoriesColumns,
 		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
 	}
-	// ImagesColumns holds the columns for the "images" table.
-	ImagesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
-		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
-		{Name: "name", Type: field.TypeString},
-		{Name: "original_name", Type: field.TypeString},
-	}
-	// ImagesTable holds the schema information for the "images" table.
-	ImagesTable = &schema.Table{
-		Name:       "images",
-		Columns:    ImagesColumns,
-		PrimaryKey: []*schema.Column{ImagesColumns[0]},
-	}
 	// OrdersColumns holds the columns for the "orders" table.
 	OrdersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -157,7 +143,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
-		{Name: "image_id", Type: field.TypeInt64},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "product_id", Type: field.TypeInt64},
 	}
 	// ProductImagesTable holds the schema information for the "product_images" table.
@@ -166,12 +152,6 @@ var (
 		Columns:    ProductImagesColumns,
 		PrimaryKey: []*schema.Column{ProductImagesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "product_image_image_fk",
-				Columns:    []*schema.Column{ProductImagesColumns[3]},
-				RefColumns: []*schema.Column{ImagesColumns[0]},
-				OnDelete:   schema.Restrict,
-			},
 			{
 				Symbol:     "product_image_product_fk",
 				Columns:    []*schema.Column{ProductImagesColumns[4]},
@@ -202,7 +182,6 @@ var (
 		AddressesTable,
 		CartsTable,
 		CategoriesTable,
-		ImagesTable,
 		OrdersTable,
 		OrderProductsTable,
 		ProductsTable,
@@ -224,9 +203,6 @@ func init() {
 	CategoriesTable.Annotation = &entsql.Annotation{
 		Table: "categories",
 	}
-	ImagesTable.Annotation = &entsql.Annotation{
-		Table: "images",
-	}
 	OrdersTable.ForeignKeys[0].RefTable = UsersTable
 	OrdersTable.Annotation = &entsql.Annotation{
 		Table: "orders",
@@ -238,8 +214,7 @@ func init() {
 	ProductsTable.Annotation = &entsql.Annotation{
 		Table: "products",
 	}
-	ProductImagesTable.ForeignKeys[0].RefTable = ImagesTable
-	ProductImagesTable.ForeignKeys[1].RefTable = ProductsTable
+	ProductImagesTable.ForeignKeys[0].RefTable = ProductsTable
 	ProductImagesTable.Annotation = &entsql.Annotation{
 		Table: "product_images",
 	}

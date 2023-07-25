@@ -97,9 +97,9 @@ type Error struct {
 
 // Image defines model for Image.
 type Image struct {
-	Id           int64  `json:"id"`
-	Name         string `json:"name"`
-	OriginalName string `json:"originalName"`
+	Id        int64  `json:"id"`
+	Name      string `json:"name"`
+	ProductId int64  `json:"productId"`
 }
 
 // ImageList defines model for ImageList.
@@ -167,7 +167,12 @@ type SignupRequest struct {
 }
 
 // UpdateProductRequest defines model for UpdateProductRequest.
-type UpdateProductRequest = map[string]interface{}
+type UpdateProductRequest struct {
+	Amount      *int64  `json:"amount,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	Price       *int64  `json:"price,omitempty"`
+}
 
 // UploadImagesRequest defines model for UploadImagesRequest.
 type UploadImagesRequest struct {
@@ -195,6 +200,9 @@ type Conflict = Error
 // InternalError defines model for InternalError.
 type InternalError = Error
 
+// NotFound defines model for NotFound.
+type NotFound = Error
+
 // Unauthorized defines model for Unauthorized.
 type Unauthorized = Error
 
@@ -219,11 +227,11 @@ type PatchCategoryJSONRequestBody = Category
 // PostCategoryJSONRequestBody defines body for PostCategory for application/json ContentType.
 type PostCategoryJSONRequestBody = CreateCategoryRequest
 
-// PostImageUploadMultipartRequestBody defines body for PostImageUpload for multipart/form-data ContentType.
-type PostImageUploadMultipartRequestBody = UploadImagesRequest
-
 // PostProductJSONRequestBody defines body for PostProduct for application/json ContentType.
 type PostProductJSONRequestBody = CreateProductRequest
 
 // PatchProductProductIdJSONRequestBody defines body for PatchProductProductId for application/json ContentType.
 type PatchProductProductIdJSONRequestBody = UpdateProductRequest
+
+// PostProductProductIdImageMultipartRequestBody defines body for PostProductProductIdImage for multipart/form-data ContentType.
+type PostProductProductIdImageMultipartRequestBody = UploadImagesRequest

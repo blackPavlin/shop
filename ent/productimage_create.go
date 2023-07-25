@@ -10,7 +10,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/product"
 	"github.com/blackPavlin/shop/ent/productimage"
 )
@@ -56,9 +55,9 @@ func (pic *ProductImageCreate) SetProductID(i int64) *ProductImageCreate {
 	return pic
 }
 
-// SetImageID sets the "image_id" field.
-func (pic *ProductImageCreate) SetImageID(i int64) *ProductImageCreate {
-	pic.mutation.SetImageID(i)
+// SetName sets the "name" field.
+func (pic *ProductImageCreate) SetName(s string) *ProductImageCreate {
+	pic.mutation.SetName(s)
 	return pic
 }
 
@@ -71,17 +70,6 @@ func (pic *ProductImageCreate) SetProductsID(id int64) *ProductImageCreate {
 // SetProducts sets the "products" edge to the Product entity.
 func (pic *ProductImageCreate) SetProducts(p *Product) *ProductImageCreate {
 	return pic.SetProductsID(p.ID)
-}
-
-// SetImagesID sets the "images" edge to the Image entity by ID.
-func (pic *ProductImageCreate) SetImagesID(id int64) *ProductImageCreate {
-	pic.mutation.SetImagesID(id)
-	return pic
-}
-
-// SetImages sets the "images" edge to the Image entity.
-func (pic *ProductImageCreate) SetImages(i *Image) *ProductImageCreate {
-	return pic.SetImagesID(i.ID)
 }
 
 // Mutation returns the ProductImageMutation object of the builder.
@@ -140,14 +128,11 @@ func (pic *ProductImageCreate) check() error {
 	if _, ok := pic.mutation.ProductID(); !ok {
 		return &ValidationError{Name: "product_id", err: errors.New(`ent: missing required field "ProductImage.product_id"`)}
 	}
-	if _, ok := pic.mutation.ImageID(); !ok {
-		return &ValidationError{Name: "image_id", err: errors.New(`ent: missing required field "ProductImage.image_id"`)}
+	if _, ok := pic.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ProductImage.name"`)}
 	}
 	if _, ok := pic.mutation.ProductsID(); !ok {
 		return &ValidationError{Name: "products", err: errors.New(`ent: missing required edge "ProductImage.products"`)}
-	}
-	if _, ok := pic.mutation.ImagesID(); !ok {
-		return &ValidationError{Name: "images", err: errors.New(`ent: missing required edge "ProductImage.images"`)}
 	}
 	return nil
 }
@@ -183,6 +168,10 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := pic.mutation.Name(); ok {
+		_spec.SetField(productimage.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
 	if nodes := pic.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -198,23 +187,6 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.ProductID = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pic.mutation.ImagesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   productimage.ImagesTable,
-			Columns: []string{productimage.ImagesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(image.FieldID, field.TypeInt64),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.ImageID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

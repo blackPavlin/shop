@@ -8,7 +8,6 @@ import (
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
-	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/order"
 	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/product"
@@ -86,29 +85,6 @@ func init() {
 	categoryDescName := categoryFields[0].Descriptor()
 	// category.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	category.NameValidator = categoryDescName.Validators[0].(func(string) error)
-	imageMixin := schema.Image{}.Mixin()
-	imageMixinFields0 := imageMixin[0].Fields()
-	_ = imageMixinFields0
-	imageFields := schema.Image{}.Fields()
-	_ = imageFields
-	// imageDescCreatedAt is the schema descriptor for created_at field.
-	imageDescCreatedAt := imageMixinFields0[0].Descriptor()
-	// image.DefaultCreatedAt holds the default value on creation for the created_at field.
-	image.DefaultCreatedAt = imageDescCreatedAt.Default.(func() time.Time)
-	// imageDescUpdatedAt is the schema descriptor for updated_at field.
-	imageDescUpdatedAt := imageMixinFields0[1].Descriptor()
-	// image.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	image.DefaultUpdatedAt = imageDescUpdatedAt.Default.(func() time.Time)
-	// image.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	image.UpdateDefaultUpdatedAt = imageDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// imageDescName is the schema descriptor for name field.
-	imageDescName := imageFields[0].Descriptor()
-	// image.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	image.NameValidator = imageDescName.Validators[0].(func(string) error)
-	// imageDescOriginalName is the schema descriptor for original_name field.
-	imageDescOriginalName := imageFields[1].Descriptor()
-	// image.OriginalNameValidator is a validator for the "original_name" field. It is called by the builders before save.
-	image.OriginalNameValidator = imageDescOriginalName.Validators[0].(func(string) error)
 	orderMixin := schema.Order{}.Mixin()
 	orderMixinFields0 := orderMixin[0].Fields()
 	_ = orderMixinFields0

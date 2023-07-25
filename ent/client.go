@@ -17,7 +17,6 @@ import (
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
-	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/order"
 	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/product"
@@ -36,8 +35,6 @@ type Client struct {
 	Cart *CartClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
-	// Image is the client for interacting with the Image builders.
-	Image *ImageClient
 	// Order is the client for interacting with the Order builders.
 	Order *OrderClient
 	// OrderProduct is the client for interacting with the OrderProduct builders.
@@ -64,7 +61,6 @@ func (c *Client) init() {
 	c.Address = NewAddressClient(c.config)
 	c.Cart = NewCartClient(c.config)
 	c.Category = NewCategoryClient(c.config)
-	c.Image = NewImageClient(c.config)
 	c.Order = NewOrderClient(c.config)
 	c.OrderProduct = NewOrderProductClient(c.config)
 	c.Product = NewProductClient(c.config)
@@ -155,7 +151,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Address:      NewAddressClient(cfg),
 		Cart:         NewCartClient(cfg),
 		Category:     NewCategoryClient(cfg),
-		Image:        NewImageClient(cfg),
 		Order:        NewOrderClient(cfg),
 		OrderProduct: NewOrderProductClient(cfg),
 		Product:      NewProductClient(cfg),
@@ -183,7 +178,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Address:      NewAddressClient(cfg),
 		Cart:         NewCartClient(cfg),
 		Category:     NewCategoryClient(cfg),
-		Image:        NewImageClient(cfg),
 		Order:        NewOrderClient(cfg),
 		OrderProduct: NewOrderProductClient(cfg),
 		Product:      NewProductClient(cfg),
@@ -218,7 +212,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Address, c.Cart, c.Category, c.Image, c.Order, c.OrderProduct, c.Product,
+		c.Address, c.Cart, c.Category, c.Order, c.OrderProduct, c.Product,
 		c.ProductImage, c.User,
 	} {
 		n.Use(hooks...)
@@ -229,7 +223,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Address, c.Cart, c.Category, c.Image, c.Order, c.OrderProduct, c.Product,
+		c.Address, c.Cart, c.Category, c.Order, c.OrderProduct, c.Product,
 		c.ProductImage, c.User,
 	} {
 		n.Intercept(interceptors...)
@@ -245,8 +239,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Cart.mutate(ctx, m)
 	case *CategoryMutation:
 		return c.Category.mutate(ctx, m)
-	case *ImageMutation:
-		return c.Image.mutate(ctx, m)
 	case *OrderMutation:
 		return c.Order.mutate(ctx, m)
 	case *OrderProductMutation:
@@ -677,140 +669,6 @@ func (c *CategoryClient) mutate(ctx context.Context, m *CategoryMutation) (Value
 		return (&CategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Category mutation op: %q", m.Op())
-	}
-}
-
-// ImageClient is a client for the Image schema.
-type ImageClient struct {
-	config
-}
-
-// NewImageClient returns a client for the Image from the given config.
-func NewImageClient(c config) *ImageClient {
-	return &ImageClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `image.Hooks(f(g(h())))`.
-func (c *ImageClient) Use(hooks ...Hook) {
-	c.hooks.Image = append(c.hooks.Image, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `image.Intercept(f(g(h())))`.
-func (c *ImageClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Image = append(c.inters.Image, interceptors...)
-}
-
-// Create returns a builder for creating a Image entity.
-func (c *ImageClient) Create() *ImageCreate {
-	mutation := newImageMutation(c.config, OpCreate)
-	return &ImageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Image entities.
-func (c *ImageClient) CreateBulk(builders ...*ImageCreate) *ImageCreateBulk {
-	return &ImageCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Image.
-func (c *ImageClient) Update() *ImageUpdate {
-	mutation := newImageMutation(c.config, OpUpdate)
-	return &ImageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ImageClient) UpdateOne(i *Image) *ImageUpdateOne {
-	mutation := newImageMutation(c.config, OpUpdateOne, withImage(i))
-	return &ImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ImageClient) UpdateOneID(id int64) *ImageUpdateOne {
-	mutation := newImageMutation(c.config, OpUpdateOne, withImageID(id))
-	return &ImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Image.
-func (c *ImageClient) Delete() *ImageDelete {
-	mutation := newImageMutation(c.config, OpDelete)
-	return &ImageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ImageClient) DeleteOne(i *Image) *ImageDeleteOne {
-	return c.DeleteOneID(i.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ImageClient) DeleteOneID(id int64) *ImageDeleteOne {
-	builder := c.Delete().Where(image.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ImageDeleteOne{builder}
-}
-
-// Query returns a query builder for Image.
-func (c *ImageClient) Query() *ImageQuery {
-	return &ImageQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeImage},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Image entity by its id.
-func (c *ImageClient) Get(ctx context.Context, id int64) (*Image, error) {
-	return c.Query().Where(image.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ImageClient) GetX(ctx context.Context, id int64) *Image {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryProductImages queries the product_images edge of a Image.
-func (c *ImageClient) QueryProductImages(i *Image) *ProductImageQuery {
-	query := (&ProductImageClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := i.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(image.Table, image.FieldID, id),
-			sqlgraph.To(productimage.Table, productimage.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, image.ProductImagesTable, image.ProductImagesColumn),
-		)
-		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *ImageClient) Hooks() []Hook {
-	return c.hooks.Image
-}
-
-// Interceptors returns the client interceptors.
-func (c *ImageClient) Interceptors() []Interceptor {
-	return c.inters.Image
-}
-
-func (c *ImageClient) mutate(ctx context.Context, m *ImageMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ImageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ImageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ImageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Image mutation op: %q", m.Op())
 	}
 }
 
@@ -1341,22 +1199,6 @@ func (c *ProductImageClient) QueryProducts(pi *ProductImage) *ProductQuery {
 	return query
 }
 
-// QueryImages queries the images edge of a ProductImage.
-func (c *ProductImageClient) QueryImages(pi *ProductImage) *ImageQuery {
-	query := (&ImageClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pi.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(productimage.Table, productimage.FieldID, id),
-			sqlgraph.To(image.Table, image.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, productimage.ImagesTable, productimage.ImagesColumn),
-		)
-		fromV = sqlgraph.Neighbors(pi.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *ProductImageClient) Hooks() []Hook {
 	return c.hooks.ProductImage
@@ -1551,11 +1393,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Address, Cart, Category, Image, Order, OrderProduct, Product, ProductImage,
+		Address, Cart, Category, Order, OrderProduct, Product, ProductImage,
 		User []ent.Hook
 	}
 	inters struct {
-		Address, Cart, Category, Image, Order, OrderProduct, Product, ProductImage,
+		Address, Cart, Category, Order, OrderProduct, Product, ProductImage,
 		User []ent.Interceptor
 	}
 )

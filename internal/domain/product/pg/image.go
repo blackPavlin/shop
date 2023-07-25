@@ -108,8 +108,7 @@ func mapDomainImageFromRow(row *ent.ProductImage) *product.Image {
 		UpdatedAt: row.UpdatedAt,
 		Props: &product.ImageProps{
 			ProductID: product.ID(row.ProductID),
-			// Name:      row.Name,
-			// todo: 
+			Name:      row.Name,
 		},
 	}
 }

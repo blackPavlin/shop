@@ -125,5 +125,6 @@ func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, 
 		restx.HandleError(w, r, err)
 		return
 	}
+	render.Status(r, http.StatusCreated)
 	render.Respond(w, r, mapping.CreateUploadImagesResponse(result))
 }

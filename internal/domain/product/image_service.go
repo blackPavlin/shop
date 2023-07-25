@@ -7,11 +7,12 @@ import (
 	"mime"
 	"path/filepath"
 
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/repositoryx"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
 )
 
 //go:generate mockgen -source $GOFILE -destination "image_service_mock.go" -package "product"
@@ -41,7 +42,7 @@ func NewImageUseCase(
 	return &ImageUseCase{logger, productRepo, imageRepo, imageStorage, txManager}
 }
 
-// BulkCreate
+// BulkCreate product images.
 func (s *ImageUseCase) BulkCreate(
 	ctx context.Context,
 	productID ID,

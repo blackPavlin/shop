@@ -15,7 +15,6 @@ import (
 	"github.com/blackPavlin/shop/ent/address"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
-	"github.com/blackPavlin/shop/ent/image"
 	"github.com/blackPavlin/shop/ent/order"
 	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/product"
@@ -84,7 +83,6 @@ func checkColumn(table, column string) error {
 			address.Table:      address.ValidColumn,
 			cart.Table:         cart.ValidColumn,
 			category.Table:     category.ValidColumn,
-			image.Table:        image.ValidColumn,
 			order.Table:        order.ValidColumn,
 			orderproduct.Table: orderproduct.ValidColumn,
 			product.Table:      product.ValidColumn,

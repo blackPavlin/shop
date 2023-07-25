@@ -15,9 +15,6 @@ type Cart func(*sql.Selector)
 // Category is the predicate function for category builders.
 type Category func(*sql.Selector)
 
-// Image is the predicate function for image builders.
-type Image func(*sql.Selector)
-
 // Order is the predicate function for order builders.
 type Order func(*sql.Selector)
 

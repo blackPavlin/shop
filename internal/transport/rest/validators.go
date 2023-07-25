@@ -22,9 +22,9 @@ func (r LoginRequest) Validate() error {
 func (r SignupRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Email, validation.Required, is.EmailFormat),
-		validation.Field(&r.Name, validation.Required),
-		validation.Field(&r.Phone, validation.Required, is.E164),
-		validation.Field(&r.Password, validation.Required),
+		validation.Field(&r.Name, validation.Required, validation.Length(1, 100)),
+		validation.Field(&r.Phone, validation.Required, is.E164, validation.Length(1, 100)),
+		validation.Field(&r.Password, validation.Required, validation.Length(1, 100)),
 	); err != nil {
 		return errorx.NewBadRequestError(err.Error())
 	}
@@ -38,7 +38,7 @@ func (r CreateAddressRequest) Validate() error {
 		validation.Field(&r.Country, validation.Required),
 		validation.Field(&r.House, validation.Required, validation.Min(1)),
 		validation.Field(&r.Postcode, validation.Required, validation.Min(1)),
-		validation.Field(&r.Street, validation.Required),
+		validation.Field(&r.Street, validation.Required, validation.Length(1, 50)),
 	); err != nil {
 		return errorx.NewBadRequestError(err.Error())
 	}
