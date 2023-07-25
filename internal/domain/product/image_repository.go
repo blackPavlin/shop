@@ -2,7 +2,7 @@ package product
 
 import "context"
 
-//go:generate mockgen -source $GOFILE -destination "product_image_repository_mock.go" -package "product"
+//go:generate mockgen -source $GOFILE -destination "image_repository_mock.go" -package "product"
 
 // ImageRepository represents product image repository.
 type ImageRepository interface {

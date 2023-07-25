@@ -1,10 +1,6 @@
 package product
 
-import (
-	"time"
-
-	"github.com/blackPavlin/shop/internal/domain/image"
-)
+import "time"
 
 // ImageID represents an id for product image.
 type ImageID int64
@@ -28,7 +24,7 @@ type Images []*Image
 // ImageProps represents product image editable fields.
 type ImageProps struct {
 	ProductID ID
-	ImageID   image.ID
+	Name      string
 }
 
 // ToInt64 convert slice of IDs to slice int64.

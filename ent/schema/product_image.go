@@ -31,7 +31,7 @@ func (ProductImage) Mixin() []ent.Mixin {
 func (ProductImage) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("product_id").Unique(),
-		field.Int64("image_id").Unique(),
+		field.String("name").Unique(),
 	}
 }
 
@@ -43,10 +43,5 @@ func (ProductImage) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Field("product_id"),
-		edge.From("images", Image.Type).
-			Ref("product_images").
-			Unique().
-			Required().
-			Field("image_id"),
 	}
 }

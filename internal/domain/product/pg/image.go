@@ -8,7 +8,6 @@ import (
 	"github.com/blackPavlin/shop/ent"
 	"github.com/blackPavlin/shop/ent/predicate"
 	entproductimage "github.com/blackPavlin/shop/ent/productimage"
-	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
@@ -109,7 +108,8 @@ func mapDomainImageFromRow(row *ent.ProductImage) *product.Image {
 		UpdatedAt: row.UpdatedAt,
 		Props: &product.ImageProps{
 			ProductID: product.ID(row.ProductID),
-			ImageID:   image.ID(row.ImageID),
+			// Name:      row.Name,
+			// todo: 
 		},
 	}
 }
