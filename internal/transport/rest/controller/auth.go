@@ -47,7 +47,6 @@ func (ctrl *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request)
 		restx.HandleError(w, r, err)
 		return
 	}
-	render.Status(r, http.StatusCreated)
 	render.Respond(w, r, mapping.CreateLoginResponse(token))
 }
 
@@ -67,5 +66,6 @@ func (ctrl *AuthController) SignupHandler(w http.ResponseWriter, r *http.Request
 		restx.HandleError(w, r, err)
 		return
 	}
+	render.Status(r, http.StatusCreated)
 	render.Respond(w, r, mapping.CreateLoginResponse(token))
 }
