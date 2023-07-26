@@ -9,7 +9,7 @@ CREATE TABLE product_images
     updated_at  TIMESTAMP       NOT NULL    DEFAULT (now() at time zone 'utc'),
 
     PRIMARY KEY (id),
-    CONSTRAINT product_image_product_fk FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
-    CREATE UNIQUE INDEX product_images_name_unique ON product_images (name);
+    CONSTRAINT product_image_product_fk FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
 );
+CREATE UNIQUE INDEX product_images_name_unique ON product_images (name);
 COMMIT;
