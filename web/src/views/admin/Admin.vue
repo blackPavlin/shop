@@ -1,6 +1,6 @@
 <template>
   <el-container class="admin">
-    <el-aside>
+    <el-aside width="250px">
       <admin-side-bar />
     </el-aside>
     <router-view />

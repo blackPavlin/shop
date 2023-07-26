@@ -15,6 +15,7 @@
           :rules="rules"
           ref="formRef"
           @submit.prevent="createCategory(formRef)"
+          size="large"
         >
           <el-form-item prop="name">
             <el-input
@@ -34,7 +35,7 @@
           <span>Категории</span>
         </template>
 
-        <el-form>
+        <el-form size="large">
           <el-form-item>
             <el-input placeholder="Название категории"></el-input>
           </el-form-item>
@@ -73,6 +74,7 @@
         :rules="updateRules"
         ref="updateFormRef"
         @submit.prevent.stop="updateCategory(updateFormRef)"
+        size="large"
       >
         <el-form-item prop="name">
           <el-input

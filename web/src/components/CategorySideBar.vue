@@ -1,8 +1,12 @@
 <template>
-  <el-menu class="category-menu" router>
-    <el-menu-item v-for="category in categories" :key="category.id">{{
-      category.name
-    }}</el-menu-item>
+  <el-menu class="category-menu" :router="true" :default-active="$route.path">
+    <el-menu-item
+      v-for="category in categories"
+      :key="category.id"
+      :index="`/products/${category.id}`"
+      :route="`/products/${category.id}`"
+      >{{ category.name }}</el-menu-item
+    >
   </el-menu>
 </template>
 

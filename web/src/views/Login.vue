@@ -9,6 +9,7 @@
         :rules="rules"
         ref="formRef"
         @submit.prevent="login(formRef)"
+        size="large"
       >
         <el-form-item prop="email">
           <el-input

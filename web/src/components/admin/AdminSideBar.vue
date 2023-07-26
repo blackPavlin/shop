@@ -1,5 +1,5 @@
 <template>
-  <el-menu :router="true" :default-active="$route.path">
+  <el-menu class="admin-sidebar" :router="true" :default-active="$route.path">
     <el-menu-item index="/admin/category" route="/admin/category">
       <el-icon></el-icon>
       <template #title>Управление категориями</template>
@@ -28,3 +28,13 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.admin-sidebar {
+  height: 100%;
+
+  .el-menu-item {
+    user-select: none;
+  }
+}
+</style>

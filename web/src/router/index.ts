@@ -37,11 +37,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/views/Products.vue"),
     children: [
       {
-        path: "",
-        component: () => import("@/views/ProductList.vue"),
-      },
-      {
         path: ":id",
+        name: "ProductList",
         component: () => import("@/views/ProductList.vue"),
       },
     ],
@@ -53,14 +50,17 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: "category",
+        name: "CategoryAdmin",
         component: () => import("@/views/admin/CategoryAdmin.vue"),
       },
       {
         path: "product",
+        name: "ProductAdmin",
         component: () => import("@/views/admin/ProductAdmin.vue"),
       },
       {
         path: "order",
+        name: "OrderAdmin",
         component: () => import("@/views/admin/OrderAdmin.vue"),
       },
     ],
