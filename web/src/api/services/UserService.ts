@@ -11,13 +11,17 @@ export class UserService {
 
     /**
      * Получить информацию о пользователе
-     * @returns User successful operation
+     * @returns User OK
      * @throws ApiError
      */
     public static getUser(): CancelablePromise<User> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/user',
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 

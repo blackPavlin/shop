@@ -13,20 +13,24 @@ export class AddressService {
 
     /**
      * Получить список адресов доставки
-     * @returns AddressList successful operation
+     * @returns AddressList OK
      * @throws ApiError
      */
     public static getAddress(): CancelablePromise<AddressList> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/address',
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
     /**
      * Добавить адрес доставки
      * @param requestBody 
-     * @returns Address successful operation
+     * @returns Address OK
      * @throws ApiError
      */
     public static postAddress(
@@ -37,6 +41,11 @@ requestBody?: CreateAddressRequest,
             url: '/address',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 

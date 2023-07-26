@@ -13,7 +13,7 @@ export class CategoryService {
 
     /**
      * Получить список категорий товаров
-     * @returns CategoryList successful operation
+     * @returns CategoryList OK
      * @throws ApiError
      */
     public static getCategory(): CancelablePromise<CategoryList> {
@@ -26,7 +26,7 @@ export class CategoryService {
     /**
      * Создать категорию
      * @param requestBody 
-     * @returns Category successful operation
+     * @returns Category OK
      * @throws ApiError
      */
     public static postCategory(
@@ -43,7 +43,7 @@ requestBody?: CreateCategoryRequest,
     /**
      * Изменить категорию
      * @param requestBody 
-     * @returns Category successful operation
+     * @returns Category OK
      * @throws ApiError
      */
     public static patchCategory(
@@ -60,7 +60,7 @@ requestBody?: Category,
     /**
      * Удалить категорию
      * @param categoryId ID заказа
-     * @returns any successful operation
+     * @returns any OK
      * @throws ApiError
      */
     public static deleteCategory(

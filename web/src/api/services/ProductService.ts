@@ -14,7 +14,7 @@ export class ProductService {
 
     /**
      * Получить список товаров
-     * @returns ProductList successful operation
+     * @returns ProductList OK
      * @throws ApiError
      */
     public static getProduct(): CancelablePromise<ProductList> {
@@ -27,7 +27,7 @@ export class ProductService {
     /**
      * Создать товар
      * @param requestBody 
-     * @returns Product successful operation
+     * @returns Product OK
      * @throws ApiError
      */
     public static postProduct(
@@ -43,8 +43,8 @@ requestBody?: CreateProductRequest,
 
     /**
      * Получить детальную карточку товара
-     * @param productId ID заказа
-     * @returns Product successful operation
+     * @param productId ID товара
+     * @returns Product OK
      * @throws ApiError
      */
     public static getProduct1(
@@ -61,9 +61,9 @@ productId: string,
 
     /**
      * Изменить товар
-     * @param productId ID заказа
+     * @param productId ID товара
      * @param requestBody 
-     * @returns Product successful operation
+     * @returns Product OK
      * @throws ApiError
      */
     public static patchProduct(

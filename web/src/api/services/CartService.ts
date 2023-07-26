@@ -12,7 +12,7 @@ export class CartService {
 
     /**
      * Получить корзину пользователя
-     * @returns Cart successful operation
+     * @returns Cart OK
      * @throws ApiError
      */
     public static getCart(): CancelablePromise<Cart> {
@@ -25,7 +25,7 @@ export class CartService {
     /**
      * Добавить товар в корзину
      * @param requestBody 
-     * @returns Cart successful operation
+     * @returns Cart OK
      * @throws ApiError
      */
     public static postCart(
@@ -42,7 +42,7 @@ requestBody?: CartProduct,
     /**
      * Изменить количество товара в корзине
      * @param requestBody 
-     * @returns Cart successful operation
+     * @returns Cart OK
      * @throws ApiError
      */
     public static patchCart(
@@ -58,7 +58,7 @@ requestBody?: CartProduct,
 
     /**
      * Очистить корзину
-     * @returns Cart successful operation
+     * @returns Cart OK
      * @throws ApiError
      */
     public static deleteCart(): CancelablePromise<Cart> {

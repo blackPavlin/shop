@@ -14,7 +14,7 @@ export class AuthService {
     /**
      * Авторизация пользователя
      * @param requestBody 
-     * @returns LoginResponse successful operation
+     * @returns LoginResponse OK
      * @throws ApiError
      */
     public static postAuthLogin(
@@ -25,13 +25,18 @@ requestBody?: LoginRequest,
             url: '/auth/login',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
     /**
      * Регистрация пользователя
      * @param requestBody 
-     * @returns LoginResponse successful operation
+     * @returns LoginResponse OK
      * @throws ApiError
      */
     public static postAuthSignup(
@@ -42,6 +47,11 @@ requestBody?: SignupRequest,
             url: '/auth/signup',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                409: `Resource Already Exist`,
+                500: `Internal Server Error`,
+            },
         });
     }
 

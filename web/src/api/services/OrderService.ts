@@ -12,7 +12,7 @@ export class OrderService {
 
     /**
      * Получить список заказов пользователя
-     * @returns OrderList successful operation
+     * @returns OrderList OK
      * @throws ApiError
      */
     public static getOrder(): CancelablePromise<OrderList> {
@@ -24,7 +24,7 @@ export class OrderService {
 
     /**
      * Создать заказ
-     * @returns OrderDetailed successful operation
+     * @returns OrderDetailed OK
      * @throws ApiError
      */
     public static postOrder(): CancelablePromise<OrderDetailed> {
@@ -37,7 +37,7 @@ export class OrderService {
     /**
      * Получить детальную информацию о заказе
      * @param orderId ID заказа
-     * @returns OrderDetailed successful operation
+     * @returns OrderDetailed OK
      * @throws ApiError
      */
     public static getOrder1(
