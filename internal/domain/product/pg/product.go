@@ -63,6 +63,7 @@ func (r *ProductRepository) Get(
 	row, err := r.client.Product.
 		Query().
 		Where(makePredicates(filter)...).
+		WithProductImages().
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -89,6 +90,7 @@ func (r *ProductRepository) Query(
 	g.Go(func() error {
 		rows, err = r.client.Product.Query().
 			Where(predicates...).
+			WithProductImages().
 			Limit(int(criteria.Pagination.Limit)).
 			Offset(int(criteria.Pagination.Offset)).
 			All(ctx)
@@ -146,6 +148,7 @@ func mapDomainProductFromRow(row *ent.Product) *product.Product {
 		ID:        product.ID(row.ID),
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
+		Images:    mapDomainImagesFromRows(row.Edges.ProductImages),
 		Props: &product.Props{
 			CategoryID:  category.ID(row.CategoryID),
 			Name:        row.Name,

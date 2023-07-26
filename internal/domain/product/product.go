@@ -20,7 +20,8 @@ type Product struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Props *Props
+	Images Images
+	Props  *Props
 }
 
 // Products slice of Product.
