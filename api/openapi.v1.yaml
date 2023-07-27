@@ -657,6 +657,7 @@ components:
         - name
         - amount
         - price
+        - images
       properties:
         id:
           type: integer
@@ -674,6 +675,8 @@ components:
         price:
           type: integer
           format: int64
+        images:
+          $ref: '#/components/schemas/ImageList'
 
     ProductList:
       title: Список товаров

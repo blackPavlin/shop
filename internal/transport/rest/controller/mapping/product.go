@@ -14,6 +14,7 @@ func CreateProductResponse(p *product.Product) rest.Product {
 		Description: &p.Props.Description,
 		Amount:      p.Props.Amount,
 		Price:       p.Props.Price,
+		Images:      CreateUploadImagesResponse(p.Images),
 	}
 }
 

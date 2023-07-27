@@ -34,7 +34,6 @@ type Props struct {
 	Description string
 	Amount      int64
 	Price       int64
-	Images      Images
 }
 
 // ToInt64 convert slice of IDs to slice int64.

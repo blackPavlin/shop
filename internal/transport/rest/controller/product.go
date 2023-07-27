@@ -9,6 +9,7 @@ import (
 
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/internal/domain/product"
+	"github.com/blackPavlin/shop/internal/transport/rest"
 	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
 	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 	"github.com/blackPavlin/shop/pkg/errorx"
@@ -59,7 +60,24 @@ func (ctrl *ProductController) RegisterRoutes(r chi.Router) chi.Router {
 func (ctrl *ProductController) GetProductsHandler(w http.ResponseWriter, r *http.Request) {}
 
 // CreateProductHandler define handler for POST /api/product.
-func (ctrl *ProductController) CreateProductHandler(w http.ResponseWriter, r *http.Request) {}
+func (ctrl *ProductController) CreateProductHandler(w http.ResponseWriter, r *http.Request) {
+	request := &rest.CreateProductRequest{}
+	if err := render.DecodeJSON(r.Body, request); err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	if err := request.Validate(); err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	p, err := ctrl.productService.Create(r.Context(), request.ToDomainEntity())
+	if err != nil {
+		restx.HandleError(w, r, err)
+		return
+	}
+	render.Status(r, http.StatusCreated)
+	render.Respond(w, r, mapping.CreateProductResponse(p))
+}
 
 // GetProductHandler define handler for GET /api/product/{productId}.
 func (ctrl *ProductController) GetProductHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,22 +86,33 @@ func (ctrl *ProductController) GetProductHandler(w http.ResponseWriter, r *http.
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	_, err = ctrl.productService.Get(r.Context(), &product.Filter{
+	p, err := ctrl.productService.Get(r.Context(), &product.Filter{
 		ID: product.IDFilter{Eq: product.IDs{product.ID(productID)}},
 	})
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
+	render.Respond(w, r, mapping.CreateProductResponse(p))
 }
 
 // UpdateProductHandler define handler for PATCH /api/product/{productId}.
 func (ctrl *ProductController) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
-	// productID, err := restx.GetIDFromURLParams(r, "productID")
-	// if err != nil {
-	// 	restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
-	// 	return
-	// }
+	//productID, err := restx.GetIDFromURLParams(r, "productID")
+	//if err != nil {
+	//	restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+	//	return
+	//}
+	//request := &rest.UpdateProductRequest{}
+	//if err := render.DecodeJSON(r.Body, request); err != nil {
+	//	restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+	//	return
+	//}
+	//if err := request.Validate(); err != nil {
+	//	restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+	//	return
+	//}
+	//p, err := ctrl.productService.Update(r.Context(), product.ID(productID), )
 }
 
 // UploadProductImageHandler define handler for POST /api/product/{productId}/image.

@@ -4,6 +4,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/address"
 	"github.com/blackPavlin/shop/internal/domain/auth"
 	"github.com/blackPavlin/shop/internal/domain/category"
+	"github.com/blackPavlin/shop/internal/domain/product"
 )
 
 // ToDomainEntity transforms api template into domain entity.
@@ -41,5 +42,16 @@ func (r CreateAddressRequest) ToDomainEntity() *address.Props {
 func (r CreateCategoryRequest) ToDomainEntity() *category.Props {
 	return &category.Props{
 		Name: r.Name,
+	}
+}
+
+// ToDomainEntity transforms api template into domain entity.
+func (r CreateProductRequest) ToDomainEntity() *product.Props {
+	return &product.Props{
+		CategoryID:  category.ID(r.CategoryId),
+		Name:        r.Name,
+		Description: r.Description,
+		Amount:      r.Amount,
+		Price:       r.Price,
 	}
 }
