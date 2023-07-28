@@ -57,12 +57,6 @@
             ></el-input-number>
           </el-form-item>
 
-          <el-form-item prop="images">
-            <el-upload list-type="picture-card">
-              <el-icon><Plus /></el-icon>
-            </el-upload>
-          </el-form-item>
-
           <el-form-item>
             <el-button type="primary" native-type="submit">Создать</el-button>
           </el-form-item>
@@ -98,7 +92,7 @@ export default defineComponent({
   components: {},
   setup() {
     const form = reactive({
-      categoryId: null,
+      categoryId: 0,
       name: "",
       description: "",
       amount: 0,
@@ -169,6 +163,18 @@ export default defineComponent({
         if (!valid) {
           return;
         }
+
+        productStore
+          .createProduct(form)
+          .then(async () => {
+            formEl.resetFields();
+            ElNotification.success("Product successful created");
+
+            await loadProducts();
+          })
+          .catch((error) => {
+            ElNotification.error(error.message);
+          });
       });
     };
 
