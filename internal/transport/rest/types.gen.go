@@ -144,6 +144,11 @@ type OrderProduct struct {
 // OrderProductList defines model for OrderProductList.
 type OrderProductList []OrderProduct
 
+// PaginationResponse defines model for PaginationResponse.
+type PaginationResponse struct {
+	Quantity int `json:"quantity"`
+}
+
 // Product defines model for Product.
 type Product struct {
 	Amount      int64     `json:"amount"`
@@ -156,7 +161,12 @@ type Product struct {
 }
 
 // ProductList defines model for ProductList.
-type ProductList []Product
+type ProductList struct {
+	// Embedded struct due to allOf(#/components/schemas/PaginationResponse)
+	PaginationResponse `yaml:",inline"`
+	// Embedded fields due to inline allOf schema
+	Items []Product `json:"items"`
+}
 
 // SignupRequest defines model for SignupRequest.
 type SignupRequest struct {

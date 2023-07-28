@@ -57,7 +57,14 @@ func (ctrl *ProductController) RegisterRoutes(r chi.Router) chi.Router {
 }
 
 // GetProductsHandler define handler for GET /api/product.
-func (ctrl *ProductController) GetProductsHandler(w http.ResponseWriter, r *http.Request) {}
+func (ctrl *ProductController) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
+	products, err := ctrl.productService.Query(r.Context(), &product.QueryCriteria{})
+	if err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	render.Respond(w, r, mapping.CreateGetProductsResponse(products))
+}
 
 // CreateProductHandler define handler for POST /api/product.
 func (ctrl *ProductController) CreateProductHandler(w http.ResponseWriter, r *http.Request) {

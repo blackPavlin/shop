@@ -18,5 +18,21 @@ func CreateProductResponse(p *product.Product) rest.Product {
 	}
 }
 
+// CreateProductsResponse transform domain entity to rest response.
+func CreateProductsResponse(products product.Products) []rest.Product {
+	result := make([]rest.Product, 0, len(products))
+	for _, p := range products {
+		result = append(result, CreateProductResponse(p))
+	}
+	return result
+}
+
 // CreateGetProductsResponse transform domain entity to rest response.
-func CreateGetProductsResponse(products product.Products) {}
+func CreateGetProductsResponse(products *product.QueryResult) rest.ProductList {
+	return rest.ProductList{
+		PaginationResponse: rest.PaginationResponse{
+			Quantity: products.Count,
+		},
+		Items: CreateProductsResponse(products.Items),
+	}
+}
