@@ -20,17 +20,15 @@ type Service interface {
 // UseCase represents product service.
 type UseCase struct {
 	productRepo Repository
-	imageRepo   ImageRepository
 	txManager   repositoryx.TxManager
 }
 
 // NewUseCase create instance of UseCase.
 func NewUseCase(
 	productRepo Repository,
-	imageRepo ImageRepository,
 	txManager repositoryx.TxManager,
 ) *UseCase {
-	return &UseCase{productRepo: productRepo, imageRepo: imageRepo, txManager: txManager}
+	return &UseCase{productRepo: productRepo, txManager: txManager}
 }
 
 // Create product.
@@ -43,13 +41,6 @@ func (s *UseCase) Create(ctx context.Context, props *Props) (*Product, error) {
 		product, err = s.productRepo.CreateTx(ctx, props)
 		if err != nil {
 			return fmt.Errorf("create product error: %w", err)
-		}
-		for _, image := range props.Images {
-			image.Props.ProductID = product.ID
-		}
-		product.Props.Images, err = s.imageRepo.BulkCreateTx(ctx, props.Images)
-		if err != nil {
-			return fmt.Errorf("bulkCreate product images error: %w", err)
 		}
 		return nil
 	})

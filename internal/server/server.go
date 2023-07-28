@@ -91,7 +91,7 @@ func NewServer(
 	authService := auth.NewUseCase(logger, conf.Auth, userRepository)
 	cartService := cart.NewUseCase(cartRepository, productRepository)
 	addressService := address.NewUseCase(addressRepository)
-	productService := product.NewUseCase(productRepository, imageRepository, txManager)
+	productService := product.NewUseCase(productRepository, txManager)
 	imageService := product.NewImageUseCase(logger, productRepository, imageRepository, imageStorage, txManager)
 	categoryService := category.NewUseCase(categoryRepository)
 
