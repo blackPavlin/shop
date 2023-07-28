@@ -331,6 +331,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductList'
+        '500':
+          $ref: "#/components/responses/InternalError"        
     post:
       summary: Создать товар
       tags:
@@ -347,6 +349,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalError"        
       security:
         - BearerAuth: []
 
@@ -362,6 +372,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '404':
+          $ref: "#/components/responses/NotFound"        
+        '500':
+          $ref: "#/components/responses/InternalError"        
     patch:
       summary: Изменить товар
       tags:
@@ -477,6 +491,15 @@ components:
       properties:
         message:
           type: string
+
+    PaginationResponse:
+      title: Ответ с пагинацией
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: integer
 
     User:
       title: Пользователь
@@ -680,9 +703,16 @@ components:
 
     ProductList:
       title: Список товаров
-      type: array
-      items:
-        $ref: '#/components/schemas/Product'
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
 
     LoginRequest:
       title: Тело запроса для авторизации пользователя
