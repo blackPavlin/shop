@@ -70,7 +70,6 @@ func (r CreateCategoryRequest) Validate() error {
 func (r CreateProductRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Name, validation.Required),
-		validation.Field(&r.Description, validation.Required),
 		validation.Field(&r.CategoryId, validation.Required),
 		validation.Field(&r.Price, validation.Required, validation.Min(0)),
 		validation.Field(&r.Amount, validation.Required, validation.Min(0)),
