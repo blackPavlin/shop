@@ -6,3 +6,4 @@ export type OrderProduct = {
     productId: string;
     amount: number;
 };
+

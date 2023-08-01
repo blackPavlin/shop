@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type LoginResponse = {
-    token: string;
+export type PaginationResponse = {
+    quantity: number;
 };
 

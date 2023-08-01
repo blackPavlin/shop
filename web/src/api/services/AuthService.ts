@@ -13,13 +13,13 @@ export class AuthService {
 
     /**
      * Авторизация пользователя
-     * @param requestBody 
+     * @param requestBody
      * @returns LoginResponse OK
      * @throws ApiError
      */
     public static postAuthLogin(
-requestBody?: LoginRequest,
-): CancelablePromise<LoginResponse> {
+        requestBody?: LoginRequest,
+    ): CancelablePromise<LoginResponse> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/auth/login',
@@ -35,13 +35,13 @@ requestBody?: LoginRequest,
 
     /**
      * Регистрация пользователя
-     * @param requestBody 
+     * @param requestBody
      * @returns LoginResponse OK
      * @throws ApiError
      */
     public static postAuthSignup(
-requestBody?: SignupRequest,
-): CancelablePromise<LoginResponse> {
+        requestBody?: SignupRequest,
+    ): CancelablePromise<LoginResponse> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/auth/signup',

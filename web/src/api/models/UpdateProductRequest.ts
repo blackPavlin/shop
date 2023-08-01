@@ -8,3 +8,4 @@ export type UpdateProductRequest = {
     amount?: number;
     price?: number;
 };
+

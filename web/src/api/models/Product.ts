@@ -2,6 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ImageList } from './ImageList';
+
 export type Product = {
     id: number;
     categoryId: number;
@@ -9,4 +11,6 @@ export type Product = {
     description?: string;
     amount: number;
     price: number;
+    images: ImageList;
 };
+

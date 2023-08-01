@@ -8,3 +8,4 @@ export type SignupRequest = {
     phone: string;
     password: string;
 };
+

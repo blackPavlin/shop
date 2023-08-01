@@ -13,14 +13,14 @@ export class ImageService {
     /**
      * Загрузка изображений товара
      * @param productId ID товара
-     * @param formData 
+     * @param formData
      * @returns ImageList OK
      * @throws ApiError
      */
     public static postProductImage(
-productId: string,
-formData?: UploadImagesRequest,
-): CancelablePromise<ImageList> {
+        productId: string,
+        formData?: UploadImagesRequest,
+    ): CancelablePromise<ImageList> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/product/{productId}/image',

@@ -26,6 +26,7 @@ export type { OrderDetailed } from './models/OrderDetailed';
 export type { OrderList } from './models/OrderList';
 export type { OrderProduct } from './models/OrderProduct';
 export type { OrderProductList } from './models/OrderProductList';
+export type { PaginationResponse } from './models/PaginationResponse';
 export type { Product } from './models/Product';
 export type { ProductList } from './models/ProductList';
 export type { SignupRequest } from './models/SignupRequest';

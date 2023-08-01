@@ -7,3 +7,4 @@ export type Image = {
     productId: number;
     name: string;
 };
+

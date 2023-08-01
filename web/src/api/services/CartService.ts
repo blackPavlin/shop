@@ -24,13 +24,13 @@ export class CartService {
 
     /**
      * Добавить товар в корзину
-     * @param requestBody 
+     * @param requestBody
      * @returns Cart OK
      * @throws ApiError
      */
     public static postCart(
-requestBody?: CartProduct,
-): CancelablePromise<Cart> {
+        requestBody?: CartProduct,
+    ): CancelablePromise<Cart> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/cart',
@@ -41,13 +41,13 @@ requestBody?: CartProduct,
 
     /**
      * Изменить количество товара в корзине
-     * @param requestBody 
+     * @param requestBody
      * @returns Cart OK
      * @throws ApiError
      */
     public static patchCart(
-requestBody?: CartProduct,
-): CancelablePromise<Cart> {
+        requestBody?: CartProduct,
+    ): CancelablePromise<Cart> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/cart',

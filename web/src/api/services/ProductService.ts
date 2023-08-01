@@ -21,23 +21,32 @@ export class ProductService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/product',
+            errors: {
+                500: `Internal Server Error`,
+            },
         });
     }
 
     /**
      * Создать товар
-     * @param requestBody 
+     * @param requestBody
      * @returns Product OK
      * @throws ApiError
      */
     public static postProduct(
-requestBody?: CreateProductRequest,
-): CancelablePromise<Product> {
+        requestBody?: CreateProductRequest,
+    ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/product',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                404: `Not Found`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -48,13 +57,17 @@ requestBody?: CreateProductRequest,
      * @throws ApiError
      */
     public static getProduct1(
-productId: string,
-): CancelablePromise<Product> {
+        productId: string,
+    ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/product/{productId}',
             path: {
                 'productId': productId,
+            },
+            errors: {
+                404: `Not Found`,
+                500: `Internal Server Error`,
             },
         });
     }
@@ -62,14 +75,14 @@ productId: string,
     /**
      * Изменить товар
      * @param productId ID товара
-     * @param requestBody 
+     * @param requestBody
      * @returns Product OK
      * @throws ApiError
      */
     public static patchProduct(
-productId: string,
-requestBody?: UpdateProductRequest,
-): CancelablePromise<Product> {
+        productId: string,
+        requestBody?: UpdateProductRequest,
+    ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/product/{productId}',

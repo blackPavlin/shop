@@ -9,3 +9,4 @@ export type OrderDetailed = {
     userId: string;
     products: OrderProductList;
 };
+
