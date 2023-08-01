@@ -70,8 +70,9 @@
 </template>
 
 <script lang="ts">
-import { FormInstance, FormRules, ElNotification } from "element-plus";
 import { defineComponent, reactive, ref } from "vue";
+import { ElNotification } from "element-plus";
+import type { FormInstance, FormRules } from "element-plus";
 import {
   User,
   Lock,
@@ -81,11 +82,12 @@ import {
 } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "vue-router";
+import type { SignupRequest } from "@/api/models/SignupRequest";
 
 export default defineComponent({
   name: "RegistrationView",
   setup() {
-    const form = reactive({
+    const form = reactive<SignupRequest & { confirmPassword: string }>({
       name: "",
       phone: "",
       email: "",
@@ -130,7 +132,6 @@ export default defineComponent({
     });
 
     const formRef = ref<FormInstance>();
-
     const loading = ref(false);
 
     const store = useAuthStore();

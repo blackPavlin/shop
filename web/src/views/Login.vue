@@ -44,15 +44,17 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
-import { FormRules, FormInstance, ElNotification } from "element-plus";
+import { ElNotification } from "element-plus";
+import type { FormRules, FormInstance } from "element-plus";
 import { User, Lock } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "vue-router";
+import type { LoginRequest } from "@/api/models/LoginRequest";
 
 export default defineComponent({
   name: "LoginView",
   setup() {
-    const form = reactive({
+    const form = reactive<LoginRequest>({
       email: "",
       password: "",
     });

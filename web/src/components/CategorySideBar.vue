@@ -12,6 +12,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, computed } from "vue";
+import { ElNotification } from "element-plus";
 import { useCategoryStore } from "@/store/category.store";
 
 export default defineComponent({
@@ -20,13 +21,13 @@ export default defineComponent({
     const categoryStore = useCategoryStore();
     const categories = computed(() => categoryStore.getCategories);
 
-    onMounted(async () => {
-      try {
-        await categoryStore.loadCategories();
-      } catch (error) {
-        console.log(error);
-      }
-    });
+    const loadCategories = async (): Promise<void> => {
+      return categoryStore.loadCategories().catch((error) => {
+        ElNotification.error(error.message);
+      });
+    };
+
+    onMounted(async () => loadCategories());
 
     return {
       categories,

@@ -102,16 +102,18 @@ import {
 } from "element-plus";
 import { Delete, Edit } from "@element-plus/icons-vue";
 import { useCategoryStore } from "@/store/category.store";
+import { CreateCategoryRequest } from "@/api/models/CreateCategoryRequest";
+import { Category } from "@/api/models/Category";
 
 export default defineComponent({
   name: "CategoryAdmin",
   components: {},
   setup() {
-    const form = reactive({
+    const form = reactive<CreateCategoryRequest>({
       name: "",
     });
 
-    const updateForm = reactive({
+    const updateForm = reactive<Category>({
       id: 0,
       name: "",
     });
@@ -194,8 +196,8 @@ export default defineComponent({
 
     const isUpdateDialogVisible = ref(false);
 
-    const openUpdateModal = (id: number, name: string) => {
-      updateForm.id = id;
+    const openUpdateModal = (categoryId: number, name: string) => {
+      updateForm.id = categoryId;
       updateForm.name = name;
 
       isUpdateDialogVisible.value = true;
@@ -253,7 +255,7 @@ export default defineComponent({
         });
     };
 
-    onMounted(() => loadCategories());
+    onMounted(async () => loadCategories());
 
     return {
       form,
