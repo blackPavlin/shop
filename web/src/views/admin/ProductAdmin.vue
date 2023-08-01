@@ -14,7 +14,7 @@
           :model="form"
           :rules="rules"
           ref="formRef"
-          @submit.prevent="createProduct(formRef)"
+          @submit.prevent="createProduct(formRef, uploadRef)"
           label-width="100px"
           size="large"
         >
@@ -57,6 +57,18 @@
             ></el-input-number>
           </el-form-item>
 
+          <el-form-item label="Изображения">
+            <el-upload
+              v-model:file-list="fileList"
+              ref="uploadRef"
+              list-type="picture-card"
+              :auto-upload="false"
+              multiple
+            >
+              <el-icon><Plus /></el-icon>
+            </el-upload>
+          </el-form-item>
+
           <el-form-item>
             <el-button type="primary" native-type="submit">Создать</el-button>
           </el-form-item>
@@ -68,35 +80,87 @@
           <span>Товары</span>
         </template>
 
-        <el-form size="large"></el-form>
+        <el-form
+          :model="updateRef"
+          :rules="rules"
+          ref="updateRef"
+          label-width="100px"
+          size="large"
+        ></el-form>
 
         <el-table :data="products">
           <el-table-column label="ID" prop="id"></el-table-column>
 
           <el-table-column label="Название" prop="name"></el-table-column>
+
+          <el-table-column label="Количество" prop="amount"></el-table-column>
+
+          <el-table-column label="Цена" prop="price"></el-table-column>
+
+          <el-table-column>
+            <template #default="scope">
+              <el-button
+                type="primary"
+                :icon="Edit"
+                @click="openUpdateModal(scope.row.id)"
+              ></el-button>
+              <el-button type="danger" :icon="Delete"></el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </el-card>
     </el-card>
+
+    <el-dialog title="Редактирование товара" v-model="isUpdateDialogVisible">
+      <el-form size="large">
+        <el-form-item>
+          <el-button type="primary" native-type="submit">Сохранить</el-button>
+          <el-button @click="isUpdateDialogVisible = false">Отмета</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </el-main>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, ref, computed, onMounted } from "vue";
-import { FormRules, FormInstance, ElNotification } from "element-plus";
-import { Plus } from "@element-plus/icons-vue";
+import {
+  FormRules,
+  FormInstance,
+  UploadInstance,
+  ElNotification,
+  UploadUserFile,
+  UploadRawFile,
+} from "element-plus";
+import { Plus, Delete, Edit } from "@element-plus/icons-vue";
 import { useCategoryStore } from "@/store/category.store";
 import { useProductStore } from "@/store/product.store";
+import { useImageStore } from "@/store/image.storage";
+import { CreateProductRequest } from "@/api/models/CreateProductRequest";
+import { Product } from "@/api/models/Product";
 
 export default defineComponent({
   name: "ProductAdmin",
-  components: {},
+  components: {
+    Plus,
+  },
   setup() {
-    const form = reactive({
+    const form = reactive<CreateProductRequest>({
       categoryId: 0,
       name: "",
       description: "",
       amount: 0,
       price: 0,
+    });
+
+    const updateForm = reactive<Product>({
+      id: 0,
+      categoryId: 0,
+      name: "",
+      description: "",
+      amount: 0,
+      price: 0,
+      images: [],
     });
 
     const rules = reactive<FormRules>({
@@ -137,9 +201,15 @@ export default defineComponent({
     });
 
     const formRef = ref<FormInstance>();
+    const updateRef = ref<FormInstance>();
+    const uploadRef = ref<UploadInstance>();
+
+    const fileList = ref<UploadUserFile[]>();
 
     const categoryStore = useCategoryStore();
     const productStore = useProductStore();
+    const imageStore = useImageStore();
+
     const categories = computed(() => categoryStore.getCategories);
     const products = computed(() => productStore.getProducts);
 
@@ -154,8 +224,11 @@ export default defineComponent({
       });
     };
 
-    const createProduct = (formEl?: FormInstance): void => {
-      if (!formEl) {
+    const createProduct = (
+      formEl?: FormInstance,
+      uploadEl?: UploadInstance
+    ): void => {
+      if (!formEl || !uploadEl) {
         return;
       }
 
@@ -166,7 +239,17 @@ export default defineComponent({
 
         productStore
           .createProduct(form)
-          .then(async () => {
+          .then(async (product) => {
+            console.log(fileList.value);
+
+            if (fileList.value && fileList.value.length) {
+              const files = fileList.value
+                .map((file) => file.raw)
+                .filter((file): file is UploadRawFile => Boolean(file));
+              await imageStore.uploadImages(String(product.id), { files });
+            }
+
+            uploadEl.clearFiles();
             formEl.resetFields();
             ElNotification.success("Product successful created");
 
@@ -178,17 +261,46 @@ export default defineComponent({
       });
     };
 
+    const isUpdateDialogVisible = ref(false);
+
+    const openUpdateModal = (productId: number) => {
+      productStore
+        .getProduct(String(productId))
+        .then((product) => {
+          updateForm.id = product.id;
+          updateForm.categoryId = product.categoryId;
+          updateForm.name = product.name;
+          updateForm.description = product.description;
+          updateForm.amount = product.amount;
+          updateForm.price = product.price;
+          updateForm.images = product.images;
+
+          isUpdateDialogVisible.value = true;
+        })
+        .catch((error) => {
+          ElNotification.error(error.message);
+        });
+    };
+
     onMounted(() => loadCategories());
     onMounted(() => loadProducts());
 
     return {
       form,
+      updateForm,
       rules,
       formRef,
+      updateRef,
+      uploadRef,
+      fileList,
       categories,
       products,
+      isUpdateDialogVisible,
       createProduct,
-      Plus,
+      openUpdateModal,
+
+      Delete,
+      Edit,
     };
   },
 });
