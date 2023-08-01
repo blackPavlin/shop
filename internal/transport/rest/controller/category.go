@@ -45,6 +45,7 @@ func (ctrl *CategoryController) RegisterRoutes(r chi.Router) chi.Router {
 func (ctrl *CategoryController) GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	categories, err := ctrl.categoryService.Query(r.Context(), &category.QueryCriteria{})
 	if err != nil {
+		restx.HandleError(w, r, err)
 		return
 	}
 	render.Respond(w, r, mapping.CreateGetCategoriesResponse(categories))

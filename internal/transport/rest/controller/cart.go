@@ -7,6 +7,7 @@ import (
 
 	"github.com/blackPavlin/shop/internal/domain/cart"
 	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
+	"github.com/blackPavlin/shop/pkg/restx"
 )
 
 // CartController represents cart controller.
@@ -35,7 +36,13 @@ func (ctrl *CartController) RegisterRoutes(r chi.Router) chi.Router {
 }
 
 // GetCartHandler define handler for GET /api/cart.
-func (ctrl *CartController) GetCartHandler(w http.ResponseWriter, r *http.Request) {}
+func (ctrl *CartController) GetCartHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := ctrl.cartService.Query(r.Context(), &cart.QueryCriteria{})
+	if err != nil {
+		restx.HandleError(w, r, err)
+		return
+	}
+}
 
 // AddProductHandler define handler for POST /api/cart.
 func (ctrl *CartController) AddProductHandler(w http.ResponseWriter, r *http.Request) {}

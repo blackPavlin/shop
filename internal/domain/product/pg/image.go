@@ -78,6 +78,7 @@ func mapImagesToCreateBuilders(
 	for _, image := range images {
 		builder := client.ProductImage.
 			Create().
+			SetName(image.Props.Name).
 			SetProductID(int64(image.Props.ProductID))
 		builders = append(builders, builder)
 	}
