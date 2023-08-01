@@ -1,23 +1,29 @@
 import { defineStore } from "pinia";
 import { Product } from "@/api/models/Product";
-import { ProductList } from "@/api/models/ProductList";
 import { ProductService } from "@/api/services/ProductService";
 import { CreateProductRequest } from "@/api/models/CreateProductRequest";
 
 type State = {
-  products: ProductList;
+  products: Product[];
+  quantity: number;
 };
 
 export const useProductStore = defineStore("product", {
   state: (): State => ({
     products: [],
+    quantity: 0,
   }),
   actions: {
     async loadProducts(): Promise<void> {
-      this.products = await ProductService.getProduct();
+      const { items, quantity } = await ProductService.getProduct();
+      this.products = items;
+      this.quantity = quantity;
     },
-    async createProduct(body: CreateProductRequest): Promise<void> {
-      await ProductService.postProduct(body);
+    async getProduct(productId: string): Promise<Product> {
+      return ProductService.getProduct1(productId);
+    },
+    async createProduct(body: CreateProductRequest): Promise<Product> {
+      return ProductService.postProduct(body);
     },
   },
   getters: {
