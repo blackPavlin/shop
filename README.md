@@ -2,6 +2,7 @@
 
 [![Go Report Card][go_report_img]][go_report_url]
 [![License][repo_license_img]][repo_license_url]
+[![Build][build_action_img]][build_action_url]
 
 ## Packages
 
@@ -15,8 +16,10 @@
 [repo_license_img]: https://img.shields.io/github/license/blackPavlin/shop?style=for-the-badge&logo=none
 [repo_license_url]: https://github.com/blackPavlin/shop/blob/master/LICENSE
 
+<!-- Actions -->
+[build_action_img]: https://img.shields.io/github/actions/workflow/status/blackPavlin/shop/build.yml?style=for-the-badge&logo=none
+[build_action_url]: https://github.com/blackPavlin/shop/actions/workflows/build.yml
+
 <!-- Go -->
 [go_report_img]: https://goreportcard.com/badge/github.com/blackPavlin/shop?style=for-the-badge&logo=none
 [go_report_url]: https://goreportcard.com/report/github.com/blackPavlin/shop
-
-
