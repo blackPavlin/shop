@@ -86,7 +86,7 @@ func (r *AddressRepository) Query(
 		criteria.Filter.UserID.Eq = user.IDs{userFromCtx.ID}
 	}
 	rows, err := r.client.Address.Query().
-		Where(makePredicates(criteria.Filter)...).
+		Where(makePredicates(&criteria.Filter)...).
 		All(ctx)
 	if err != nil {
 		r.logger.Error("query address error:", zap.Error(err))

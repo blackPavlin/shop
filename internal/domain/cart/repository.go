@@ -17,7 +17,7 @@ type Repository interface {
 
 // QueryCriteria  represents a criteria for cart query.
 type QueryCriteria struct {
-	Filter *Filter
+	Filter Filter
 }
 
 // Filter represents cart filter.

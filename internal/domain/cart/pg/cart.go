@@ -75,7 +75,7 @@ func (r *CartRepository) Query(
 	if userFromCtx, ok := user.GetUser(ctx); ok {
 		criteria.Filter.UserID.Eq = user.IDs{userFromCtx.ID}
 	}
-	predicates := makePredicates(criteria.Filter)
+	predicates := makePredicates(&criteria.Filter)
 	rows, err := r.client.Cart.Query().
 		Where(predicates...).
 		All(ctx)

@@ -13,7 +13,7 @@ type Repository interface {
 
 // QueryCriteria represents a criteria for user query.
 type QueryCriteria struct {
-	Filter *Filter
+	Filter Filter
 }
 
 // Filter represents user filter.
