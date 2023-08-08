@@ -21,7 +21,7 @@
       </el-carousel-item>
       <el-carousel-item v-for="image of product.images" :key="image.id">
         <el-image
-          :src="`http://localhost/products/${image.name}`"
+          :src="`${objectStorageURL}/${image.name}`"
           fit="fill"
         ></el-image>
       </el-carousel-item>
@@ -49,7 +49,10 @@ export default defineComponent({
     },
   },
   setup() {
-    return {};
+    const objectStorageURL = process.env.VUE_APP_IMAGE_STORAGE_URI;
+    return {
+      objectStorageURL,
+    };
   },
 });
 </script>
