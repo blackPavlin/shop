@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	entgo.io/ent v0.12.3
-	github.com/brianvoe/gofakeit/v6 v6.23.0
+	github.com/brianvoe/gofakeit/v6 v6.23.1
 	github.com/deepmap/oapi-codegen v1.13.4
 	github.com/dmarkham/enumer v1.5.8
 	github.com/go-chi/chi/v5 v5.0.10
