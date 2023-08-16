@@ -22,7 +22,8 @@ type Cart struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Props *Props
+	Props   *Props
+	Product *product.Product
 }
 
 // Carts slice of Cart.

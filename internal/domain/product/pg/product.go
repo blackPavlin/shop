@@ -55,6 +55,29 @@ func (r *ProductRepository) CreateTx(
 	return mapDomainProductFromRow(row), nil
 }
 
+// Update product in db.
+func (r *ProductRepository) Update(
+	ctx context.Context,
+	productID product.ID,
+	props *product.Props,
+) (*product.Product, error) {
+	row, err := r.client.Product.UpdateOneID(int64(productID)).
+		SetCategoryID(int64(props.CategoryID)).
+		SetName(props.Name).
+		SetDescription(props.Description).
+		SetAmount(props.Amount).
+		SetPrice(props.Price).
+		Save(ctx)
+	if err != nil {
+		if pg.IsForeignKeyViolationErr(err, "product_category_fk") {
+			return nil, errorx.ErrNotFound
+		}
+		r.logger.Error("update product error:", zap.Error(err))
+		return nil, errorx.ErrInternal
+	}
+	return mapDomainProductFromRow(row), nil
+}
+
 // Get product from db.
 func (r *ProductRepository) Get(
 	ctx context.Context,

@@ -384,7 +384,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateProductRequest'
+              $ref: '#/components/schemas/CreateProductRequest'
       responses:
         '200':
           description: OK
@@ -439,6 +439,36 @@ paths:
         in: path
         required: true
         description: ID товара
+
+  /product/{productId}/image/{imageId}:
+    delete:
+      summary: Удаление изображения товара
+      tags:
+        - Image
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalError"
+      security:
+          - BearerAuth: []
+    parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+        description: ID товара
+      - schema:
+          type: string
+        name: imageId
+        in: path
+        required: true
+        description: ID изображения  
 
 components:
   securitySchemes:
@@ -799,21 +829,6 @@ components:
       properties:
         categoryId:
           type: integer
-        name:
-          type: string
-        description:
-          type: string
-        amount:
-          type: integer
-          format: int64
-        price:
-          type: integer
-          format: int64
-
-    UpdateProductRequest:
-      title:  Запрос на изменения полей товара
-      type: object
-      properties:
         name:
           type: string
         description:

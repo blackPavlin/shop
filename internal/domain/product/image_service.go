@@ -20,6 +20,7 @@ import (
 // ImageService represents product image use cases.
 type ImageService interface {
 	BulkCreate(ctx context.Context, productID ID, props []*image.StorageProps) (Images, error)
+	Delete(ctx context.Context, imageID ImageID) error
 }
 
 // ImageUseCase represents product image service.
@@ -90,4 +91,27 @@ func (s *ImageUseCase) BulkCreate(
 		return nil, fmt.Errorf("bulkCreate images transaction error: %w", err)
 	}
 	return images, nil
+}
+
+// Delete image from db and file storage.
+func (s *ImageUseCase) Delete(ctx context.Context, imageID ImageID) error {
+	image, err := s.imageRepo.Get(ctx, &ImageFilter{
+		ImageID: ImageIDFilter{Eq: ImageIDs{imageID}},
+	})
+	if err != nil {
+		return fmt.Errorf("get image error: %w", err)
+	}
+	err = s.txManager.RunTransaction(ctx, &sql.TxOptions{}, func(ctx context.Context) error {
+		if err := s.imageRepo.DeleteTx(ctx, imageID); err != nil {
+			return fmt.Errorf("delete images error: %w", err)
+		}
+		if err := s.imageStorage.Remove(ctx, image.Props.Name); err != nil {
+			return fmt.Errorf("remove images from storage error: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("delete images transaction error: %w", err)
+	}
+	return nil
 }

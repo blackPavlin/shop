@@ -43,3 +43,13 @@ func (s *Storage) Upload(ctx context.Context, props *image.StorageProps) error {
 	}
 	return nil
 }
+
+// Remove file from storage.
+func (s *Storage) Remove(ctx context.Context, name string) error {
+	err := s.client.RemoveObject(ctx, s.config.BucketName, name, minio.RemoveObjectOptions{})
+	if err != nil {
+		s.logger.Error("remove image from storage error", zap.Error(err))
+		return errorx.ErrInternal
+	}
+	return nil
+}

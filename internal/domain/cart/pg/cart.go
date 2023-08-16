@@ -10,6 +10,7 @@ import (
 	entcart "github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/cart"
+	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/pkg/errorx"
@@ -78,6 +79,9 @@ func (r *CartRepository) Query(
 	predicates := makePredicates(&criteria.Filter)
 	rows, err := r.client.Cart.Query().
 		Where(predicates...).
+		WithProducts(func(pq *ent.ProductQuery) {
+			pq.WithProductImages()
+		}).
 		All(ctx)
 	if err != nil {
 		r.logger.Error("query carts error", zap.Error(err))
@@ -108,6 +112,7 @@ func mapDomainCartFromRow(row *ent.Cart) *cart.Cart {
 			ProductID: product.ID(row.ProductID),
 			Amount:    row.Amount,
 		},
+		Product: mapDomainProductFromRow(*row.Edges.Products),
 	}
 }
 
@@ -115,6 +120,42 @@ func mapDomainCartsFromRows(rows ent.Carts) cart.Carts {
 	result := make(cart.Carts, 0, len(rows))
 	for _, row := range rows {
 		result = append(result, mapDomainCartFromRow(row))
+	}
+	return result
+}
+
+func mapDomainProductFromRow(row ent.Product) *product.Product {
+	return &product.Product{
+		ID:        product.ID(row.ID),
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+		Images:    mapDomainImagesFromRows(row.Edges.ProductImages),
+		Props: &product.Props{
+			CategoryID:  category.ID(row.CategoryID),
+			Name:        row.Name,
+			Description: row.Description,
+			Amount:      row.Amount,
+			Price:       row.Price,
+		},
+	}
+}
+
+func mapDomainImageFromRow(row *ent.ProductImage) *product.Image {
+	return &product.Image{
+		ID:        product.ImageID(row.ID),
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+		Props: &product.ImageProps{
+			ProductID: product.ID(row.ProductID),
+			Name:      row.Name,
+		},
+	}
+}
+
+func mapDomainImagesFromRows(rows ent.ProductImages) product.Images {
+	result := make(product.Images, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, mapDomainImageFromRow(row))
 	}
 	return result
 }

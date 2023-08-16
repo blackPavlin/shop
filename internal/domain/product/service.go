@@ -13,6 +13,7 @@ import (
 // Service represents product use cases.
 type Service interface {
 	Create(ctx context.Context, props *Props) (*Product, error)
+	Update(ctx context.Context, productID ID, props *Props) (*Product, error)
 	Get(ctx context.Context, filter *Filter) (*Product, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
@@ -48,6 +49,15 @@ func (s *UseCase) Create(ctx context.Context, props *Props) (*Product, error) {
 		return nil, fmt.Errorf("create product transaction error: %w", err)
 	}
 	return product, nil
+}
+
+// Update product.
+func (s *UseCase) Update(ctx context.Context, productID ID, props *Props) (*Product, error) {
+	result, err := s.productRepo.Update(ctx, productID, props)
+	if err != nil {
+		return nil, fmt.Errorf("update product error: %w", err)
+	}
+	return result, nil
 }
 
 // Get product.

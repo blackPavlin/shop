@@ -51,6 +51,7 @@ func (ctrl *ProductController) RegisterRoutes(r chi.Router) chi.Router {
 			r.Route("/image", func(r chi.Router) {
 				r.Use(ctrl.authMiddleware.Authorization)
 				r.Post("/", ctrl.UploadProductImageHandler)
+				r.Delete("/{imageID}", ctrl.RemoveProductImageHandler)
 			})
 		})
 	})
@@ -105,21 +106,30 @@ func (ctrl *ProductController) GetProductHandler(w http.ResponseWriter, r *http.
 
 // UpdateProductHandler define handler for PATCH /api/product/{productId}.
 func (ctrl *ProductController) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
-	//productID, err := restx.GetIDFromURLParams(r, "productID")
-	//if err != nil {
-	//	restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
-	//	return
-	//}
-	//request := &rest.UpdateProductRequest{}
-	//if err := render.DecodeJSON(r.Body, request); err != nil {
-	//	restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
-	//	return
-	//}
-	//if err := request.Validate(); err != nil {
-	//	restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
-	//	return
-	//}
-	//p, err := ctrl.productService.Update(r.Context(), product.ID(productID), )
+	productID, err := restx.GetIDFromURLParams(r, "productID")
+	if err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	request := &rest.CreateProductRequest{}
+	if err := render.DecodeJSON(r.Body, request); err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	if err := request.Validate(); err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	p, err := ctrl.productService.Update(
+		r.Context(),
+		product.ID(productID),
+		request.ToDomainEntity(),
+	)
+	if err != nil {
+		restx.HandleError(w, r, err)
+		return
+	}
+	render.Respond(w, r, mapping.CreateProductResponse(p))
 }
 
 // UploadProductImageHandler define handler for POST /api/product/{productId}/image.
@@ -163,4 +173,17 @@ func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, 
 	}
 	render.Status(r, http.StatusCreated)
 	render.Respond(w, r, mapping.CreateUploadImagesResponse(result))
+}
+
+// RemoveProductImageHandler define handler for DELETE /api/product/{productId}/image/{imageID}.
+func (ctrl *ProductController) RemoveProductImageHandler(w http.ResponseWriter, r *http.Request) {
+	imageID, err := restx.GetIDFromURLParams(r, "imageID")
+	if err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	if err := ctrl.imageService.Delete(r.Context(), product.ImageID(imageID)); err != nil {
+		restx.HandleError(w, r, err)
+		return
+	}
 }

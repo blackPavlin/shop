@@ -7,6 +7,7 @@ import "context"
 // Storage represents file store.
 type Storage interface {
 	Upload(ctx context.Context, props *StorageProps) error
+	Remove(ctx context.Context, name string) error
 }
 
 type StorageProps struct {

@@ -54,6 +54,24 @@ func (r *ImageRepository) BulkCreateTx(
 	return mapDomainImagesFromRows(rows), nil
 }
 
+// Get product image from db.
+func (r *ImageRepository) Get(
+	ctx context.Context,
+	filter *product.ImageFilter,
+) (*product.Image, error) {
+	row, err := r.client.ProductImage.Query().
+		Where(makeImagePredicates(filter)...).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, errorx.ErrNotFound
+		}
+		r.logger.Error("get image error", zap.Error(err))
+		return nil, errorx.ErrInternal
+	}
+	return mapDomainImageFromRow(row), nil
+}
+
 // Query product images from db.
 func (r *ImageRepository) Query(
 	ctx context.Context,
@@ -68,6 +86,21 @@ func (r *ImageRepository) Query(
 		return nil, errorx.ErrInternal
 	}
 	return mapDomainImagesFromRows(rows), nil
+}
+
+// DeleteTx delete product images in db with transaction.
+func (r *ImageRepository) DeleteTx(ctx context.Context, imageID product.ImageID) error {
+	tx := ent.TxFromContext(ctx)
+	if tx == nil {
+		r.logger.Error("using tx in non tx context", zap.Error(errorx.ErrInternal))
+		return errorx.ErrInternal
+	}
+	err := r.client.ProductImage.DeleteOneID(int64(imageID)).Exec(ctx)
+	if err != nil {
+		r.logger.Error("delete product images error", zap.Error(err))
+		return errorx.ErrInternal
+	}
+	return nil
 }
 
 func mapImagesToCreateBuilders(
@@ -97,6 +130,18 @@ func makeImagePredicates(filter *product.ImageFilter) []predicate.ProductImage {
 		predicates = append(
 			predicates,
 			entproductimage.ProductIDNotIn(filter.ProductID.Neq.ToInt64()...),
+		)
+	}
+	if len(filter.ImageID.Eq) > 0 {
+		predicates = append(
+			predicates,
+			entproductimage.IDIn(filter.ImageID.Eq.ToInt64()...),
+		)
+	}
+	if len(filter.ImageID.Neq) > 0 {
+		predicates = append(
+			predicates,
+			entproductimage.IDNotIn(filter.ImageID.Eq.ToInt64()...),
 		)
 	}
 	return predicates
