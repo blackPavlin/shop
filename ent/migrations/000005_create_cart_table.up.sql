@@ -13,4 +13,5 @@ CREATE TABLE carts
     CONSTRAINT cart_user_fk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
     CONSTRAINT cart_product_fk FOREIGN KEY (product_id) REFERENCES products (id)  ON DELETE RESTRICT
 );
+CREATE UNIQUE INDEX "carts_user_id_product_id_unique" ON "carts" ("user_id", "product_id");
 COMMIT;
