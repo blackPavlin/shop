@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // Cart holds the schema definition for the Cart entity.
@@ -30,8 +31,8 @@ func (Cart) Mixin() []ent.Mixin {
 // Fields of the Cart.
 func (Cart) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("user_id").Unique(),
-		field.Int64("product_id").Unique(),
+		field.Int64("user_id"),
+		field.Int64("product_id"),
 		field.Int64("amount").Min(0),
 	}
 }
@@ -49,5 +50,12 @@ func (Cart) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Field("product_id"),
+	}
+}
+
+// Indexes of the Cart.
+func (Cart) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("user_id", "product_id").Unique(),
 	}
 }
