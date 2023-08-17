@@ -3,12 +3,12 @@ package pgutil
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
 	// pgx driver.
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jmoiron/sqlx"
 )
 
 // PostgresConfig is a Postgres configuration.
@@ -37,8 +37,8 @@ func (p *PostgresConfig) toDataSourceName() string {
 }
 
 // NewDatabase creates database connection and checks it.
-func NewDatabase(ctx context.Context, config *PostgresConfig) (*sqlx.DB, error) {
-	db, err := sqlx.ConnectContext(ctx, "pgx", config.toDataSourceName())
+func NewDatabase(ctx context.Context, config *PostgresConfig) (*sql.DB, error) {
+	db, err := sql.Open("pgx", config.toDataSourceName())
 	if err != nil {
 		return nil, fmt.Errorf("connect to database error: %w", err)
 	}

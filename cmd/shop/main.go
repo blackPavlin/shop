@@ -35,7 +35,7 @@ func main() {
 		log.Fatalf("failed to connect database: %+v", err)
 	}
 
-	driver := sql.OpenDB(dialect.Postgres, db.DB)
+	driver := sql.OpenDB(dialect.Postgres, db)
 	database := ent.NewClient(ent.Driver(driver))
 
 	storage, err := s3x.NewStorage(context.Background(), conf.S3)

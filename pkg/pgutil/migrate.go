@@ -22,7 +22,7 @@ func MakeMigrate(ctx context.Context, config *PostgresConfig) error {
 	if err != nil {
 		return fmt.Errorf("init source error: %w", err)
 	}
-	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("database instance error: %w", err)
 	}
