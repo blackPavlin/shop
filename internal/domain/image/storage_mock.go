@@ -34,6 +34,20 @@ func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
 	return m.recorder
 }
 
+// Remove mocks base method.
+func (m *MockStorage) Remove(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Remove", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Remove indicates an expected call of Remove.
+func (mr *MockStorageMockRecorder) Remove(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockStorage)(nil).Remove), ctx, name)
+}
+
 // Upload mocks base method.
 func (m *MockStorage) Upload(ctx context.Context, props *StorageProps) error {
 	m.ctrl.T.Helper()

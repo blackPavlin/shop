@@ -49,6 +49,35 @@ func (mr *MockImageRepositoryMockRecorder) BulkCreateTx(ctx, images interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreateTx", reflect.TypeOf((*MockImageRepository)(nil).BulkCreateTx), ctx, images)
 }
 
+// DeleteTx mocks base method.
+func (m *MockImageRepository) DeleteTx(ctx context.Context, imageID ImageID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteTx", ctx, imageID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteTx indicates an expected call of DeleteTx.
+func (mr *MockImageRepositoryMockRecorder) DeleteTx(ctx, imageID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTx", reflect.TypeOf((*MockImageRepository)(nil).DeleteTx), ctx, imageID)
+}
+
+// Get mocks base method.
+func (m *MockImageRepository) Get(ctx context.Context, filter *ImageFilter) (*Image, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, filter)
+	ret0, _ := ret[0].(*Image)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockImageRepositoryMockRecorder) Get(ctx, filter interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockImageRepository)(nil).Get), ctx, filter)
+}
+
 // Query mocks base method.
 func (m *MockImageRepository) Query(ctx context.Context, criteria *ImageQueryCriteria) (Images, error) {
 	m.ctrl.T.Helper()

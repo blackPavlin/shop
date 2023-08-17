@@ -49,3 +49,17 @@ func (mr *MockImageServiceMockRecorder) BulkCreate(ctx, productID, props interfa
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockImageService)(nil).BulkCreate), ctx, productID, props)
 }
+
+// Delete mocks base method.
+func (m *MockImageService) Delete(ctx context.Context, imageID ImageID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, imageID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockImageServiceMockRecorder) Delete(ctx, imageID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockImageService)(nil).Delete), ctx, imageID)
+}

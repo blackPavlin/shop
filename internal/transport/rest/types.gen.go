@@ -176,14 +176,6 @@ type SignupRequest struct {
 	Phone    string `json:"phone"`
 }
 
-// UpdateProductRequest defines model for UpdateProductRequest.
-type UpdateProductRequest struct {
-	Amount      *int64  `json:"amount,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Name        *string `json:"name,omitempty"`
-	Price       *int64  `json:"price,omitempty"`
-}
-
 // UploadImagesRequest defines model for UploadImagesRequest.
 type UploadImagesRequest struct {
 	Files []string `json:"files"`
@@ -241,7 +233,7 @@ type PostCategoryJSONBody CreateCategoryRequest
 type PostProductJSONBody CreateProductRequest
 
 // PatchProductProductIdJSONBody defines parameters for PatchProductProductId.
-type PatchProductProductIdJSONBody UpdateProductRequest
+type PatchProductProductIdJSONBody CreateProductRequest
 
 // PostAddressJSONRequestBody defines body for PostAddress for application/json ContentType.
 type PostAddressJSONRequestBody PostAddressJSONBody
