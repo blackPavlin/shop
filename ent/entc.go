@@ -18,7 +18,9 @@ func main() {
 		},
 	}
 
-	options := []entc.Option{}
+	options := []entc.Option{
+		entc.FeatureNames("sql/upsert"),
+	}
 
 	if err := entc.Generate("./schema", config, options...); err != nil {
 		log.Fatalf("running ent codegen: %v", err)

@@ -65,6 +65,13 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "carts_user_id_product_id_unique",
+				Unique:  true,
+				Columns: []*schema.Column{CartsColumns[5], CartsColumns[4]},
+			},
+		},
 	}
 	// CategoriesColumns holds the columns for the "categories" table.
 	CategoriesColumns = []*schema.Column{

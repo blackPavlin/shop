@@ -56,6 +56,8 @@ func (Cart) Edges() []ent.Edge {
 // Indexes of the Cart.
 func (Cart) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("user_id", "product_id").Unique(),
+		index.Fields("user_id", "product_id").
+			Unique().
+			StorageKey("carts_user_id_product_id_unique"),
 	}
 }

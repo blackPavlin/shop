@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/cart"
@@ -20,6 +21,7 @@ type CartCreate struct {
 	config
 	mutation *CartMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -189,6 +191,7 @@ func (cc *CartCreate) createSpec() (*Cart, *sqlgraph.CreateSpec) {
 		_node = &Cart{config: cc.config}
 		_spec = sqlgraph.NewCreateSpec(cart.Table, sqlgraph.NewFieldSpec(cart.FieldID, field.TypeInt64))
 	)
+	_spec.OnConflict = cc.conflict
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.SetField(cart.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -238,10 +241,255 @@ func (cc *CartCreate) createSpec() (*Cart, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Cart.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CartUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (cc *CartCreate) OnConflict(opts ...sql.ConflictOption) *CartUpsertOne {
+	cc.conflict = opts
+	return &CartUpsertOne{
+		create: cc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Cart.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (cc *CartCreate) OnConflictColumns(columns ...string) *CartUpsertOne {
+	cc.conflict = append(cc.conflict, sql.ConflictColumns(columns...))
+	return &CartUpsertOne{
+		create: cc,
+	}
+}
+
+type (
+	// CartUpsertOne is the builder for "upsert"-ing
+	//  one Cart node.
+	CartUpsertOne struct {
+		create *CartCreate
+	}
+
+	// CartUpsert is the "OnConflict" setter.
+	CartUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CartUpsert) SetUpdatedAt(v time.Time) *CartUpsert {
+	u.Set(cart.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CartUpsert) UpdateUpdatedAt() *CartUpsert {
+	u.SetExcluded(cart.FieldUpdatedAt)
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *CartUpsert) SetUserID(v int64) *CartUpsert {
+	u.Set(cart.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *CartUpsert) UpdateUserID() *CartUpsert {
+	u.SetExcluded(cart.FieldUserID)
+	return u
+}
+
+// SetProductID sets the "product_id" field.
+func (u *CartUpsert) SetProductID(v int64) *CartUpsert {
+	u.Set(cart.FieldProductID, v)
+	return u
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *CartUpsert) UpdateProductID() *CartUpsert {
+	u.SetExcluded(cart.FieldProductID)
+	return u
+}
+
+// SetAmount sets the "amount" field.
+func (u *CartUpsert) SetAmount(v int64) *CartUpsert {
+	u.Set(cart.FieldAmount, v)
+	return u
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *CartUpsert) UpdateAmount() *CartUpsert {
+	u.SetExcluded(cart.FieldAmount)
+	return u
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *CartUpsert) AddAmount(v int64) *CartUpsert {
+	u.Add(cart.FieldAmount, v)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.Cart.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *CartUpsertOne) UpdateNewValues() *CartUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(cart.FieldCreatedAt)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Cart.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *CartUpsertOne) Ignore() *CartUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *CartUpsertOne) DoNothing() *CartUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the CartCreate.OnConflict
+// documentation for more info.
+func (u *CartUpsertOne) Update(set func(*CartUpsert)) *CartUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&CartUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CartUpsertOne) SetUpdatedAt(v time.Time) *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CartUpsertOne) UpdateUpdatedAt() *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetUserID sets the "user_id" field.
+func (u *CartUpsertOne) SetUserID(v int64) *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *CartUpsertOne) UpdateUserID() *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetProductID sets the "product_id" field.
+func (u *CartUpsertOne) SetProductID(v int64) *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.SetProductID(v)
+	})
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *CartUpsertOne) UpdateProductID() *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateProductID()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *CartUpsertOne) SetAmount(v int64) *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *CartUpsertOne) AddAmount(v int64) *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.AddAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *CartUpsertOne) UpdateAmount() *CartUpsertOne {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// Exec executes the query.
+func (u *CartUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for CartCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *CartUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *CartUpsertOne) ID(ctx context.Context) (id int64, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *CartUpsertOne) IDX(ctx context.Context) int64 {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // CartCreateBulk is the builder for creating many Cart entities in bulk.
 type CartCreateBulk struct {
 	config
 	builders []*CartCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Cart entities in the database.
@@ -268,6 +516,7 @@ func (ccb *CartCreateBulk) Save(ctx context.Context) ([]*Cart, error) {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = ccb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, ccb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -318,6 +567,177 @@ func (ccb *CartCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (ccb *CartCreateBulk) ExecX(ctx context.Context) {
 	if err := ccb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Cart.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CartUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (ccb *CartCreateBulk) OnConflict(opts ...sql.ConflictOption) *CartUpsertBulk {
+	ccb.conflict = opts
+	return &CartUpsertBulk{
+		create: ccb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Cart.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (ccb *CartCreateBulk) OnConflictColumns(columns ...string) *CartUpsertBulk {
+	ccb.conflict = append(ccb.conflict, sql.ConflictColumns(columns...))
+	return &CartUpsertBulk{
+		create: ccb,
+	}
+}
+
+// CartUpsertBulk is the builder for "upsert"-ing
+// a bulk of Cart nodes.
+type CartUpsertBulk struct {
+	create *CartCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Cart.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *CartUpsertBulk) UpdateNewValues() *CartUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(cart.FieldCreatedAt)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Cart.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *CartUpsertBulk) Ignore() *CartUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *CartUpsertBulk) DoNothing() *CartUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the CartCreateBulk.OnConflict
+// documentation for more info.
+func (u *CartUpsertBulk) Update(set func(*CartUpsert)) *CartUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&CartUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CartUpsertBulk) SetUpdatedAt(v time.Time) *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CartUpsertBulk) UpdateUpdatedAt() *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetUserID sets the "user_id" field.
+func (u *CartUpsertBulk) SetUserID(v int64) *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *CartUpsertBulk) UpdateUserID() *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetProductID sets the "product_id" field.
+func (u *CartUpsertBulk) SetProductID(v int64) *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.SetProductID(v)
+	})
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *CartUpsertBulk) UpdateProductID() *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateProductID()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *CartUpsertBulk) SetAmount(v int64) *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *CartUpsertBulk) AddAmount(v int64) *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.AddAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *CartUpsertBulk) UpdateAmount() *CartUpsertBulk {
+	return u.Update(func(s *CartUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// Exec executes the query.
+func (u *CartUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the CartCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for CartCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *CartUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

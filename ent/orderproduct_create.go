@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/orderproduct"
@@ -18,6 +19,7 @@ type OrderProductCreate struct {
 	config
 	mutation *OrderProductMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -127,6 +129,7 @@ func (opc *OrderProductCreate) createSpec() (*OrderProduct, *sqlgraph.CreateSpec
 		_node = &OrderProduct{config: opc.config}
 		_spec = sqlgraph.NewCreateSpec(orderproduct.Table, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
 	)
+	_spec.OnConflict = opc.conflict
 	if value, ok := opc.mutation.CreatedAt(); ok {
 		_spec.SetField(orderproduct.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -138,10 +141,164 @@ func (opc *OrderProductCreate) createSpec() (*OrderProduct, *sqlgraph.CreateSpec
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.OrderProduct.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.OrderProductUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (opc *OrderProductCreate) OnConflict(opts ...sql.ConflictOption) *OrderProductUpsertOne {
+	opc.conflict = opts
+	return &OrderProductUpsertOne{
+		create: opc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.OrderProduct.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (opc *OrderProductCreate) OnConflictColumns(columns ...string) *OrderProductUpsertOne {
+	opc.conflict = append(opc.conflict, sql.ConflictColumns(columns...))
+	return &OrderProductUpsertOne{
+		create: opc,
+	}
+}
+
+type (
+	// OrderProductUpsertOne is the builder for "upsert"-ing
+	//  one OrderProduct node.
+	OrderProductUpsertOne struct {
+		create *OrderProductCreate
+	}
+
+	// OrderProductUpsert is the "OnConflict" setter.
+	OrderProductUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *OrderProductUpsert) SetUpdatedAt(v time.Time) *OrderProductUpsert {
+	u.Set(orderproduct.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *OrderProductUpsert) UpdateUpdatedAt() *OrderProductUpsert {
+	u.SetExcluded(orderproduct.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.OrderProduct.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *OrderProductUpsertOne) UpdateNewValues() *OrderProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(orderproduct.FieldCreatedAt)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.OrderProduct.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *OrderProductUpsertOne) Ignore() *OrderProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *OrderProductUpsertOne) DoNothing() *OrderProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the OrderProductCreate.OnConflict
+// documentation for more info.
+func (u *OrderProductUpsertOne) Update(set func(*OrderProductUpsert)) *OrderProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&OrderProductUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *OrderProductUpsertOne) SetUpdatedAt(v time.Time) *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *OrderProductUpsertOne) UpdateUpdatedAt() *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *OrderProductUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for OrderProductCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *OrderProductUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *OrderProductUpsertOne) ID(ctx context.Context) (id int64, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *OrderProductUpsertOne) IDX(ctx context.Context) int64 {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // OrderProductCreateBulk is the builder for creating many OrderProduct entities in bulk.
 type OrderProductCreateBulk struct {
 	config
 	builders []*OrderProductCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the OrderProduct entities in the database.
@@ -168,6 +325,7 @@ func (opcb *OrderProductCreateBulk) Save(ctx context.Context) ([]*OrderProduct, 
 					_, err = mutators[i+1].Mutate(root, opcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = opcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, opcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -218,6 +376,128 @@ func (opcb *OrderProductCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (opcb *OrderProductCreateBulk) ExecX(ctx context.Context) {
 	if err := opcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.OrderProduct.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.OrderProductUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (opcb *OrderProductCreateBulk) OnConflict(opts ...sql.ConflictOption) *OrderProductUpsertBulk {
+	opcb.conflict = opts
+	return &OrderProductUpsertBulk{
+		create: opcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.OrderProduct.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (opcb *OrderProductCreateBulk) OnConflictColumns(columns ...string) *OrderProductUpsertBulk {
+	opcb.conflict = append(opcb.conflict, sql.ConflictColumns(columns...))
+	return &OrderProductUpsertBulk{
+		create: opcb,
+	}
+}
+
+// OrderProductUpsertBulk is the builder for "upsert"-ing
+// a bulk of OrderProduct nodes.
+type OrderProductUpsertBulk struct {
+	create *OrderProductCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.OrderProduct.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *OrderProductUpsertBulk) UpdateNewValues() *OrderProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(orderproduct.FieldCreatedAt)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.OrderProduct.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *OrderProductUpsertBulk) Ignore() *OrderProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *OrderProductUpsertBulk) DoNothing() *OrderProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the OrderProductCreateBulk.OnConflict
+// documentation for more info.
+func (u *OrderProductUpsertBulk) Update(set func(*OrderProductUpsert)) *OrderProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&OrderProductUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *OrderProductUpsertBulk) SetUpdatedAt(v time.Time) *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *OrderProductUpsertBulk) UpdateUpdatedAt() *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *OrderProductUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the OrderProductCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for OrderProductCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *OrderProductUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/cart"
@@ -21,6 +22,7 @@ type ProductCreate struct {
 	config
 	mutation *ProductMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -251,6 +253,7 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 		_node = &Product{config: pc.config}
 		_spec = sqlgraph.NewCreateSpec(product.Table, sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64))
 	)
+	_spec.OnConflict = pc.conflict
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.SetField(product.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -327,10 +330,333 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Product.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ProductUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (pc *ProductCreate) OnConflict(opts ...sql.ConflictOption) *ProductUpsertOne {
+	pc.conflict = opts
+	return &ProductUpsertOne{
+		create: pc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Product.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (pc *ProductCreate) OnConflictColumns(columns ...string) *ProductUpsertOne {
+	pc.conflict = append(pc.conflict, sql.ConflictColumns(columns...))
+	return &ProductUpsertOne{
+		create: pc,
+	}
+}
+
+type (
+	// ProductUpsertOne is the builder for "upsert"-ing
+	//  one Product node.
+	ProductUpsertOne struct {
+		create *ProductCreate
+	}
+
+	// ProductUpsert is the "OnConflict" setter.
+	ProductUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProductUpsert) SetUpdatedAt(v time.Time) *ProductUpsert {
+	u.Set(product.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProductUpsert) UpdateUpdatedAt() *ProductUpsert {
+	u.SetExcluded(product.FieldUpdatedAt)
+	return u
+}
+
+// SetCategoryID sets the "category_id" field.
+func (u *ProductUpsert) SetCategoryID(v int64) *ProductUpsert {
+	u.Set(product.FieldCategoryID, v)
+	return u
+}
+
+// UpdateCategoryID sets the "category_id" field to the value that was provided on create.
+func (u *ProductUpsert) UpdateCategoryID() *ProductUpsert {
+	u.SetExcluded(product.FieldCategoryID)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *ProductUpsert) SetName(v string) *ProductUpsert {
+	u.Set(product.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ProductUpsert) UpdateName() *ProductUpsert {
+	u.SetExcluded(product.FieldName)
+	return u
+}
+
+// SetDescription sets the "description" field.
+func (u *ProductUpsert) SetDescription(v string) *ProductUpsert {
+	u.Set(product.FieldDescription, v)
+	return u
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *ProductUpsert) UpdateDescription() *ProductUpsert {
+	u.SetExcluded(product.FieldDescription)
+	return u
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *ProductUpsert) ClearDescription() *ProductUpsert {
+	u.SetNull(product.FieldDescription)
+	return u
+}
+
+// SetAmount sets the "amount" field.
+func (u *ProductUpsert) SetAmount(v int64) *ProductUpsert {
+	u.Set(product.FieldAmount, v)
+	return u
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *ProductUpsert) UpdateAmount() *ProductUpsert {
+	u.SetExcluded(product.FieldAmount)
+	return u
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *ProductUpsert) AddAmount(v int64) *ProductUpsert {
+	u.Add(product.FieldAmount, v)
+	return u
+}
+
+// SetPrice sets the "price" field.
+func (u *ProductUpsert) SetPrice(v int64) *ProductUpsert {
+	u.Set(product.FieldPrice, v)
+	return u
+}
+
+// UpdatePrice sets the "price" field to the value that was provided on create.
+func (u *ProductUpsert) UpdatePrice() *ProductUpsert {
+	u.SetExcluded(product.FieldPrice)
+	return u
+}
+
+// AddPrice adds v to the "price" field.
+func (u *ProductUpsert) AddPrice(v int64) *ProductUpsert {
+	u.Add(product.FieldPrice, v)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.Product.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *ProductUpsertOne) UpdateNewValues() *ProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(product.FieldCreatedAt)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Product.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *ProductUpsertOne) Ignore() *ProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ProductUpsertOne) DoNothing() *ProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ProductCreate.OnConflict
+// documentation for more info.
+func (u *ProductUpsertOne) Update(set func(*ProductUpsert)) *ProductUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ProductUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProductUpsertOne) SetUpdatedAt(v time.Time) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProductUpsertOne) UpdateUpdatedAt() *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetCategoryID sets the "category_id" field.
+func (u *ProductUpsertOne) SetCategoryID(v int64) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetCategoryID(v)
+	})
+}
+
+// UpdateCategoryID sets the "category_id" field to the value that was provided on create.
+func (u *ProductUpsertOne) UpdateCategoryID() *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateCategoryID()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *ProductUpsertOne) SetName(v string) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ProductUpsertOne) UpdateName() *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *ProductUpsertOne) SetDescription(v string) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *ProductUpsertOne) UpdateDescription() *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *ProductUpsertOne) ClearDescription() *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *ProductUpsertOne) SetAmount(v int64) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *ProductUpsertOne) AddAmount(v int64) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.AddAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *ProductUpsertOne) UpdateAmount() *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// SetPrice sets the "price" field.
+func (u *ProductUpsertOne) SetPrice(v int64) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetPrice(v)
+	})
+}
+
+// AddPrice adds v to the "price" field.
+func (u *ProductUpsertOne) AddPrice(v int64) *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.AddPrice(v)
+	})
+}
+
+// UpdatePrice sets the "price" field to the value that was provided on create.
+func (u *ProductUpsertOne) UpdatePrice() *ProductUpsertOne {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdatePrice()
+	})
+}
+
+// Exec executes the query.
+func (u *ProductUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ProductCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ProductUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *ProductUpsertOne) ID(ctx context.Context) (id int64, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *ProductUpsertOne) IDX(ctx context.Context) int64 {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // ProductCreateBulk is the builder for creating many Product entities in bulk.
 type ProductCreateBulk struct {
 	config
 	builders []*ProductCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Product entities in the database.
@@ -357,6 +683,7 @@ func (pcb *ProductCreateBulk) Save(ctx context.Context) ([]*Product, error) {
 					_, err = mutators[i+1].Mutate(root, pcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = pcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, pcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -407,6 +734,219 @@ func (pcb *ProductCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (pcb *ProductCreateBulk) ExecX(ctx context.Context) {
 	if err := pcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Product.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ProductUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (pcb *ProductCreateBulk) OnConflict(opts ...sql.ConflictOption) *ProductUpsertBulk {
+	pcb.conflict = opts
+	return &ProductUpsertBulk{
+		create: pcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Product.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (pcb *ProductCreateBulk) OnConflictColumns(columns ...string) *ProductUpsertBulk {
+	pcb.conflict = append(pcb.conflict, sql.ConflictColumns(columns...))
+	return &ProductUpsertBulk{
+		create: pcb,
+	}
+}
+
+// ProductUpsertBulk is the builder for "upsert"-ing
+// a bulk of Product nodes.
+type ProductUpsertBulk struct {
+	create *ProductCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Product.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *ProductUpsertBulk) UpdateNewValues() *ProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(product.FieldCreatedAt)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Product.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *ProductUpsertBulk) Ignore() *ProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ProductUpsertBulk) DoNothing() *ProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ProductCreateBulk.OnConflict
+// documentation for more info.
+func (u *ProductUpsertBulk) Update(set func(*ProductUpsert)) *ProductUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ProductUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProductUpsertBulk) SetUpdatedAt(v time.Time) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProductUpsertBulk) UpdateUpdatedAt() *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetCategoryID sets the "category_id" field.
+func (u *ProductUpsertBulk) SetCategoryID(v int64) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetCategoryID(v)
+	})
+}
+
+// UpdateCategoryID sets the "category_id" field to the value that was provided on create.
+func (u *ProductUpsertBulk) UpdateCategoryID() *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateCategoryID()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *ProductUpsertBulk) SetName(v string) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ProductUpsertBulk) UpdateName() *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *ProductUpsertBulk) SetDescription(v string) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *ProductUpsertBulk) UpdateDescription() *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *ProductUpsertBulk) ClearDescription() *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *ProductUpsertBulk) SetAmount(v int64) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *ProductUpsertBulk) AddAmount(v int64) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.AddAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *ProductUpsertBulk) UpdateAmount() *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// SetPrice sets the "price" field.
+func (u *ProductUpsertBulk) SetPrice(v int64) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.SetPrice(v)
+	})
+}
+
+// AddPrice adds v to the "price" field.
+func (u *ProductUpsertBulk) AddPrice(v int64) *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.AddPrice(v)
+	})
+}
+
+// UpdatePrice sets the "price" field to the value that was provided on create.
+func (u *ProductUpsertBulk) UpdatePrice() *ProductUpsertBulk {
+	return u.Update(func(s *ProductUpsert) {
+		s.UpdatePrice()
+	})
+}
+
+// Exec executes the query.
+func (u *ProductUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ProductCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ProductCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ProductUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

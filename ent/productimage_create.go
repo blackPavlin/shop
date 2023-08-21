@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/product"
@@ -19,6 +20,7 @@ type ProductImageCreate struct {
 	config
 	mutation *ProductImageMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -160,6 +162,7 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 		_node = &ProductImage{config: pic.config}
 		_spec = sqlgraph.NewCreateSpec(productimage.Table, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
 	)
+	_spec.OnConflict = pic.conflict
 	if value, ok := pic.mutation.CreatedAt(); ok {
 		_spec.SetField(productimage.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -192,10 +195,216 @@ func (pic *ProductImageCreate) createSpec() (*ProductImage, *sqlgraph.CreateSpec
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.ProductImage.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ProductImageUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (pic *ProductImageCreate) OnConflict(opts ...sql.ConflictOption) *ProductImageUpsertOne {
+	pic.conflict = opts
+	return &ProductImageUpsertOne{
+		create: pic,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.ProductImage.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (pic *ProductImageCreate) OnConflictColumns(columns ...string) *ProductImageUpsertOne {
+	pic.conflict = append(pic.conflict, sql.ConflictColumns(columns...))
+	return &ProductImageUpsertOne{
+		create: pic,
+	}
+}
+
+type (
+	// ProductImageUpsertOne is the builder for "upsert"-ing
+	//  one ProductImage node.
+	ProductImageUpsertOne struct {
+		create *ProductImageCreate
+	}
+
+	// ProductImageUpsert is the "OnConflict" setter.
+	ProductImageUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProductImageUpsert) SetUpdatedAt(v time.Time) *ProductImageUpsert {
+	u.Set(productimage.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProductImageUpsert) UpdateUpdatedAt() *ProductImageUpsert {
+	u.SetExcluded(productimage.FieldUpdatedAt)
+	return u
+}
+
+// SetProductID sets the "product_id" field.
+func (u *ProductImageUpsert) SetProductID(v int64) *ProductImageUpsert {
+	u.Set(productimage.FieldProductID, v)
+	return u
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *ProductImageUpsert) UpdateProductID() *ProductImageUpsert {
+	u.SetExcluded(productimage.FieldProductID)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *ProductImageUpsert) SetName(v string) *ProductImageUpsert {
+	u.Set(productimage.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ProductImageUpsert) UpdateName() *ProductImageUpsert {
+	u.SetExcluded(productimage.FieldName)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// Using this option is equivalent to using:
+//
+//	client.ProductImage.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *ProductImageUpsertOne) UpdateNewValues() *ProductImageUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(productimage.FieldCreatedAt)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.ProductImage.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *ProductImageUpsertOne) Ignore() *ProductImageUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ProductImageUpsertOne) DoNothing() *ProductImageUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ProductImageCreate.OnConflict
+// documentation for more info.
+func (u *ProductImageUpsertOne) Update(set func(*ProductImageUpsert)) *ProductImageUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ProductImageUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProductImageUpsertOne) SetUpdatedAt(v time.Time) *ProductImageUpsertOne {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProductImageUpsertOne) UpdateUpdatedAt() *ProductImageUpsertOne {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetProductID sets the "product_id" field.
+func (u *ProductImageUpsertOne) SetProductID(v int64) *ProductImageUpsertOne {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.SetProductID(v)
+	})
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *ProductImageUpsertOne) UpdateProductID() *ProductImageUpsertOne {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.UpdateProductID()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *ProductImageUpsertOne) SetName(v string) *ProductImageUpsertOne {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ProductImageUpsertOne) UpdateName() *ProductImageUpsertOne {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.UpdateName()
+	})
+}
+
+// Exec executes the query.
+func (u *ProductImageUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ProductImageCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ProductImageUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *ProductImageUpsertOne) ID(ctx context.Context) (id int64, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *ProductImageUpsertOne) IDX(ctx context.Context) int64 {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // ProductImageCreateBulk is the builder for creating many ProductImage entities in bulk.
 type ProductImageCreateBulk struct {
 	config
 	builders []*ProductImageCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the ProductImage entities in the database.
@@ -222,6 +431,7 @@ func (picb *ProductImageCreateBulk) Save(ctx context.Context) ([]*ProductImage, 
 					_, err = mutators[i+1].Mutate(root, picb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = picb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, picb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -272,6 +482,156 @@ func (picb *ProductImageCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (picb *ProductImageCreateBulk) ExecX(ctx context.Context) {
 	if err := picb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.ProductImage.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ProductImageUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (picb *ProductImageCreateBulk) OnConflict(opts ...sql.ConflictOption) *ProductImageUpsertBulk {
+	picb.conflict = opts
+	return &ProductImageUpsertBulk{
+		create: picb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.ProductImage.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (picb *ProductImageCreateBulk) OnConflictColumns(columns ...string) *ProductImageUpsertBulk {
+	picb.conflict = append(picb.conflict, sql.ConflictColumns(columns...))
+	return &ProductImageUpsertBulk{
+		create: picb,
+	}
+}
+
+// ProductImageUpsertBulk is the builder for "upsert"-ing
+// a bulk of ProductImage nodes.
+type ProductImageUpsertBulk struct {
+	create *ProductImageCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.ProductImage.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//		).
+//		Exec(ctx)
+func (u *ProductImageUpsertBulk) UpdateNewValues() *ProductImageUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(productimage.FieldCreatedAt)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.ProductImage.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *ProductImageUpsertBulk) Ignore() *ProductImageUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ProductImageUpsertBulk) DoNothing() *ProductImageUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ProductImageCreateBulk.OnConflict
+// documentation for more info.
+func (u *ProductImageUpsertBulk) Update(set func(*ProductImageUpsert)) *ProductImageUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ProductImageUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProductImageUpsertBulk) SetUpdatedAt(v time.Time) *ProductImageUpsertBulk {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProductImageUpsertBulk) UpdateUpdatedAt() *ProductImageUpsertBulk {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetProductID sets the "product_id" field.
+func (u *ProductImageUpsertBulk) SetProductID(v int64) *ProductImageUpsertBulk {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.SetProductID(v)
+	})
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *ProductImageUpsertBulk) UpdateProductID() *ProductImageUpsertBulk {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.UpdateProductID()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *ProductImageUpsertBulk) SetName(v string) *ProductImageUpsertBulk {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ProductImageUpsertBulk) UpdateName() *ProductImageUpsertBulk {
+	return u.Update(func(s *ProductImageUpsert) {
+		s.UpdateName()
+	})
+}
+
+// Exec executes the query.
+func (u *ProductImageUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ProductImageCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ProductImageCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ProductImageUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
