@@ -41,15 +41,15 @@ type AddressList []Address
 
 // Cart defines model for Cart.
 type Cart struct {
-	Id       string          `json:"id"`
+	Id       int64           `json:"id"`
 	Products CartProductList `json:"products"`
 	UserId   string          `json:"userId"`
 }
 
 // CartProduct defines model for CartProduct.
 type CartProduct struct {
-	Amount    int    `json:"amount"`
-	ProductId string `json:"productId"`
+	Amount    int   `json:"amount"`
+	ProductId int64 `json:"productId"`
 }
 
 // CartProductList defines model for CartProductList.
@@ -117,9 +117,9 @@ type LoginResponse struct {
 
 // Order defines model for Order.
 type Order struct {
-	Id     string      `json:"id"`
+	Id     int64       `json:"id"`
 	Status OrderStatus `json:"status"`
-	UserId string      `json:"userId"`
+	UserId int64       `json:"userId"`
 }
 
 // OrderStatus defines model for Order.Status.
@@ -127,9 +127,9 @@ type OrderStatus string
 
 // OrderDetailed defines model for OrderDetailed.
 type OrderDetailed struct {
-	Id       string           `json:"id"`
+	Id       int64            `json:"id"`
 	Products OrderProductList `json:"products"`
-	UserId   string           `json:"userId"`
+	UserId   int64            `json:"userId"`
 }
 
 // OrderList defines model for OrderList.
@@ -137,8 +137,8 @@ type OrderList []Order
 
 // OrderProduct defines model for OrderProduct.
 type OrderProduct struct {
-	Amount    int    `json:"amount"`
-	ProductId string `json:"productId"`
+	Amount    int   `json:"amount"`
+	ProductId int64 `json:"productId"`
 }
 
 // OrderProductList defines model for OrderProductList.

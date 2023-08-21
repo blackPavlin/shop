@@ -332,7 +332,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductList'
         '500':
-          $ref: "#/components/responses/InternalError"        
+          $ref: "#/components/responses/InternalError"
     post:
       summary: Создать товар
       tags:
@@ -356,7 +356,7 @@ paths:
         '404':
           $ref: "#/components/responses/NotFound"
         '500':
-          $ref: "#/components/responses/InternalError"        
+          $ref: "#/components/responses/InternalError"
       security:
         - BearerAuth: []
 
@@ -373,9 +373,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '404':
-          $ref: "#/components/responses/NotFound"        
+          $ref: "#/components/responses/NotFound"
         '500':
-          $ref: "#/components/responses/InternalError"        
+          $ref: "#/components/responses/InternalError"
     patch:
       summary: Изменить товар
       tags:
@@ -455,7 +455,7 @@ paths:
         '500':
           $ref: "#/components/responses/InternalError"
       security:
-          - BearerAuth: []
+        - BearerAuth: []
     parameters:
       - schema:
           type: string
@@ -468,7 +468,7 @@ paths:
         name: imageId
         in: path
         required: true
-        description: ID изображения  
+        description: ID изображения
 
 components:
   securitySchemes:
@@ -604,7 +604,8 @@ components:
         - products
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
         userId:
           type: string
         products:
@@ -617,7 +618,8 @@ components:
         - amount
       properties:
         productId:
-          type: string
+          type: integer
+          format: int64
         amount:
           type: integer
 
@@ -636,9 +638,11 @@ components:
         - status
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
         userId:
-          type: string
+          type: integer
+          format: int64
         status:
           type: string
           enum: [CREATED, ACCEPTED, CANCELED]
@@ -658,9 +662,11 @@ components:
         - products
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
         userId:
-          type: string
+          type: integer
+          format: int64
         products:
           $ref: '#/components/schemas/OrderProductList'
 
@@ -678,7 +684,8 @@ components:
         - amount
       properties:
         productId:
-          type: string
+          type: integer
+          format: int64
         amount:
           type: integer
 
