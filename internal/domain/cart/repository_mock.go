@@ -34,21 +34,6 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
-// Create mocks base method.
-func (m *MockRepository) Create(ctx context.Context, props *Props) (*Cart, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, props)
-	ret0, _ := ret[0].(*Cart)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Create indicates an expected call of Create.
-func (mr *MockRepositoryMockRecorder) Create(ctx, props interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, props)
-}
-
 // Get mocks base method.
 func (m *MockRepository) Get(ctx context.Context, filter *Filter) (*Cart, error) {
 	m.ctrl.T.Helper()
@@ -77,4 +62,19 @@ func (m *MockRepository) Query(ctx context.Context, criteria *QueryCriteria) (*Q
 func (mr *MockRepositoryMockRecorder) Query(ctx, criteria interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockRepository)(nil).Query), ctx, criteria)
+}
+
+// Save mocks base method.
+func (m *MockRepository) Save(ctx context.Context, props *Props) (*Cart, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Save", ctx, props)
+	ret0, _ := ret[0].(*Cart)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Save indicates an expected call of Save.
+func (mr *MockRepositoryMockRecorder) Save(ctx, props interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockRepository)(nil).Save), ctx, props)
 }

@@ -10,8 +10,8 @@ import (
 
 // Repository represents cart repository.
 type Repository interface {
-	Create(ctx context.Context, props *Props) (*Cart, error)
 	Get(ctx context.Context, filter *Filter) (*Cart, error)
+	Save(ctx context.Context, props *Props) (*Cart, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
