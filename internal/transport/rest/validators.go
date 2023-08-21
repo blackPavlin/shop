@@ -78,3 +78,14 @@ func (r CreateProductRequest) Validate() error {
 	}
 	return nil
 }
+
+// Validate body of CartProduct.
+func (r CartProduct) Validate() error {
+	if err := validation.ValidateStruct(&r,
+		validation.Field(&r.ProductId, validation.Required),
+		validation.Field(&r.Amount, validation.Required, validation.Min(0)),
+	); err != nil {
+		return errorx.NewBadRequestError(err.Error())
+	}
+	return nil
+}

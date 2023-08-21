@@ -91,8 +91,14 @@ func makeUserPredicate(filter *user.Filter) []predicate.User {
 	if len(filter.ID.Eq) > 0 {
 		predicates = append(predicates, entuser.IDIn(filter.ID.Eq.ToInt64()...))
 	}
+	if len(filter.ID.Neq) > 0 {
+		predicates = append(predicates, entuser.IDNotIn(filter.ID.Neq.ToInt64()...))
+	}
 	if len(filter.Email.Eq) > 0 {
 		predicates = append(predicates, entuser.EmailIn(filter.Email.Eq...))
+	}
+	if len(filter.Email.Neq) > 0 {
+		predicates = append(predicates, entuser.EmailNotIn(filter.Email.Neq...))
 	}
 	return predicates
 }

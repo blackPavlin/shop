@@ -4,6 +4,7 @@ package pg
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"go.uber.org/zap"
 
 	"github.com/blackPavlin/shop/ent"
@@ -28,17 +29,22 @@ func NewCartRepository(client *ent.Client, logger *zap.Logger) *CartRepository {
 	return &CartRepository{client: client, logger: logger}
 }
 
-// Create cart in db.
-func (r *CartRepository) Create(ctx context.Context, props *cart.Props) (*cart.Cart, error) {
+// Save cart in db.
+func (r *CartRepository) Save(ctx context.Context, props *cart.Props) (*cart.Cart, error) {
 	userFromCtx, ok := user.GetUser(ctx)
 	if !ok {
 		return nil, errorx.ErrUnauthorized
 	}
-	row, err := r.client.Cart.Create().
+	err := r.client.Cart.Create().
 		SetUserID(int64(userFromCtx.ID)).
 		SetProductID(int64(props.ProductID)).
 		SetAmount(props.Amount).
-		Save(ctx)
+		OnConflict(
+			sql.ConflictConstraint(""),
+		).
+		UpdateAmount().
+		UpdateUpdatedAt().
+		Exec(ctx)
 	if err != nil {
 		if pg.IsForeignKeyViolationErr(err, "cart_user_fk") {
 			return nil, errorx.ErrNotFound
@@ -49,7 +55,7 @@ func (r *CartRepository) Create(ctx context.Context, props *cart.Props) (*cart.C
 		r.logger.Error("create cart error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
-	return mapDomainCartFromRow(row), nil
+	return r.Get(ctx, &cart.Filter{})
 }
 
 // Get cart from db.

@@ -95,7 +95,7 @@ func (s *ImageUseCase) BulkCreate(
 
 // Delete image from db and file storage.
 func (s *ImageUseCase) Delete(ctx context.Context, imageID ImageID) error {
-	image, err := s.imageRepo.Get(ctx, &ImageFilter{
+	img, err := s.imageRepo.Get(ctx, &ImageFilter{
 		ImageID: ImageIDFilter{Eq: ImageIDs{imageID}},
 	})
 	if err != nil {
@@ -105,7 +105,7 @@ func (s *ImageUseCase) Delete(ctx context.Context, imageID ImageID) error {
 		if err := s.imageRepo.DeleteTx(ctx, imageID); err != nil {
 			return fmt.Errorf("delete images error: %w", err)
 		}
-		if err := s.imageStorage.Remove(ctx, image.Props.Name); err != nil {
+		if err := s.imageStorage.Remove(ctx, img.Props.Name); err != nil {
 			return fmt.Errorf("remove images from storage error: %w", err)
 		}
 		return nil

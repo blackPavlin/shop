@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/blackPavlin/shop/internal/domain/address"
 	"github.com/blackPavlin/shop/internal/domain/auth"
+	"github.com/blackPavlin/shop/internal/domain/cart"
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/domain/product"
 )
@@ -53,5 +54,13 @@ func (r CreateProductRequest) ToDomainEntity() *product.Props {
 		Description: r.Description,
 		Amount:      r.Amount,
 		Price:       r.Price,
+	}
+}
+
+// ToDomainEntity transforms api template into domain entity.
+func (r CartProduct) ToDomainEntity() *cart.Props {
+	return &cart.Props{
+		ProductID: product.ID(r.ProductId),
+		Amount:    int64(r.Amount),
 	}
 }
