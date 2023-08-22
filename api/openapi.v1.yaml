@@ -147,7 +147,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'
+                $ref: '#/components/schemas/CartList'
       security:
         - BearerAuth: []
     post:
@@ -601,15 +601,20 @@ components:
       required:
         - id
         - userId
-        - products
+        - amount
+        - product
       properties:
         id:
           type: integer
           format: int64
         userId:
-          type: string
-        products:
-          $ref: '#/components/schemas/CartProductList'
+          type: integer
+          format: int64
+        amount:
+          type: integer
+          format: int64
+        product:
+          $ref: '#/components/schemas/Product'
 
     CartProduct:
       title: Товар в корзине пользователя
@@ -623,11 +628,11 @@ components:
         amount:
           type: integer
 
-    CartProductList:
+    CartList:
       title: Список товаров в корзине пользователя
       type: array
       items:
-        $ref: '#/components/schemas/CartProduct'
+        $ref: '#/components/schemas/Cart'
 
     Order:
       title: Заказ

@@ -8,6 +8,7 @@ import (
 
 	"github.com/blackPavlin/shop/internal/domain/cart"
 	"github.com/blackPavlin/shop/internal/transport/rest"
+	"github.com/blackPavlin/shop/internal/transport/rest/controller/mapping"
 	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/restx"
@@ -40,11 +41,12 @@ func (ctrl *CartController) RegisterRoutes(r chi.Router) chi.Router {
 
 // GetCartHandler define handler for GET /api/cart.
 func (ctrl *CartController) GetCartHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := ctrl.cartService.Query(r.Context(), &cart.QueryCriteria{})
+	carts, err := ctrl.cartService.Query(r.Context(), &cart.QueryCriteria{})
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
+	render.Respond(w, r, mapping.CreateCartListResponse(carts.Items))
 }
 
 // AddProductHandler define handler for POST /api/cart.
@@ -58,12 +60,13 @@ func (ctrl *CartController) AddProductHandler(w http.ResponseWriter, r *http.Req
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	_, err := ctrl.cartService.Save(r.Context(), request.ToDomainEntity())
+	c, err := ctrl.cartService.Save(r.Context(), request.ToDomainEntity())
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
 	render.Status(r, http.StatusCreated)
+	render.Respond(w, r, mapping.CreateCartResponse(c))
 }
 
 // UpdateProductHandler define handler for PATCH /api/cart.
@@ -77,11 +80,12 @@ func (ctrl *CartController) UpdateProductHandler(w http.ResponseWriter, r *http.
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	_, err := ctrl.cartService.Save(r.Context(), request.ToDomainEntity())
+	c, err := ctrl.cartService.Save(r.Context(), request.ToDomainEntity())
 	if err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
+	render.Respond(w, r, mapping.CreateCartResponse(c))
 }
 
 // DeleteProductHandler define handler for DELETE /api/cart.

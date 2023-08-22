@@ -41,19 +41,20 @@ type AddressList []Address
 
 // Cart defines model for Cart.
 type Cart struct {
-	Id       int64           `json:"id"`
-	Products CartProductList `json:"products"`
-	UserId   string          `json:"userId"`
+	Amount  int64   `json:"amount"`
+	Id      int64   `json:"id"`
+	Product Product `json:"product"`
+	UserId  int64   `json:"userId"`
 }
+
+// CartList defines model for CartList.
+type CartList []Cart
 
 // CartProduct defines model for CartProduct.
 type CartProduct struct {
 	Amount    int   `json:"amount"`
 	ProductId int64 `json:"productId"`
 }
-
-// CartProductList defines model for CartProductList.
-type CartProductList []CartProduct
 
 // Category defines model for Category.
 type Category struct {
