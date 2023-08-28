@@ -1,7 +1,9 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { Cart } from '../models/Cart';
+import type { CartList } from '../models/CartList';
 import type { CartProduct } from '../models/CartProduct';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -12,10 +14,10 @@ export class CartService {
 
     /**
      * Получить корзину пользователя
-     * @returns Cart OK
+     * @returns CartList OK
      * @throws ApiError
      */
-    public static getCart(): CancelablePromise<Cart> {
+    public static getCart(): CancelablePromise<CartList> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/cart',
@@ -24,13 +26,13 @@ export class CartService {
 
     /**
      * Добавить товар в корзину
-     * @param requestBody
+     * @param requestBody 
      * @returns Cart OK
      * @throws ApiError
      */
     public static postCart(
-        requestBody?: CartProduct,
-    ): CancelablePromise<Cart> {
+requestBody?: CartProduct,
+): CancelablePromise<Cart> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/cart',
@@ -41,13 +43,13 @@ export class CartService {
 
     /**
      * Изменить количество товара в корзине
-     * @param requestBody
+     * @param requestBody 
      * @returns Cart OK
      * @throws ApiError
      */
     public static patchCart(
-        requestBody?: CartProduct,
-    ): CancelablePromise<Cart> {
+requestBody?: CartProduct,
+): CancelablePromise<Cart> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/cart',

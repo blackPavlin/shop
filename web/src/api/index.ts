@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -9,8 +10,8 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 export type { Address } from './models/Address';
 export type { AddressList } from './models/AddressList';
 export type { Cart } from './models/Cart';
+export type { CartList } from './models/CartList';
 export type { CartProduct } from './models/CartProduct';
-export type { CartProductList } from './models/CartProductList';
 export type { Category } from './models/Category';
 export type { CategoryList } from './models/CategoryList';
 export type { CreateAddressRequest } from './models/CreateAddressRequest';
@@ -30,7 +31,6 @@ export type { PaginationResponse } from './models/PaginationResponse';
 export type { Product } from './models/Product';
 export type { ProductList } from './models/ProductList';
 export type { SignupRequest } from './models/SignupRequest';
-export type { UpdateProductRequest } from './models/UpdateProductRequest';
 export type { UploadImagesRequest } from './models/UploadImagesRequest';
 export { User } from './models/User';
 

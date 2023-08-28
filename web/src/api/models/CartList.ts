@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type LoginRequest = {
-    email: string;
-    password: string;
-};
+import type { Cart } from './Cart';
+
+export type CartList = Array<Cart>;

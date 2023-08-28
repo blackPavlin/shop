@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -29,13 +30,13 @@ export class AddressService {
 
     /**
      * Добавить адрес доставки
-     * @param requestBody
+     * @param requestBody 
      * @returns Address OK
      * @throws ApiError
      */
     public static postAddress(
-        requestBody?: CreateAddressRequest,
-    ): CancelablePromise<Address> {
+requestBody?: CreateAddressRequest,
+): CancelablePromise<Address> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/address',

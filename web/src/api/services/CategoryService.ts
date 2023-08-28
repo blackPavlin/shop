@@ -1,3 +1,4 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -25,13 +26,13 @@ export class CategoryService {
 
     /**
      * Создать категорию
-     * @param requestBody
+     * @param requestBody 
      * @returns Category OK
      * @throws ApiError
      */
     public static postCategory(
-        requestBody?: CreateCategoryRequest,
-    ): CancelablePromise<Category> {
+requestBody?: CreateCategoryRequest,
+): CancelablePromise<Category> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/category',
@@ -42,13 +43,13 @@ export class CategoryService {
 
     /**
      * Изменить категорию
-     * @param requestBody
+     * @param requestBody 
      * @returns Category OK
      * @throws ApiError
      */
     public static patchCategory(
-        requestBody?: Category,
-    ): CancelablePromise<Category> {
+requestBody?: Category,
+): CancelablePromise<Category> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/category',
@@ -64,8 +65,8 @@ export class CategoryService {
      * @throws ApiError
      */
     public static deleteCategory(
-        categoryId: number,
-    ): CancelablePromise<any> {
+categoryId: number,
+): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/category/{categoryId}',

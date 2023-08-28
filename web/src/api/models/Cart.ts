@@ -1,12 +1,13 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CartProductList } from './CartProductList';
+import type { Product } from './Product';
 
 export type Cart = {
-    id: string;
-    userId: string;
-    products: CartProductList;
+    id: number;
+    userId: number;
+    amount: number;
+    product: Product;
 };
-

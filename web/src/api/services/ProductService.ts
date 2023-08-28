@@ -1,10 +1,10 @@
+/* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateProductRequest } from '../models/CreateProductRequest';
 import type { Product } from '../models/Product';
 import type { ProductList } from '../models/ProductList';
-import type { UpdateProductRequest } from '../models/UpdateProductRequest';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -29,13 +29,13 @@ export class ProductService {
 
     /**
      * Создать товар
-     * @param requestBody
+     * @param requestBody 
      * @returns Product OK
      * @throws ApiError
      */
     public static postProduct(
-        requestBody?: CreateProductRequest,
-    ): CancelablePromise<Product> {
+requestBody?: CreateProductRequest,
+): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/product',
@@ -57,8 +57,8 @@ export class ProductService {
      * @throws ApiError
      */
     public static getProduct1(
-        productId: string,
-    ): CancelablePromise<Product> {
+productId: string,
+): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/product/{productId}',
@@ -75,14 +75,14 @@ export class ProductService {
     /**
      * Изменить товар
      * @param productId ID товара
-     * @param requestBody
+     * @param requestBody 
      * @returns Product OK
      * @throws ApiError
      */
     public static patchProduct(
-        productId: string,
-        requestBody?: UpdateProductRequest,
-    ): CancelablePromise<Product> {
+productId: string,
+requestBody?: CreateProductRequest,
+): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/product/{productId}',
