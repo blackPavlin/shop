@@ -1,15 +1,24 @@
+.DS_Store
+
 .git
 .github
 .gitignore
 
+# Editor directories and files
+.idea
 .vscode
 
+api
 web
 build
 configs
 
 README.md
+LICENSE
 Makefile
 
+# Dependency and binaries directories and files
+vendor
+target
 shop
 shop.exe
