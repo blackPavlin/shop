@@ -14,3 +14,4 @@ export type Product = {
     price: number;
     images: ImageList;
 };
+

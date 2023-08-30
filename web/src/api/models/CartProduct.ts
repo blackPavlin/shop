@@ -4,4 +4,7 @@
 /* eslint-disable */
 
 export type CartProduct = {
+    productId: number;
+    amount: number;
 };
+

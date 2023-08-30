@@ -10,3 +10,4 @@ export type CreateProductRequest = {
     amount: number;
     price: number;
 };
+

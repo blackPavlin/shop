@@ -10,3 +10,4 @@ export type OrderDetailed = {
     userId: number;
     products: OrderProductList;
 };
+

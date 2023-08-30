@@ -6,3 +6,4 @@
 export type PaginationResponse = {
     quantity: number;
 };
+

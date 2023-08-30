@@ -6,3 +6,4 @@
 export type UploadImagesRequest = {
     files: Array<Blob>;
 };
+

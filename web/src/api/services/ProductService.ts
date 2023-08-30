@@ -29,13 +29,13 @@ export class ProductService {
 
     /**
      * Создать товар
-     * @param requestBody 
+     * @param requestBody
      * @returns Product OK
      * @throws ApiError
      */
     public static postProduct(
-requestBody?: CreateProductRequest,
-): CancelablePromise<Product> {
+        requestBody?: CreateProductRequest,
+    ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/product',
@@ -57,8 +57,8 @@ requestBody?: CreateProductRequest,
      * @throws ApiError
      */
     public static getProduct1(
-productId: string,
-): CancelablePromise<Product> {
+        productId: string,
+    ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/product/{productId}',
@@ -75,14 +75,14 @@ productId: string,
     /**
      * Изменить товар
      * @param productId ID товара
-     * @param requestBody 
+     * @param requestBody
      * @returns Product OK
      * @throws ApiError
      */
     public static patchProduct(
-productId: string,
-requestBody?: CreateProductRequest,
-): CancelablePromise<Product> {
+        productId: string,
+        requestBody?: CreateProductRequest,
+    ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/product/{productId}',
@@ -91,6 +91,28 @@ requestBody?: CreateProductRequest,
             },
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * Удалить товар
+     * @param productId ID товара
+     * @returns void
+     * @throws ApiError
+     */
+    public static deleteProduct(
+        productId: string,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/product/{productId}',
+            path: {
+                'productId': productId,
+            },
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 

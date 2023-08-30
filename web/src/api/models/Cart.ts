@@ -11,3 +11,4 @@ export type Cart = {
     amount: number;
     product: Product;
 };
+

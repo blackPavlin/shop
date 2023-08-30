@@ -14,14 +14,14 @@ export class ImageService {
     /**
      * Загрузка изображений товара
      * @param productId ID товара
-     * @param formData 
+     * @param formData
      * @returns ImageList OK
      * @throws ApiError
      */
     public static postProductImage(
-productId: string,
-formData?: UploadImagesRequest,
-): CancelablePromise<ImageList> {
+        productId: string,
+        formData?: UploadImagesRequest,
+    ): CancelablePromise<ImageList> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/product/{productId}/image',
@@ -43,13 +43,13 @@ formData?: UploadImagesRequest,
      * Удаление изображения товара
      * @param productId ID товара
      * @param imageId ID изображения
-     * @returns any OK
+     * @returns void
      * @throws ApiError
      */
     public static deleteProductImage(
-productId: string,
-imageId: string,
-): CancelablePromise<any> {
+        productId: string,
+        imageId: string,
+    ): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/product/{productId}/image/{imageId}',

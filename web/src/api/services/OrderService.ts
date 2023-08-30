@@ -42,8 +42,8 @@ export class OrderService {
      * @throws ApiError
      */
     public static getOrder1(
-orderId: number,
-): CancelablePromise<OrderDetailed> {
+        orderId: number,
+    ): CancelablePromise<OrderDetailed> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/order/{orderId}',

@@ -7,3 +7,4 @@ export type OrderProduct = {
     productId: number;
     amount: number;
 };
+

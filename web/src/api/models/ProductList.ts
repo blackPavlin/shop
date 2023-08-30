@@ -7,5 +7,6 @@ import type { PaginationResponse } from './PaginationResponse';
 import type { Product } from './Product';
 
 export type ProductList = (PaginationResponse & {
-items: Array<Product>;
+    items: Array<Product>;
 });
+
