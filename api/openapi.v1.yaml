@@ -306,7 +306,7 @@ paths:
       tags:
         - Category
       responses:
-        '200':
+        '204':
           description: OK
       security:
         - BearerAuth: []
@@ -394,6 +394,19 @@ paths:
                 $ref: '#/components/schemas/Product'
       security:
         - BearerAuth: []
+    delete:
+      summary: Удалить товар
+      tags:
+        - Product
+      responses:
+        '204':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
+      security:
+        - BearerAuth: []
     parameters:
       - schema:
           type: string
@@ -446,7 +459,7 @@ paths:
       tags:
         - Image
       responses:
-        '200':
+        '204':
           description: OK
         '401':
           $ref: "#/components/responses/Unauthorized"
@@ -618,6 +631,7 @@ components:
 
     CartProduct:
       title: Товар в корзине пользователя
+      type: object
       required:
         - productId
         - amount

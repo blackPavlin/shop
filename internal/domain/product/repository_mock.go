@@ -34,19 +34,33 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
-// CreateTx mocks base method.
-func (m *MockRepository) CreateTx(ctx context.Context, props *Props) (*Product, error) {
+// Create mocks base method.
+func (m *MockRepository) Create(ctx context.Context, props *Props) (*Product, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateTx", ctx, props)
+	ret := m.ctrl.Call(m, "Create", ctx, props)
 	ret0, _ := ret[0].(*Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateTx indicates an expected call of CreateTx.
-func (mr *MockRepositoryMockRecorder) CreateTx(ctx, props interface{}) *gomock.Call {
+// Create indicates an expected call of Create.
+func (mr *MockRepositoryMockRecorder) Create(ctx, props interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTx", reflect.TypeOf((*MockRepository)(nil).CreateTx), ctx, props)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, props)
+}
+
+// Delete mocks base method.
+func (m *MockRepository) Delete(ctx context.Context, productID ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, productID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockRepositoryMockRecorder) Delete(ctx, productID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepository)(nil).Delete), ctx, productID)
 }
 
 // Get mocks base method.

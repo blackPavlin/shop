@@ -103,4 +103,6 @@ func (ctrl *CategoryController) DeleteCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, err)
 		return
 	}
+	render.Status(r, http.StatusNoContent)
+	render.Respond(w, r, nil)
 }

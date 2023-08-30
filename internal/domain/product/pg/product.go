@@ -27,17 +27,15 @@ func NewProductRepository(client *ent.Client, logger *zap.Logger) *ProductReposi
 	return &ProductRepository{client: client, logger: logger}
 }
 
-// CreateTx product in db with transaction.
-func (r *ProductRepository) CreateTx(
+// Create product in db.
+func (r *ProductRepository) Create(
 	ctx context.Context,
 	props *product.Props,
 ) (*product.Product, error) {
-	tx := ent.TxFromContext(ctx)
-	if tx == nil {
-		r.logger.Error("using tx in non tx context", zap.Error(errorx.ErrInternal))
-		return nil, errorx.ErrInternal
+	client := r.client
+	if tx := ent.TxFromContext(ctx); tx != nil {
+		client = tx.Client()
 	}
-	client := tx.Client()
 	row, err := client.Product.Create().
 		SetCategoryID(int64(props.CategoryID)).
 		SetName(props.Name).
@@ -76,6 +74,22 @@ func (r *ProductRepository) Update(
 		return nil, errorx.ErrInternal
 	}
 	return mapDomainProductFromRow(row), nil
+}
+
+// Delete product in db.
+func (r *ProductRepository) Delete(ctx context.Context, productID product.ID) error {
+	client := r.client
+	if tx := ent.TxFromContext(ctx); tx != nil {
+		client = tx.Client()
+	}
+	err := client.Product.
+		DeleteOneID(int64(productID)).
+		Exec(ctx)
+	if err != nil {
+		r.logger.Error("delete product error:", zap.Error(err))
+		return errorx.ErrInternal
+	}
+	return nil
 }
 
 // Get product from db.

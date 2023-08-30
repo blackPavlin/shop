@@ -10,8 +10,9 @@ import (
 
 // Repository represents product repository.
 type Repository interface {
-	CreateTx(ctx context.Context, props *Props) (*Product, error)
+	Create(ctx context.Context, props *Props) (*Product, error)
 	Update(ctx context.Context, productID ID, props *Props) (*Product, error)
+	Delete(ctx context.Context, productID ID) error
 	Get(ctx context.Context, filter *Filter) (*Product, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }

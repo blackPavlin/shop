@@ -89,4 +89,7 @@ func (ctrl *CartController) UpdateProductHandler(w http.ResponseWriter, r *http.
 }
 
 // DeleteProductHandler define handler for DELETE /api/cart.
-func (ctrl *CartController) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {}
+func (ctrl *CartController) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
+	render.Status(r, http.StatusNoContent)
+	render.Respond(w, r, nil)
+}

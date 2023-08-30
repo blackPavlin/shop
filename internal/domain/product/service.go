@@ -14,6 +14,7 @@ import (
 type Service interface {
 	Create(ctx context.Context, props *Props) (*Product, error)
 	Update(ctx context.Context, productID ID, props *Props) (*Product, error)
+	Delete(ctx context.Context, productID ID) error
 	Get(ctx context.Context, filter *Filter) (*Product, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
@@ -39,7 +40,7 @@ func (s *UseCase) Create(ctx context.Context, props *Props) (*Product, error) {
 		err     error
 	)
 	err = s.txManager.RunTransaction(ctx, &sql.TxOptions{}, func(ctx context.Context) error {
-		product, err = s.productRepo.CreateTx(ctx, props)
+		product, err = s.productRepo.Create(ctx, props)
 		if err != nil {
 			return fmt.Errorf("create product error: %w", err)
 		}
@@ -58,6 +59,11 @@ func (s *UseCase) Update(ctx context.Context, productID ID, props *Props) (*Prod
 		return nil, fmt.Errorf("update product error: %w", err)
 	}
 	return result, nil
+}
+
+// Delete product.
+func (s *UseCase) Delete(ctx context.Context, productID ID) error {
+	return nil
 }
 
 // Get product.
