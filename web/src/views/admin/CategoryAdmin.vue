@@ -218,7 +218,7 @@ export default defineComponent({
           .then(async () => {
             formEl.resetFields();
             isUpdateDialogVisible.value = false;
-            ElNotification.success("Category successful updated");
+            ElNotification.success("Категория успешно изменена");
 
             await loadCategories();
           })
@@ -236,14 +236,13 @@ export default defineComponent({
           confirmButtonText: "Удалить",
           cancelButtonText: "Отмена",
           type: "warning",
-        }
+        },
       )
         .then(() => {
           store
             .deleteCategory(id)
             .then(async () => {
-              ElNotification.success("Category successful deleted");
-
+              ElNotification.success("Категория успешно удалена");
               await loadCategories();
             })
             .catch((error) => {

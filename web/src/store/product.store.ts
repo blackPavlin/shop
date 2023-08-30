@@ -25,6 +25,15 @@ export const useProductStore = defineStore("product", {
     async createProduct(body: CreateProductRequest): Promise<Product> {
       return ProductService.postProduct(body);
     },
+    async updateProduct(
+      productId: string,
+      body: CreateProductRequest,
+    ): Promise<Product> {
+      return ProductService.patchProduct(productId, body);
+    },
+    async deleteProduct(productId: string): Promise<void> {
+      await ProductService.deleteProduct(productId);
+    },
   },
   getters: {
     getProducts: (state) => state.products,

@@ -1,10 +1,9 @@
 import { defineStore } from "pinia";
 import { CartService } from "@/api/services/CartService";
-
-import { CartProductList } from "@/api/models/CartProductList";
+import type { CartList } from "@/api/models/CartList";
 
 type State = {
-  products: CartProductList;
+  products: CartList;
 };
 
 export const useCartStore = defineStore("cart", {
@@ -13,12 +12,11 @@ export const useCartStore = defineStore("cart", {
   }),
   actions: {
     async loadCart(): Promise<void> {
-      const cart = await CartService.getCart();
-      this.products = cart.products;
+      this.products = await CartService.getCart();
     },
   },
   getters: {
-    getCartProducts(): CartProductList {
+    getCartProducts(): CartList {
       return this.products;
     },
   },

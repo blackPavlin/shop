@@ -80,14 +80,6 @@
           <span>Товары</span>
         </template>
 
-        <el-form
-          :model="updateRef"
-          :rules="rules"
-          ref="updateRef"
-          label-width="100px"
-          size="large"
-        ></el-form>
-
         <el-table :data="products">
           <el-table-column label="ID" prop="id"></el-table-column>
 
@@ -104,7 +96,11 @@
                 :icon="Edit"
                 @click="openUpdateModal(scope.row.id)"
               ></el-button>
-              <el-button type="danger" :icon="Delete"></el-button>
+              <el-button
+                type="danger"
+                :icon="Delete"
+                @click="deleteProduct(scope.row.id)"
+              ></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -112,7 +108,42 @@
     </el-card>
 
     <el-dialog title="Редактирование товара" v-model="isUpdateDialogVisible">
-      <el-form size="large">
+      <el-form
+        :model="updateForm"
+        :rules="rules"
+        ref="updateRef"
+        @submit.prevent="updateProduct(updateRef)"
+        label-width="100px"
+        size="large"
+      >
+        <el-form-item prop="name" label="Название">
+          <el-input v-model="updateForm.name" placeholder="Название"></el-input>
+        </el-form-item>
+
+        <el-form-item prop="description" label="Описание">
+          <el-input
+            v-model="updateForm.description"
+            placeholder="Описание"
+            type="textarea"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item prop="amount" label="Количество">
+          <el-input-number
+            v-model="updateForm.amount"
+            placeholder="Количество"
+            :min="0"
+          ></el-input-number>
+        </el-form-item>
+
+        <el-form-item prop="price" label="Цена">
+          <el-input-number
+            v-model="updateForm.price"
+            placeholder="Цена"
+            :min="0"
+          ></el-input-number>
+        </el-form-item>
+
         <el-form-item>
           <el-button type="primary" native-type="submit">Сохранить</el-button>
           <el-button @click="isUpdateDialogVisible = false">Отмета</el-button>
@@ -129,6 +160,7 @@ import {
   FormInstance,
   UploadInstance,
   ElNotification,
+  ElMessageBox,
   UploadUserFile,
   UploadRawFile,
 } from "element-plus";
@@ -226,7 +258,7 @@ export default defineComponent({
 
     const createProduct = (
       formEl?: FormInstance,
-      uploadEl?: UploadInstance
+      uploadEl?: UploadInstance,
     ): void => {
       if (!formEl || !uploadEl) {
         return;
@@ -282,6 +314,53 @@ export default defineComponent({
         });
     };
 
+    const updateProduct = (formEl?: FormInstance) => {
+      if (!formEl) {
+        return;
+      }
+
+      formEl.validate((valid) => {
+        if (!valid) {
+          return;
+        }
+      });
+
+      productStore
+        .updateProduct(String(updateForm.id), updateForm)
+        .then(async () => {
+          formEl.resetFields();
+          isUpdateDialogVisible.value = false;
+          ElNotification.success("Товар успешно изменён");
+
+          await loadProducts();
+        })
+        .catch((error) => {
+          ElNotification.error(error.message);
+        });
+    };
+
+    const deleteProduct = (productId: number) => {
+      ElMessageBox.confirm("Вы уверены, что хотите удалить товар?", "Warning", {
+        confirmButtonText: "Удалить",
+        cancelButtonText: "Отмена",
+        type: "warning",
+      })
+        .then(() => {
+          productStore
+            .deleteProduct(String(productId))
+            .then(async () => {
+              ElNotification.success("Товар успешно удалён");
+              await loadProducts();
+            })
+            .catch((error) => {
+              ElNotification.error(error.message);
+            });
+        })
+        .catch(() => {
+          ElNotification.info("Удаление отменено");
+        });
+    };
+
     onMounted(() => loadCategories());
     onMounted(() => loadProducts());
 
@@ -298,6 +377,8 @@ export default defineComponent({
       isUpdateDialogVisible,
       createProduct,
       openUpdateModal,
+      updateProduct,
+      deleteProduct,
 
       Delete,
       Edit,

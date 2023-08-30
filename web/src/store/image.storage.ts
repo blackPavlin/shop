@@ -7,7 +7,7 @@ export const useImageStore = defineStore("image", {
   actions: {
     async uploadImages(
       productId: string,
-      formData: UploadImagesRequest
+      formData: UploadImagesRequest,
     ): Promise<ImageList> {
       return ImageService.postProductImage(productId, formData);
     },
