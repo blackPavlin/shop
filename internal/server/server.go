@@ -91,7 +91,7 @@ func NewServer(
 	authService := auth.NewUseCase(logger, conf.Auth, userRepository)
 	cartService := cart.NewUseCase(cartRepository, productRepository)
 	addressService := address.NewUseCase(addressRepository)
-	productService := product.NewUseCase(productRepository, txManager)
+	productService := product.NewUseCase(productRepository, imageRepository, imageStorage, txManager)
 	imageService := product.NewImageUseCase(logger, productRepository, imageRepository, imageStorage, txManager)
 	categoryService := category.NewUseCase(categoryRepository)
 
@@ -139,6 +139,9 @@ func (s *Server) Run() error {
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
 		return fmt.Errorf("shutdown server error: %w", err)
+	}
+	if err := s.database.Close(); err != nil {
+		return fmt.Errorf("close database connection error: %w", err)
 	}
 	return nil
 }
