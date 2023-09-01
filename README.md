@@ -11,6 +11,8 @@
 - **Zap**: blazing fast, structured, leveled logging in Go.
 - **Ozzo-validation**: is a Go package that provides configurable and extensible data validation capabilities.
 - **Jwt**: implementation of JSON Web Tokens. This library supports the parsing and verification as well as the generation and signing of JWTs.
+- **Envconfig**: golang library for managing configuration data from environment variables.
+- **Minio-go**: the MinIO Go Client SDK provides simple APIs to access any Amazon S3 compatible object storage.
 
 <!-- Repository -->
 [repo_license_img]: https://img.shields.io/github/license/blackPavlin/shop?style=for-the-badge&logo=none
