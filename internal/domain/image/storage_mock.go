@@ -34,6 +34,34 @@ func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
 	return m.recorder
 }
 
+// BulkRemove mocks base method.
+func (m *MockStorage) BulkRemove(ctx context.Context, names []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BulkRemove", ctx, names)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BulkRemove indicates an expected call of BulkRemove.
+func (mr *MockStorageMockRecorder) BulkRemove(ctx, names interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkRemove", reflect.TypeOf((*MockStorage)(nil).BulkRemove), ctx, names)
+}
+
+// BulkUpload mocks base method.
+func (m *MockStorage) BulkUpload(ctx context.Context, props []*StorageProps) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BulkUpload", ctx, props)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BulkUpload indicates an expected call of BulkUpload.
+func (mr *MockStorageMockRecorder) BulkUpload(ctx, props interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkUpload", reflect.TypeOf((*MockStorage)(nil).BulkUpload), ctx, props)
+}
+
 // Remove mocks base method.
 func (m *MockStorage) Remove(ctx context.Context, name string) error {
 	m.ctrl.T.Helper()

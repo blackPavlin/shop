@@ -7,9 +7,12 @@ import "context"
 // Storage represents file store.
 type Storage interface {
 	Upload(ctx context.Context, props *StorageProps) error
+	BulkUpload(ctx context.Context, props []*StorageProps) error
 	Remove(ctx context.Context, name string) error
+	BulkRemove(ctx context.Context, names []string) error
 }
 
+// StorageProps represents image storage fields.
 type StorageProps struct {
 	Name        string
 	Buffer      []byte
