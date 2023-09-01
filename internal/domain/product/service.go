@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
@@ -21,33 +22,32 @@ type Service interface {
 
 // UseCase represents product service.
 type UseCase struct {
-	productRepo Repository
-	txManager   repositoryx.TxManager
+	productRepo      Repository
+	productImageRepo ImageRepository
+	imageStorage     image.Storage
+	txManager        repositoryx.TxManager
 }
 
 // NewUseCase create instance of UseCase.
 func NewUseCase(
 	productRepo Repository,
+	productImageRepo ImageRepository,
+	imageStorage image.Storage,
 	txManager repositoryx.TxManager,
 ) *UseCase {
-	return &UseCase{productRepo: productRepo, txManager: txManager}
+	return &UseCase{
+		productRepo:      productRepo,
+		productImageRepo: productImageRepo,
+		imageStorage:     imageStorage,
+		txManager:        txManager,
+	}
 }
 
 // Create product.
 func (s *UseCase) Create(ctx context.Context, props *Props) (*Product, error) {
-	var (
-		product *Product
-		err     error
-	)
-	err = s.txManager.RunTransaction(ctx, &sql.TxOptions{}, func(ctx context.Context) error {
-		product, err = s.productRepo.Create(ctx, props)
-		if err != nil {
-			return fmt.Errorf("create product error: %w", err)
-		}
-		return nil
-	})
+	product, err := s.productRepo.Create(ctx, props)
 	if err != nil {
-		return nil, fmt.Errorf("create product transaction error: %w", err)
+		return nil, fmt.Errorf("create product error: %w", err)
 	}
 	return product, nil
 }
@@ -63,6 +63,28 @@ func (s *UseCase) Update(ctx context.Context, productID ID, props *Props) (*Prod
 
 // Delete product.
 func (s *UseCase) Delete(ctx context.Context, productID ID) error {
+	images, err := s.productImageRepo.Query(ctx, &ImageQueryCriteria{
+		Filter: ImageFilter{
+			ProductID: IDFilter{Eq: IDs{productID}},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("query product images error: %w", err)
+	}
+	err = s.txManager.RunTransaction(ctx, &sql.TxOptions{}, func(ctx context.Context) error {
+		if err := s.productRepo.Delete(ctx, &Filter{
+			ID: IDFilter{Eq: IDs{productID}},
+		}); err != nil {
+			return fmt.Errorf("delete product error: %w", err)
+		}
+		if err := s.imageStorage.BulkRemove(ctx, images.Names()); err != nil {
+			return fmt.Errorf("bulkRemove images errro: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("delete product transaction error: %w", err)
+	}
 	return nil
 }
 
