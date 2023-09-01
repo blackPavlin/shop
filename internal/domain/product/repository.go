@@ -12,7 +12,7 @@ import (
 type Repository interface {
 	Create(ctx context.Context, props *Props) (*Product, error)
 	Update(ctx context.Context, productID ID, props *Props) (*Product, error)
-	Delete(ctx context.Context, productID ID) error
+	Delete(ctx context.Context, filter *Filter) error
 	Get(ctx context.Context, filter *Filter) (*Product, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }

@@ -27,11 +27,29 @@ type ImageProps struct {
 	Name      string
 }
 
-// ToInt64 convert slice of IDs to slice int64.
+// ToInt64 convert slice of ImageIDs to slice int64.
 func (ids ImageIDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {
 		result = append(result, int64(id))
+	}
+	return result
+}
+
+// IDs convert slice of Images to slice ImageIDs.
+func (ii Images) IDs() ImageIDs {
+	result := make(ImageIDs, 0, len(ii))
+	for _, i := range ii {
+		result = append(result, i.ID)
+	}
+	return result
+}
+
+// Names convert slice of Images to slice []string.
+func (ii Images) Names() []string {
+	result := make([]string, 0, len(ii))
+	for _, i := range ii {
+		result = append(result, i.Props.Name)
 	}
 	return result
 }

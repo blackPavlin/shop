@@ -59,7 +59,11 @@ func (r *ImageRepository) Get(
 	ctx context.Context,
 	filter *product.ImageFilter,
 ) (*product.Image, error) {
-	row, err := r.client.ProductImage.Query().
+	client := r.client
+	if tx := ent.TxFromContext(ctx); tx != nil {
+		client = tx.Client()
+	}
+	row, err := client.ProductImage.Query().
 		Where(makeImagePredicates(filter)...).
 		First(ctx)
 	if err != nil {
@@ -77,7 +81,11 @@ func (r *ImageRepository) Query(
 	ctx context.Context,
 	criteria *product.ImageQueryCriteria,
 ) (product.Images, error) {
-	rows, err := r.client.ProductImage.
+	client := r.client
+	if tx := ent.TxFromContext(ctx); tx != nil {
+		client = tx.Client()
+	}
+	rows, err := client.ProductImage.
 		Query().
 		Where(makeImagePredicates(&criteria.Filter)...).
 		All(ctx)
@@ -88,14 +96,16 @@ func (r *ImageRepository) Query(
 	return mapDomainImagesFromRows(rows), nil
 }
 
-// DeleteTx delete product images in db with transaction.
-func (r *ImageRepository) DeleteTx(ctx context.Context, imageID product.ImageID) error {
-	tx := ent.TxFromContext(ctx)
-	if tx == nil {
-		r.logger.Error("using tx in non tx context", zap.Error(errorx.ErrInternal))
-		return errorx.ErrInternal
+// Delete delete product images in db.
+func (r *ImageRepository) Delete(ctx context.Context, filter *product.ImageFilter) error {
+	client := r.client
+	if tx := ent.TxFromContext(ctx); tx != nil {
+		client = tx.Client()
 	}
-	err := r.client.ProductImage.DeleteOneID(int64(imageID)).Exec(ctx)
+	_, err := client.ProductImage.
+		Delete().
+		Where(makeImagePredicates(filter)...).
+		Exec(ctx)
 	if err != nil {
 		r.logger.Error("delete product images error", zap.Error(err))
 		return errorx.ErrInternal

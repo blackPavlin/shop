@@ -80,10 +80,8 @@ func (s *ImageUseCase) BulkCreate(
 		if err != nil {
 			return fmt.Errorf("bulkCreate images error: %w", err)
 		}
-		for _, prop := range props {
-			if err := s.imageStorage.Upload(ctx, prop); err != nil {
-				return fmt.Errorf("upload images error: %w", err)
-			}
+		if err := s.imageStorage.BulkUpload(ctx, props); err != nil {
+			return fmt.Errorf("bulkUpload images error: %w", err)
 		}
 		return nil
 	})
@@ -102,7 +100,9 @@ func (s *ImageUseCase) Delete(ctx context.Context, imageID ImageID) error {
 		return fmt.Errorf("get image error: %w", err)
 	}
 	err = s.txManager.RunTransaction(ctx, &sql.TxOptions{}, func(ctx context.Context) error {
-		if err := s.imageRepo.DeleteTx(ctx, imageID); err != nil {
+		if err := s.imageRepo.Delete(ctx, &ImageFilter{
+			ImageID: ImageIDFilter{Eq: ImageIDs{imageID}},
+		}); err != nil {
 			return fmt.Errorf("delete images error: %w", err)
 		}
 		if err := s.imageStorage.Remove(ctx, img.Props.Name); err != nil {

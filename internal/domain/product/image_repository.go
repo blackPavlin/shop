@@ -9,7 +9,7 @@ type ImageRepository interface {
 	BulkCreateTx(ctx context.Context, images Images) (Images, error)
 	Get(ctx context.Context, filter *ImageFilter) (*Image, error)
 	Query(ctx context.Context, criteria *ImageQueryCriteria) (Images, error)
-	DeleteTx(ctx context.Context, imageID ImageID) error
+	Delete(ctx context.Context, filter *ImageFilter) error
 }
 
 // ImageQueryCriteria  represents a criteria for image product query.

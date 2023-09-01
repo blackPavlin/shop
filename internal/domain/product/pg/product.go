@@ -77,13 +77,14 @@ func (r *ProductRepository) Update(
 }
 
 // Delete product in db.
-func (r *ProductRepository) Delete(ctx context.Context, productID product.ID) error {
+func (r *ProductRepository) Delete(ctx context.Context, filter *product.Filter) error {
 	client := r.client
 	if tx := ent.TxFromContext(ctx); tx != nil {
 		client = tx.Client()
 	}
-	err := client.Product.
-		DeleteOneID(int64(productID)).
+	_, err := client.Product.
+		Delete().
+		Where(makePredicates(filter)...).
 		Exec(ctx)
 	if err != nil {
 		r.logger.Error("delete product error:", zap.Error(err))
