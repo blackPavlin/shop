@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/blackPavlin/shop/internal/domain/cart"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
 	"github.com/blackPavlin/shop/pkg/testutilx"
-	"github.com/stretchr/testify/suite"
 )
 
 func TestCartServiceSuite(t *testing.T) {
@@ -49,6 +50,11 @@ func (s *CartServiceSuite) TestSave() {
 	test := func(prepare func(ctx context.Context) context.Context, args args, want want) func(t *testing.T) {
 		return func(t *testing.T) {
 			t.Helper()
+			args.ctx = prepare(args.ctx)
+
+			got, err := s.cartService.Save(args.ctx, args.props)
+			s.Equal(got, want.res)
+			s.ErrorIs(err, want.err)
 		}
 	}
 	tests := []struct {

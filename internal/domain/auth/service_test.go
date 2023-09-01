@@ -2,7 +2,6 @@ package auth_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -61,9 +60,10 @@ func (s *AuthServiceSuite) TestSignup() {
 		return func(t *testing.T) {
 			t.Helper()
 			args.ctx = prepare(args.ctx)
+
 			got, err := s.authService.Signup(args.ctx, args.props)
-			s.Equal(want.res, got)
-			s.True(errors.Is(err, want.err))
+			s.Equal(got, want.res)
+			s.ErrorIs(err, want.err)
 		}
 	}
 	signupProps1 := &auth.SignupProps{
@@ -117,9 +117,10 @@ func (s *AuthServiceSuite) TestLogin() {
 		return func(t *testing.T) {
 			t.Helper()
 			args.ctx = prepare(args.ctx)
+
 			got, err := s.authService.Login(args.ctx, args.props)
-			s.Equal(want.res, got)
-			s.True(errors.Is(err, want.err))
+			s.Equal(got, want.res)
+			s.ErrorIs(err, want.err)
 		}
 	}
 	testUser := &user.User{
