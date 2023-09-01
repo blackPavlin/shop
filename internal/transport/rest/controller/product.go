@@ -170,7 +170,11 @@ func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, 
 			restx.HandleError(w, r, errorx.ErrInternal)
 			return
 		}
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				restx.HandleError(w, r, errorx.ErrInternal)
+			}
+		}()
 		buff, err := io.ReadAll(f)
 		if err != nil {
 			restx.HandleError(w, r, errorx.ErrInternal)
