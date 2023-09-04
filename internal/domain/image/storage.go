@@ -1,6 +1,9 @@
 package image
 
-import "context"
+import (
+	"context"
+	"io"
+)
 
 //go:generate mockgen -source $GOFILE -destination "storage_mock.go" -package "image"
 
@@ -15,6 +18,7 @@ type Storage interface {
 // StorageProps represents image storage fields.
 type StorageProps struct {
 	Name        string
-	Buffer      []byte
+	Reader      io.Reader
+	Size        int64
 	ContentType string
 }

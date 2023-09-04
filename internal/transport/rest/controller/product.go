@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -176,14 +175,10 @@ func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, 
 				restx.HandleError(w, r, errorx.ErrInternal)
 			}
 		}()
-		buff, err := io.ReadAll(f)
-		if err != nil {
-			restx.HandleError(w, r, errorx.ErrInternal)
-			return
-		}
 		images = append(images, &image.StorageProps{
 			Name:   file.Filename,
-			Buffer: buff,
+			Size:   file.Size,
+			Reader: f,
 		})
 	}
 	result, err := ctrl.imageService.BulkCreate(r.Context(), product.ID(productID), images)
