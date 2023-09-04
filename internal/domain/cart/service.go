@@ -13,6 +13,7 @@ import (
 // Service represents cart use cases.
 type Service interface {
 	Save(ctx context.Context, props *Props) (*Cart, error)
+	Delete(ctx context.Context, filter *Filter) error
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
@@ -44,6 +45,14 @@ func (s *UseCase) Save(ctx context.Context, props *Props) (*Cart, error) {
 		return nil, fmt.Errorf("create cart error: %w", err)
 	}
 	return result, nil
+}
+
+// Delete carts.
+func (s *UseCase) Delete(ctx context.Context, filter *Filter) error {
+	if err := s.cartRepo.Delete(ctx, filter); err != nil {
+		return fmt.Errorf("delete carts error: %w", err)
+	}
+	return nil
 }
 
 // Query carts.

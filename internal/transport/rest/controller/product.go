@@ -145,6 +145,7 @@ func (ctrl *ProductController) DeleteProductHandler(w http.ResponseWriter, r *ht
 		return
 	}
 	render.Status(r, http.StatusNoContent)
+	render.Respond(w, r, nil)
 }
 
 // UploadProductImageHandler define handler for POST /api/product/{productId}/image.

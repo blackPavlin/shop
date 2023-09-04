@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Cart, error)
 	Save(ctx context.Context, props *Props) (*Cart, error)
+	Delete(ctx context.Context, filter *Filter) error
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
@@ -22,7 +23,14 @@ type QueryCriteria struct {
 
 // Filter represents cart filter.
 type Filter struct {
+	ID     IDFilter
 	UserID user.IDFilter
+}
+
+// IDFilter represents ID filter.
+type IDFilter struct {
+	Eq  IDs
+	Neq IDs
 }
 
 // QueryResult represents a result for cart query.

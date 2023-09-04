@@ -148,6 +148,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartList'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"         
       security:
         - BearerAuth: []
     post:
@@ -166,6 +170,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: "#/components/responses/BadRequest"        
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"         
       security:
         - BearerAuth: []
     patch:
@@ -184,6 +194,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: "#/components/responses/BadRequest"        
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"        
       security:
         - BearerAuth: []
     delete:
@@ -191,14 +207,36 @@ paths:
       tags:
         - Cart
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Cart'
+        '204':
+          $ref: "#/components/responses/NoContent"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
       security:
         - BearerAuth: []
+
+  /cart/{cartId}:
+    delete:
+      summary: Удалить товар из корзины
+      tags:
+        - Cart
+      responses:
+        '204':
+          $ref: "#/components/responses/NoContent"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
+      security:
+        - BearerAuth: []
+    parameters:
+      - schema:
+          type: string
+        name: cartId
+        in: path
+        required: true
+        description: ID товара в корзине    
 
   /order:
     get:
@@ -212,6 +250,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderList'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"        
       security:
         - BearerAuth: []
     post:
@@ -225,6 +267,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderDetailed'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalError"        
       security:
         - BearerAuth: []
 
@@ -234,12 +284,20 @@ paths:
       tags:
         - Order
       responses:
-        '201':
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderDetailed'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalError"          
       security:
         - BearerAuth: []
     parameters:
@@ -263,6 +321,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoryList'
+        '500':
+          $ref: "#/components/responses/InternalError"        
     post:
       summary: Создать категорию
       tags:
@@ -279,6 +339,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Category'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"        
       security:
         - BearerAuth: []
     patch:
@@ -297,6 +363,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Category'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalError"        
       security:
         - BearerAuth: []
 
@@ -307,7 +381,11 @@ paths:
         - Category
       responses:
         '204':
-          description: OK
+          $ref: "#/components/responses/NoContent"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalError"
       security:
         - BearerAuth: []
     parameters:
@@ -392,6 +470,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalError"        
       security:
         - BearerAuth: []
     delete:
@@ -400,7 +486,7 @@ paths:
         - Product
       responses:
         '204':
-          description: OK
+          $ref: "#/components/responses/NoContent"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '500':
@@ -460,7 +546,7 @@ paths:
         - Image
       responses:
         '204':
-          description: OK
+          $ref: "#/components/responses/NoContent"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -490,6 +576,9 @@ components:
       scheme: bearer
 
   responses:
+    NoContent:
+      description: No content
+  
     NotFound:
       description: Not Found
       content:

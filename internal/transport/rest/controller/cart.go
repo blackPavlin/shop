@@ -35,7 +35,8 @@ func (ctrl *CartController) RegisterRoutes(r chi.Router) chi.Router {
 		r.Get("/", ctrl.GetCartHandler)
 		r.Post("/", ctrl.AddProductHandler)
 		r.Patch("/", ctrl.UpdateProductHandler)
-		r.Delete("/", ctrl.DeleteProductHandler)
+		r.Delete("/", ctrl.DeleteProductsHandler)
+		r.Delete("/{cartID}", ctrl.DeleteProductHandler)
 	})
 }
 
@@ -88,8 +89,29 @@ func (ctrl *CartController) UpdateProductHandler(w http.ResponseWriter, r *http.
 	render.Respond(w, r, mapping.CreateCartResponse(c))
 }
 
-// DeleteProductHandler define handler for DELETE /api/cart.
+// DeleteProductsHandler define handler for DELETE /api/cart.
+func (ctrl *CartController) DeleteProductsHandler(w http.ResponseWriter, r *http.Request) {
+	if err := ctrl.cartService.Delete(r.Context(), &cart.Filter{}); err != nil {
+		restx.HandleError(w, r, err)
+		return
+	}
+	render.Status(r, http.StatusNoContent)
+	render.Respond(w, r, nil)
+}
+
+// DeleteProductHandler define handler for DELETE /api/cart/{cartId}.
 func (ctrl *CartController) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
+	cartID, err := restx.GetIDFromURLParams(r, "cartId")
+	if err != nil {
+		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
+		return
+	}
+	if err := ctrl.cartService.Delete(r.Context(), &cart.Filter{
+		ID: cart.IDFilter{Eq: cart.IDs{cart.ID(cartID)}},
+	}); err != nil {
+		restx.HandleError(w, r, err)
+		return
+	}
 	render.Status(r, http.StatusNoContent)
 	render.Respond(w, r, nil)
 }

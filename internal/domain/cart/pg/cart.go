@@ -58,6 +58,21 @@ func (r *CartRepository) Save(ctx context.Context, props *cart.Props) (*cart.Car
 	return r.Get(ctx, &cart.Filter{})
 }
 
+// Delete carts from db.
+func (r *CartRepository) Delete(ctx context.Context, filter *cart.Filter) error {
+	if userFromCtx, ok := user.GetUser(ctx); ok {
+		filter.UserID.Eq = user.IDs{userFromCtx.ID}
+	}
+	_, err := r.client.Cart.Delete().
+		Where(makePredicates(filter)...).
+		Exec(ctx)
+	if err != nil {
+		r.logger.Error("delete carts error", zap.Error(err))
+		return errorx.ErrInternal
+	}
+	return nil
+}
+
 // Get cart from db.
 func (r *CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Cart, error) {
 	row, err := r.client.Cart.
@@ -106,6 +121,12 @@ func makePredicates(filter *cart.Filter) []predicate.Cart {
 	}
 	if len(filter.UserID.Neq) > 0 {
 		predicates = append(predicates, entcart.UserIDNotIn(filter.UserID.Neq.ToInt64()...))
+	}
+	if len(filter.ID.Eq) > 0 {
+		predicates = append(predicates, entcart.IDIn(filter.UserID.Eq.ToInt64()...))
+	}
+	if len(filter.ID.Neq) > 0 {
+		predicates = append(predicates, entcart.IDNotIn(filter.UserID.Neq.ToInt64()...))
 	}
 	return predicates
 }
