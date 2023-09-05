@@ -34,6 +34,8 @@ const (
 	EdgeCarts = "carts"
 	// EdgeProductImages holds the string denoting the product_images edge name in mutations.
 	EdgeProductImages = "product_images"
+	// EdgeOrderProducts holds the string denoting the order_products edge name in mutations.
+	EdgeOrderProducts = "order_products"
 	// Table holds the table name of the product in the database.
 	Table = "products"
 	// CategoriesTable is the table that holds the categories relation/edge.
@@ -57,6 +59,13 @@ const (
 	ProductImagesInverseTable = "product_images"
 	// ProductImagesColumn is the table column denoting the product_images relation/edge.
 	ProductImagesColumn = "product_id"
+	// OrderProductsTable is the table that holds the order_products relation/edge.
+	OrderProductsTable = "order_products"
+	// OrderProductsInverseTable is the table name for the OrderProduct entity.
+	// It exists in this package in order to avoid circular dependency with the "orderproduct" package.
+	OrderProductsInverseTable = "order_products"
+	// OrderProductsColumn is the table column denoting the order_products relation/edge.
+	OrderProductsColumn = "product_id"
 )
 
 // Columns holds all SQL columns for product fields.
@@ -175,6 +184,20 @@ func ByProductImages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newProductImagesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByOrderProductsCount orders the results by order_products count.
+func ByOrderProductsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOrderProductsStep(), opts...)
+	}
+}
+
+// ByOrderProducts orders the results by order_products terms.
+func ByOrderProducts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOrderProductsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCategoriesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -194,5 +217,12 @@ func newProductImagesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProductImagesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ProductImagesTable, ProductImagesColumn),
+	)
+}
+func newOrderProductsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OrderProductsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OrderProductsTable, OrderProductsColumn),
 	)
 }

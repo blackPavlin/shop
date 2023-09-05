@@ -115,6 +115,16 @@ func init() {
 	orderproduct.DefaultUpdatedAt = orderproductDescUpdatedAt.Default.(func() time.Time)
 	// orderproduct.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	orderproduct.UpdateDefaultUpdatedAt = orderproductDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// orderproductDescAmount is the schema descriptor for amount field.
+	orderproductDescAmount := orderproductFields[2].Descriptor()
+	// orderproduct.DefaultAmount holds the default value on creation for the amount field.
+	orderproduct.DefaultAmount = orderproductDescAmount.Default.(int64)
+	// orderproduct.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
+	orderproduct.AmountValidator = orderproductDescAmount.Validators[0].(func(int64) error)
+	// orderproductDescPrice is the schema descriptor for price field.
+	orderproductDescPrice := orderproductFields[3].Descriptor()
+	// orderproduct.PriceValidator is a validator for the "price" field. It is called by the builders before save.
+	orderproduct.PriceValidator = orderproductDescPrice.Validators[0].(func(int64) error)
 	productMixin := schema.Product{}.Mixin()
 	productMixinFields0 := productMixin[0].Fields()
 	_ = productMixinFields0

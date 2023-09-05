@@ -53,5 +53,12 @@ func (Order) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Field("user_id"),
+		edge.To("order_products", OrderProduct.Type).
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Restrict},
+			).
+			StorageKey(
+				edge.Symbol("order_product_order_fk"),
+			),
 	}
 }

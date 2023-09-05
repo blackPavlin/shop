@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
+	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/product"
 	"github.com/blackPavlin/shop/ent/productimage"
 )
@@ -138,6 +139,21 @@ func (pc *ProductCreate) AddProductImages(p ...*ProductImage) *ProductCreate {
 		ids[i] = p[i].ID
 	}
 	return pc.AddProductImageIDs(ids...)
+}
+
+// AddOrderProductIDs adds the "order_products" edge to the OrderProduct entity by IDs.
+func (pc *ProductCreate) AddOrderProductIDs(ids ...int64) *ProductCreate {
+	pc.mutation.AddOrderProductIDs(ids...)
+	return pc
+}
+
+// AddOrderProducts adds the "order_products" edges to the OrderProduct entity.
+func (pc *ProductCreate) AddOrderProducts(o ...*OrderProduct) *ProductCreate {
+	ids := make([]int64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return pc.AddOrderProductIDs(ids...)
 }
 
 // Mutation returns the ProductMutation object of the builder.
@@ -320,6 +336,22 @@ func (pc *ProductCreate) createSpec() (*Product, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.OrderProductsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   product.OrderProductsTable,
+			Columns: []string{product.OrderProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

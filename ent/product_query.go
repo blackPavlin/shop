@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/cart"
 	"github.com/blackPavlin/shop/ent/category"
+	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/predicate"
 	"github.com/blackPavlin/shop/ent/product"
 	"github.com/blackPavlin/shop/ent/productimage"
@@ -28,6 +29,7 @@ type ProductQuery struct {
 	withCategories    *CategoryQuery
 	withCarts         *CartQuery
 	withProductImages *ProductImageQuery
+	withOrderProducts *OrderProductQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -123,6 +125,28 @@ func (pq *ProductQuery) QueryProductImages() *ProductImageQuery {
 			sqlgraph.From(product.Table, product.FieldID, selector),
 			sqlgraph.To(productimage.Table, productimage.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.ProductImagesTable, product.ProductImagesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOrderProducts chains the current query on the "order_products" edge.
+func (pq *ProductQuery) QueryOrderProducts() *OrderProductQuery {
+	query := (&OrderProductClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, selector),
+			sqlgraph.To(orderproduct.Table, orderproduct.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, product.OrderProductsTable, product.OrderProductsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -325,6 +349,7 @@ func (pq *ProductQuery) Clone() *ProductQuery {
 		withCategories:    pq.withCategories.Clone(),
 		withCarts:         pq.withCarts.Clone(),
 		withProductImages: pq.withProductImages.Clone(),
+		withOrderProducts: pq.withOrderProducts.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -361,6 +386,17 @@ func (pq *ProductQuery) WithProductImages(opts ...func(*ProductImageQuery)) *Pro
 		opt(query)
 	}
 	pq.withProductImages = query
+	return pq
+}
+
+// WithOrderProducts tells the query-builder to eager-load the nodes that are connected to
+// the "order_products" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProductQuery) WithOrderProducts(opts ...func(*OrderProductQuery)) *ProductQuery {
+	query := (&OrderProductClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withOrderProducts = query
 	return pq
 }
 
@@ -442,10 +478,11 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	var (
 		nodes       = []*Product{}
 		_spec       = pq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			pq.withCategories != nil,
 			pq.withCarts != nil,
 			pq.withProductImages != nil,
+			pq.withOrderProducts != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -483,6 +520,13 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 		if err := pq.loadProductImages(ctx, query, nodes,
 			func(n *Product) { n.Edges.ProductImages = []*ProductImage{} },
 			func(n *Product, e *ProductImage) { n.Edges.ProductImages = append(n.Edges.ProductImages, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withOrderProducts; query != nil {
+		if err := pq.loadOrderProducts(ctx, query, nodes,
+			func(n *Product) { n.Edges.OrderProducts = []*OrderProduct{} },
+			func(n *Product, e *OrderProduct) { n.Edges.OrderProducts = append(n.Edges.OrderProducts, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -563,6 +607,36 @@ func (pq *ProductQuery) loadProductImages(ctx context.Context, query *ProductIma
 	}
 	query.Where(predicate.ProductImage(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(product.ProductImagesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ProductID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "product_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (pq *ProductQuery) loadOrderProducts(ctx context.Context, query *OrderProductQuery, nodes []*Product, init func(*Product), assign func(*Product, *OrderProduct)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*Product)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(orderproduct.FieldProductID)
+	}
+	query.Where(predicate.OrderProduct(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(product.OrderProductsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

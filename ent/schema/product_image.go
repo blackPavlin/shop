@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // ProductImage holds the schema definition for the ProductImage entity.
@@ -30,8 +31,8 @@ func (ProductImage) Mixin() []ent.Mixin {
 // Fields of the ProductImage.
 func (ProductImage) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("product_id").Unique(),
-		field.String("name").Unique(),
+		field.Int64("product_id"),
+		field.String("name"),
 	}
 }
 
@@ -43,5 +44,14 @@ func (ProductImage) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Field("product_id"),
+	}
+}
+
+// Indexes of the ProductImage.
+func (ProductImage) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("product_id", "name").
+			Unique().
+			StorageKey("product_images_name_unique"),
 	}
 }

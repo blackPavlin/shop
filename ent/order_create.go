@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/blackPavlin/shop/ent/order"
+	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/user"
 )
 
@@ -80,6 +81,21 @@ func (oc *OrderCreate) SetUsersID(id int64) *OrderCreate {
 // SetUsers sets the "users" edge to the User entity.
 func (oc *OrderCreate) SetUsers(u *User) *OrderCreate {
 	return oc.SetUsersID(u.ID)
+}
+
+// AddOrderProductIDs adds the "order_products" edge to the OrderProduct entity by IDs.
+func (oc *OrderCreate) AddOrderProductIDs(ids ...int64) *OrderCreate {
+	oc.mutation.AddOrderProductIDs(ids...)
+	return oc
+}
+
+// AddOrderProducts adds the "order_products" edges to the OrderProduct entity.
+func (oc *OrderCreate) AddOrderProducts(o ...*OrderProduct) *OrderCreate {
+	ids := make([]int64, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return oc.AddOrderProductIDs(ids...)
 }
 
 // Mutation returns the OrderMutation object of the builder.
@@ -207,6 +223,22 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.UserID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := oc.mutation.OrderProductsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   order.OrderProductsTable,
+			Columns: []string{order.OrderProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

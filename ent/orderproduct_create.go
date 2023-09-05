@@ -11,7 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/blackPavlin/shop/ent/order"
 	"github.com/blackPavlin/shop/ent/orderproduct"
+	"github.com/blackPavlin/shop/ent/product"
 )
 
 // OrderProductCreate is the builder for creating a OrderProduct entity.
@@ -48,6 +50,60 @@ func (opc *OrderProductCreate) SetNillableUpdatedAt(t *time.Time) *OrderProductC
 		opc.SetUpdatedAt(*t)
 	}
 	return opc
+}
+
+// SetOrderID sets the "order_id" field.
+func (opc *OrderProductCreate) SetOrderID(i int64) *OrderProductCreate {
+	opc.mutation.SetOrderID(i)
+	return opc
+}
+
+// SetProductID sets the "product_id" field.
+func (opc *OrderProductCreate) SetProductID(i int64) *OrderProductCreate {
+	opc.mutation.SetProductID(i)
+	return opc
+}
+
+// SetAmount sets the "amount" field.
+func (opc *OrderProductCreate) SetAmount(i int64) *OrderProductCreate {
+	opc.mutation.SetAmount(i)
+	return opc
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (opc *OrderProductCreate) SetNillableAmount(i *int64) *OrderProductCreate {
+	if i != nil {
+		opc.SetAmount(*i)
+	}
+	return opc
+}
+
+// SetPrice sets the "price" field.
+func (opc *OrderProductCreate) SetPrice(i int64) *OrderProductCreate {
+	opc.mutation.SetPrice(i)
+	return opc
+}
+
+// SetOrdersID sets the "orders" edge to the Order entity by ID.
+func (opc *OrderProductCreate) SetOrdersID(id int64) *OrderProductCreate {
+	opc.mutation.SetOrdersID(id)
+	return opc
+}
+
+// SetOrders sets the "orders" edge to the Order entity.
+func (opc *OrderProductCreate) SetOrders(o *Order) *OrderProductCreate {
+	return opc.SetOrdersID(o.ID)
+}
+
+// SetProductsID sets the "products" edge to the Product entity by ID.
+func (opc *OrderProductCreate) SetProductsID(id int64) *OrderProductCreate {
+	opc.mutation.SetProductsID(id)
+	return opc
+}
+
+// SetProducts sets the "products" edge to the Product entity.
+func (opc *OrderProductCreate) SetProducts(p *Product) *OrderProductCreate {
+	return opc.SetProductsID(p.ID)
 }
 
 // Mutation returns the OrderProductMutation object of the builder.
@@ -93,6 +149,10 @@ func (opc *OrderProductCreate) defaults() {
 		v := orderproduct.DefaultUpdatedAt()
 		opc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := opc.mutation.Amount(); !ok {
+		v := orderproduct.DefaultAmount
+		opc.mutation.SetAmount(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -102,6 +162,34 @@ func (opc *OrderProductCreate) check() error {
 	}
 	if _, ok := opc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "OrderProduct.updated_at"`)}
+	}
+	if _, ok := opc.mutation.OrderID(); !ok {
+		return &ValidationError{Name: "order_id", err: errors.New(`ent: missing required field "OrderProduct.order_id"`)}
+	}
+	if _, ok := opc.mutation.ProductID(); !ok {
+		return &ValidationError{Name: "product_id", err: errors.New(`ent: missing required field "OrderProduct.product_id"`)}
+	}
+	if _, ok := opc.mutation.Amount(); !ok {
+		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "OrderProduct.amount"`)}
+	}
+	if v, ok := opc.mutation.Amount(); ok {
+		if err := orderproduct.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.amount": %w`, err)}
+		}
+	}
+	if _, ok := opc.mutation.Price(); !ok {
+		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "OrderProduct.price"`)}
+	}
+	if v, ok := opc.mutation.Price(); ok {
+		if err := orderproduct.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.price": %w`, err)}
+		}
+	}
+	if _, ok := opc.mutation.OrdersID(); !ok {
+		return &ValidationError{Name: "orders", err: errors.New(`ent: missing required edge "OrderProduct.orders"`)}
+	}
+	if _, ok := opc.mutation.ProductsID(); !ok {
+		return &ValidationError{Name: "products", err: errors.New(`ent: missing required edge "OrderProduct.products"`)}
 	}
 	return nil
 }
@@ -137,6 +225,48 @@ func (opc *OrderProductCreate) createSpec() (*OrderProduct, *sqlgraph.CreateSpec
 	if value, ok := opc.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := opc.mutation.Amount(); ok {
+		_spec.SetField(orderproduct.FieldAmount, field.TypeInt64, value)
+		_node.Amount = value
+	}
+	if value, ok := opc.mutation.Price(); ok {
+		_spec.SetField(orderproduct.FieldPrice, field.TypeInt64, value)
+		_node.Price = value
+	}
+	if nodes := opc.mutation.OrdersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.OrdersTable,
+			Columns: []string{orderproduct.OrdersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.OrderID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := opc.mutation.ProductsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.ProductsTable,
+			Columns: []string{orderproduct.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ProductID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -202,6 +332,66 @@ func (u *OrderProductUpsert) UpdateUpdatedAt() *OrderProductUpsert {
 	return u
 }
 
+// SetOrderID sets the "order_id" field.
+func (u *OrderProductUpsert) SetOrderID(v int64) *OrderProductUpsert {
+	u.Set(orderproduct.FieldOrderID, v)
+	return u
+}
+
+// UpdateOrderID sets the "order_id" field to the value that was provided on create.
+func (u *OrderProductUpsert) UpdateOrderID() *OrderProductUpsert {
+	u.SetExcluded(orderproduct.FieldOrderID)
+	return u
+}
+
+// SetProductID sets the "product_id" field.
+func (u *OrderProductUpsert) SetProductID(v int64) *OrderProductUpsert {
+	u.Set(orderproduct.FieldProductID, v)
+	return u
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *OrderProductUpsert) UpdateProductID() *OrderProductUpsert {
+	u.SetExcluded(orderproduct.FieldProductID)
+	return u
+}
+
+// SetAmount sets the "amount" field.
+func (u *OrderProductUpsert) SetAmount(v int64) *OrderProductUpsert {
+	u.Set(orderproduct.FieldAmount, v)
+	return u
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *OrderProductUpsert) UpdateAmount() *OrderProductUpsert {
+	u.SetExcluded(orderproduct.FieldAmount)
+	return u
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *OrderProductUpsert) AddAmount(v int64) *OrderProductUpsert {
+	u.Add(orderproduct.FieldAmount, v)
+	return u
+}
+
+// SetPrice sets the "price" field.
+func (u *OrderProductUpsert) SetPrice(v int64) *OrderProductUpsert {
+	u.Set(orderproduct.FieldPrice, v)
+	return u
+}
+
+// UpdatePrice sets the "price" field to the value that was provided on create.
+func (u *OrderProductUpsert) UpdatePrice() *OrderProductUpsert {
+	u.SetExcluded(orderproduct.FieldPrice)
+	return u
+}
+
+// AddPrice adds v to the "price" field.
+func (u *OrderProductUpsert) AddPrice(v int64) *OrderProductUpsert {
+	u.Add(orderproduct.FieldPrice, v)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -258,6 +448,76 @@ func (u *OrderProductUpsertOne) SetUpdatedAt(v time.Time) *OrderProductUpsertOne
 func (u *OrderProductUpsertOne) UpdateUpdatedAt() *OrderProductUpsertOne {
 	return u.Update(func(s *OrderProductUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetOrderID sets the "order_id" field.
+func (u *OrderProductUpsertOne) SetOrderID(v int64) *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetOrderID(v)
+	})
+}
+
+// UpdateOrderID sets the "order_id" field to the value that was provided on create.
+func (u *OrderProductUpsertOne) UpdateOrderID() *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateOrderID()
+	})
+}
+
+// SetProductID sets the "product_id" field.
+func (u *OrderProductUpsertOne) SetProductID(v int64) *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetProductID(v)
+	})
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *OrderProductUpsertOne) UpdateProductID() *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateProductID()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *OrderProductUpsertOne) SetAmount(v int64) *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *OrderProductUpsertOne) AddAmount(v int64) *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.AddAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *OrderProductUpsertOne) UpdateAmount() *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// SetPrice sets the "price" field.
+func (u *OrderProductUpsertOne) SetPrice(v int64) *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetPrice(v)
+	})
+}
+
+// AddPrice adds v to the "price" field.
+func (u *OrderProductUpsertOne) AddPrice(v int64) *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.AddPrice(v)
+	})
+}
+
+// UpdatePrice sets the "price" field to the value that was provided on create.
+func (u *OrderProductUpsertOne) UpdatePrice() *OrderProductUpsertOne {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdatePrice()
 	})
 }
 
@@ -479,6 +739,76 @@ func (u *OrderProductUpsertBulk) SetUpdatedAt(v time.Time) *OrderProductUpsertBu
 func (u *OrderProductUpsertBulk) UpdateUpdatedAt() *OrderProductUpsertBulk {
 	return u.Update(func(s *OrderProductUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetOrderID sets the "order_id" field.
+func (u *OrderProductUpsertBulk) SetOrderID(v int64) *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetOrderID(v)
+	})
+}
+
+// UpdateOrderID sets the "order_id" field to the value that was provided on create.
+func (u *OrderProductUpsertBulk) UpdateOrderID() *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateOrderID()
+	})
+}
+
+// SetProductID sets the "product_id" field.
+func (u *OrderProductUpsertBulk) SetProductID(v int64) *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetProductID(v)
+	})
+}
+
+// UpdateProductID sets the "product_id" field to the value that was provided on create.
+func (u *OrderProductUpsertBulk) UpdateProductID() *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateProductID()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *OrderProductUpsertBulk) SetAmount(v int64) *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// AddAmount adds v to the "amount" field.
+func (u *OrderProductUpsertBulk) AddAmount(v int64) *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.AddAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *OrderProductUpsertBulk) UpdateAmount() *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// SetPrice sets the "price" field.
+func (u *OrderProductUpsertBulk) SetPrice(v int64) *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.SetPrice(v)
+	})
+}
+
+// AddPrice adds v to the "price" field.
+func (u *OrderProductUpsertBulk) AddPrice(v int64) *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.AddPrice(v)
+	})
+}
+
+// UpdatePrice sets the "price" field to the value that was provided on create.
+func (u *OrderProductUpsertBulk) UpdatePrice() *OrderProductUpsertBulk {
+	return u.Update(func(s *OrderProductUpsert) {
+		s.UpdatePrice()
 	})
 }
 

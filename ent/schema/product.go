@@ -60,5 +60,12 @@ func (Product) Edges() []ent.Edge {
 			StorageKey(
 				edge.Symbol("product_image_product_fk"),
 			),
+		edge.To("order_products", OrderProduct.Type).
+			Annotations(
+				entsql.Annotation{OnDelete: entsql.Restrict},
+			).
+			StorageKey(
+				edge.Symbol("order_product_product_fk"),
+			),
 	}
 }

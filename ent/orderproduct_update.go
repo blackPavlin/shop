@@ -11,8 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/blackPavlin/shop/ent/order"
 	"github.com/blackPavlin/shop/ent/orderproduct"
 	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/ent/product"
 )
 
 // OrderProductUpdate is the builder for updating OrderProduct entities.
@@ -34,9 +36,89 @@ func (opu *OrderProductUpdate) SetUpdatedAt(t time.Time) *OrderProductUpdate {
 	return opu
 }
 
+// SetOrderID sets the "order_id" field.
+func (opu *OrderProductUpdate) SetOrderID(i int64) *OrderProductUpdate {
+	opu.mutation.SetOrderID(i)
+	return opu
+}
+
+// SetProductID sets the "product_id" field.
+func (opu *OrderProductUpdate) SetProductID(i int64) *OrderProductUpdate {
+	opu.mutation.SetProductID(i)
+	return opu
+}
+
+// SetAmount sets the "amount" field.
+func (opu *OrderProductUpdate) SetAmount(i int64) *OrderProductUpdate {
+	opu.mutation.ResetAmount()
+	opu.mutation.SetAmount(i)
+	return opu
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (opu *OrderProductUpdate) SetNillableAmount(i *int64) *OrderProductUpdate {
+	if i != nil {
+		opu.SetAmount(*i)
+	}
+	return opu
+}
+
+// AddAmount adds i to the "amount" field.
+func (opu *OrderProductUpdate) AddAmount(i int64) *OrderProductUpdate {
+	opu.mutation.AddAmount(i)
+	return opu
+}
+
+// SetPrice sets the "price" field.
+func (opu *OrderProductUpdate) SetPrice(i int64) *OrderProductUpdate {
+	opu.mutation.ResetPrice()
+	opu.mutation.SetPrice(i)
+	return opu
+}
+
+// AddPrice adds i to the "price" field.
+func (opu *OrderProductUpdate) AddPrice(i int64) *OrderProductUpdate {
+	opu.mutation.AddPrice(i)
+	return opu
+}
+
+// SetOrdersID sets the "orders" edge to the Order entity by ID.
+func (opu *OrderProductUpdate) SetOrdersID(id int64) *OrderProductUpdate {
+	opu.mutation.SetOrdersID(id)
+	return opu
+}
+
+// SetOrders sets the "orders" edge to the Order entity.
+func (opu *OrderProductUpdate) SetOrders(o *Order) *OrderProductUpdate {
+	return opu.SetOrdersID(o.ID)
+}
+
+// SetProductsID sets the "products" edge to the Product entity by ID.
+func (opu *OrderProductUpdate) SetProductsID(id int64) *OrderProductUpdate {
+	opu.mutation.SetProductsID(id)
+	return opu
+}
+
+// SetProducts sets the "products" edge to the Product entity.
+func (opu *OrderProductUpdate) SetProducts(p *Product) *OrderProductUpdate {
+	return opu.SetProductsID(p.ID)
+}
+
 // Mutation returns the OrderProductMutation object of the builder.
 func (opu *OrderProductUpdate) Mutation() *OrderProductMutation {
 	return opu.mutation
+}
+
+// ClearOrders clears the "orders" edge to the Order entity.
+func (opu *OrderProductUpdate) ClearOrders() *OrderProductUpdate {
+	opu.mutation.ClearOrders()
+	return opu
+}
+
+// ClearProducts clears the "products" edge to the Product entity.
+func (opu *OrderProductUpdate) ClearProducts() *OrderProductUpdate {
+	opu.mutation.ClearProducts()
+	return opu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -75,7 +157,31 @@ func (opu *OrderProductUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (opu *OrderProductUpdate) check() error {
+	if v, ok := opu.mutation.Amount(); ok {
+		if err := orderproduct.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.amount": %w`, err)}
+		}
+	}
+	if v, ok := opu.mutation.Price(); ok {
+		if err := orderproduct.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.price": %w`, err)}
+		}
+	}
+	if _, ok := opu.mutation.OrdersID(); opu.mutation.OrdersCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "OrderProduct.orders"`)
+	}
+	if _, ok := opu.mutation.ProductsID(); opu.mutation.ProductsCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "OrderProduct.products"`)
+	}
+	return nil
+}
+
 func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := opu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(orderproduct.Table, orderproduct.Columns, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
 	if ps := opu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -86,6 +192,76 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := opu.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := opu.mutation.Amount(); ok {
+		_spec.SetField(orderproduct.FieldAmount, field.TypeInt64, value)
+	}
+	if value, ok := opu.mutation.AddedAmount(); ok {
+		_spec.AddField(orderproduct.FieldAmount, field.TypeInt64, value)
+	}
+	if value, ok := opu.mutation.Price(); ok {
+		_spec.SetField(orderproduct.FieldPrice, field.TypeInt64, value)
+	}
+	if value, ok := opu.mutation.AddedPrice(); ok {
+		_spec.AddField(orderproduct.FieldPrice, field.TypeInt64, value)
+	}
+	if opu.mutation.OrdersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.OrdersTable,
+			Columns: []string{orderproduct.OrdersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := opu.mutation.OrdersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.OrdersTable,
+			Columns: []string{orderproduct.OrdersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if opu.mutation.ProductsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.ProductsTable,
+			Columns: []string{orderproduct.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := opu.mutation.ProductsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.ProductsTable,
+			Columns: []string{orderproduct.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, opu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -113,9 +289,89 @@ func (opuo *OrderProductUpdateOne) SetUpdatedAt(t time.Time) *OrderProductUpdate
 	return opuo
 }
 
+// SetOrderID sets the "order_id" field.
+func (opuo *OrderProductUpdateOne) SetOrderID(i int64) *OrderProductUpdateOne {
+	opuo.mutation.SetOrderID(i)
+	return opuo
+}
+
+// SetProductID sets the "product_id" field.
+func (opuo *OrderProductUpdateOne) SetProductID(i int64) *OrderProductUpdateOne {
+	opuo.mutation.SetProductID(i)
+	return opuo
+}
+
+// SetAmount sets the "amount" field.
+func (opuo *OrderProductUpdateOne) SetAmount(i int64) *OrderProductUpdateOne {
+	opuo.mutation.ResetAmount()
+	opuo.mutation.SetAmount(i)
+	return opuo
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (opuo *OrderProductUpdateOne) SetNillableAmount(i *int64) *OrderProductUpdateOne {
+	if i != nil {
+		opuo.SetAmount(*i)
+	}
+	return opuo
+}
+
+// AddAmount adds i to the "amount" field.
+func (opuo *OrderProductUpdateOne) AddAmount(i int64) *OrderProductUpdateOne {
+	opuo.mutation.AddAmount(i)
+	return opuo
+}
+
+// SetPrice sets the "price" field.
+func (opuo *OrderProductUpdateOne) SetPrice(i int64) *OrderProductUpdateOne {
+	opuo.mutation.ResetPrice()
+	opuo.mutation.SetPrice(i)
+	return opuo
+}
+
+// AddPrice adds i to the "price" field.
+func (opuo *OrderProductUpdateOne) AddPrice(i int64) *OrderProductUpdateOne {
+	opuo.mutation.AddPrice(i)
+	return opuo
+}
+
+// SetOrdersID sets the "orders" edge to the Order entity by ID.
+func (opuo *OrderProductUpdateOne) SetOrdersID(id int64) *OrderProductUpdateOne {
+	opuo.mutation.SetOrdersID(id)
+	return opuo
+}
+
+// SetOrders sets the "orders" edge to the Order entity.
+func (opuo *OrderProductUpdateOne) SetOrders(o *Order) *OrderProductUpdateOne {
+	return opuo.SetOrdersID(o.ID)
+}
+
+// SetProductsID sets the "products" edge to the Product entity by ID.
+func (opuo *OrderProductUpdateOne) SetProductsID(id int64) *OrderProductUpdateOne {
+	opuo.mutation.SetProductsID(id)
+	return opuo
+}
+
+// SetProducts sets the "products" edge to the Product entity.
+func (opuo *OrderProductUpdateOne) SetProducts(p *Product) *OrderProductUpdateOne {
+	return opuo.SetProductsID(p.ID)
+}
+
 // Mutation returns the OrderProductMutation object of the builder.
 func (opuo *OrderProductUpdateOne) Mutation() *OrderProductMutation {
 	return opuo.mutation
+}
+
+// ClearOrders clears the "orders" edge to the Order entity.
+func (opuo *OrderProductUpdateOne) ClearOrders() *OrderProductUpdateOne {
+	opuo.mutation.ClearOrders()
+	return opuo
+}
+
+// ClearProducts clears the "products" edge to the Product entity.
+func (opuo *OrderProductUpdateOne) ClearProducts() *OrderProductUpdateOne {
+	opuo.mutation.ClearProducts()
+	return opuo
 }
 
 // Where appends a list predicates to the OrderProductUpdate builder.
@@ -167,7 +423,31 @@ func (opuo *OrderProductUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (opuo *OrderProductUpdateOne) check() error {
+	if v, ok := opuo.mutation.Amount(); ok {
+		if err := orderproduct.AmountValidator(v); err != nil {
+			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.amount": %w`, err)}
+		}
+	}
+	if v, ok := opuo.mutation.Price(); ok {
+		if err := orderproduct.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.price": %w`, err)}
+		}
+	}
+	if _, ok := opuo.mutation.OrdersID(); opuo.mutation.OrdersCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "OrderProduct.orders"`)
+	}
+	if _, ok := opuo.mutation.ProductsID(); opuo.mutation.ProductsCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "OrderProduct.products"`)
+	}
+	return nil
+}
+
 func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderProduct, err error) {
+	if err := opuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(orderproduct.Table, orderproduct.Columns, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
 	id, ok := opuo.mutation.ID()
 	if !ok {
@@ -195,6 +475,76 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 	}
 	if value, ok := opuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := opuo.mutation.Amount(); ok {
+		_spec.SetField(orderproduct.FieldAmount, field.TypeInt64, value)
+	}
+	if value, ok := opuo.mutation.AddedAmount(); ok {
+		_spec.AddField(orderproduct.FieldAmount, field.TypeInt64, value)
+	}
+	if value, ok := opuo.mutation.Price(); ok {
+		_spec.SetField(orderproduct.FieldPrice, field.TypeInt64, value)
+	}
+	if value, ok := opuo.mutation.AddedPrice(); ok {
+		_spec.AddField(orderproduct.FieldPrice, field.TypeInt64, value)
+	}
+	if opuo.mutation.OrdersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.OrdersTable,
+			Columns: []string{orderproduct.OrdersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := opuo.mutation.OrdersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.OrdersTable,
+			Columns: []string{orderproduct.OrdersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if opuo.mutation.ProductsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.ProductsTable,
+			Columns: []string{orderproduct.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := opuo.mutation.ProductsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   orderproduct.ProductsTable,
+			Columns: []string{orderproduct.ProductsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &OrderProduct{config: opuo.config}
 	_spec.Assign = _node.assignValues

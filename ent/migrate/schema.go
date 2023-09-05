@@ -113,12 +113,37 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
+		{Name: "amount", Type: field.TypeInt64, Default: 0},
+		{Name: "price", Type: field.TypeInt64},
+		{Name: "order_id", Type: field.TypeInt64},
+		{Name: "product_id", Type: field.TypeInt64},
 	}
 	// OrderProductsTable holds the schema information for the "order_products" table.
 	OrderProductsTable = &schema.Table{
 		Name:       "order_products",
 		Columns:    OrderProductsColumns,
 		PrimaryKey: []*schema.Column{OrderProductsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "order_product_order_fk",
+				Columns:    []*schema.Column{OrderProductsColumns[5]},
+				RefColumns: []*schema.Column{OrdersColumns[0]},
+				OnDelete:   schema.Restrict,
+			},
+			{
+				Symbol:     "order_product_product_fk",
+				Columns:    []*schema.Column{OrderProductsColumns[6]},
+				RefColumns: []*schema.Column{ProductsColumns[0]},
+				OnDelete:   schema.Restrict,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "order_product_order_id_product_id_unique",
+				Unique:  true,
+				Columns: []*schema.Column{OrderProductsColumns[6], OrderProductsColumns[5]},
+			},
+		},
 	}
 	// ProductsColumns holds the columns for the "products" table.
 	ProductsColumns = []*schema.Column{
@@ -150,7 +175,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamp"}},
-		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
 		{Name: "product_id", Type: field.TypeInt64},
 	}
 	// ProductImagesTable holds the schema information for the "product_images" table.
@@ -164,6 +189,13 @@ var (
 				Columns:    []*schema.Column{ProductImagesColumns[4]},
 				RefColumns: []*schema.Column{ProductsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "product_images_name_unique",
+				Unique:  true,
+				Columns: []*schema.Column{ProductImagesColumns[4], ProductImagesColumns[3]},
 			},
 		},
 	}
@@ -214,6 +246,8 @@ func init() {
 	OrdersTable.Annotation = &entsql.Annotation{
 		Table: "orders",
 	}
+	OrderProductsTable.ForeignKeys[0].RefTable = OrdersTable
+	OrderProductsTable.ForeignKeys[1].RefTable = ProductsTable
 	OrderProductsTable.Annotation = &entsql.Annotation{
 		Table: "order_products",
 	}

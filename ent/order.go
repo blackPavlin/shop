@@ -36,9 +36,11 @@ type Order struct {
 type OrderEdges struct {
 	// Users holds the value of the users edge.
 	Users *User `json:"users,omitempty"`
+	// OrderProducts holds the value of the order_products edge.
+	OrderProducts []*OrderProduct `json:"order_products,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // UsersOrErr returns the Users value or an error if the edge
@@ -52,6 +54,15 @@ func (e OrderEdges) UsersOrErr() (*User, error) {
 		return e.Users, nil
 	}
 	return nil, &NotLoadedError{edge: "users"}
+}
+
+// OrderProductsOrErr returns the OrderProducts value or an error if the edge
+// was not loaded in eager-loading.
+func (e OrderEdges) OrderProductsOrErr() ([]*OrderProduct, error) {
+	if e.loadedTypes[1] {
+		return e.OrderProducts, nil
+	}
+	return nil, &NotLoadedError{edge: "order_products"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -126,6 +137,11 @@ func (o *Order) Value(name string) (ent.Value, error) {
 // QueryUsers queries the "users" edge of the Order entity.
 func (o *Order) QueryUsers() *UserQuery {
 	return NewOrderClient(o.config).QueryUsers(o)
+}
+
+// QueryOrderProducts queries the "order_products" edge of the Order entity.
+func (o *Order) QueryOrderProducts() *OrderProductQuery {
+	return NewOrderClient(o.config).QueryOrderProducts(o)
 }
 
 // Update returns a builder for updating this Order.
