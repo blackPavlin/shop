@@ -12,7 +12,7 @@ type ImageRepository interface {
 	Delete(ctx context.Context, filter *ImageFilter) error
 }
 
-// ImageQueryCriteria  represents a criteria for image product query.
+// ImageQueryCriteria represents a criteria for image product query.
 type ImageQueryCriteria struct {
 	Filter ImageFilter
 }

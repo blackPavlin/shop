@@ -1,7 +1,11 @@
 // Package order contains user order oriented logic.
 package order
 
-import "time"
+import (
+	"time"
+
+	"github.com/blackPavlin/shop/internal/domain/user"
+)
 
 //go:generate enumer -sql -linecomment -type Status -trimprefix Status -output status_string.go order.go
 
@@ -31,10 +35,13 @@ type Order struct {
 }
 
 // Orders slice of Order.
-type Orders []Order
+type Orders []*Order
 
 // Props represents order editable fields.
-type Props struct{}
+type Props struct {
+	UserID user.ID
+	Status Status
+}
 
 // ToInt64 convert slice of IDs to slice int64.
 func (ids IDs) ToInt64() []int64 {

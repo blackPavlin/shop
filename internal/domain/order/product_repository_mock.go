@@ -35,16 +35,16 @@ func (m *MockProductRepository) EXPECT() *MockProductRepositoryMockRecorder {
 }
 
 // BulkCreateTx mocks base method.
-func (m *MockProductRepository) BulkCreateTx(ctx context.Context) (Products, error) {
+func (m *MockProductRepository) BulkCreateTx(ctx context.Context, products Products) (Products, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BulkCreateTx", ctx)
+	ret := m.ctrl.Call(m, "BulkCreateTx", ctx, products)
 	ret0, _ := ret[0].(Products)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // BulkCreateTx indicates an expected call of BulkCreateTx.
-func (mr *MockProductRepositoryMockRecorder) BulkCreateTx(ctx interface{}) *gomock.Call {
+func (mr *MockProductRepositoryMockRecorder) BulkCreateTx(ctx, products interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreateTx", reflect.TypeOf((*MockProductRepository)(nil).BulkCreateTx), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreateTx", reflect.TypeOf((*MockProductRepository)(nil).BulkCreateTx), ctx, products)
 }

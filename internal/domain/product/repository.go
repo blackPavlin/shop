@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/blackPavlin/shop/internal/domain/category"
+	"github.com/blackPavlin/shop/pkg/paging"
 )
 
 //go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "product"
@@ -21,7 +22,7 @@ type Repository interface {
 type QueryCriteria struct {
 	Filter     Filter
 	Ordering   Ordering
-	Pagination Pagination
+	Pagination paging.Pagination
 }
 
 // QueryResult represents a result for products query.
@@ -44,9 +45,3 @@ type IDFilter struct {
 
 // Ordering represents order criteria.
 type Ordering struct{}
-
-// Pagination is a pagination parameters.
-type Pagination struct {
-	Limit  uint64
-	Offset uint64
-}

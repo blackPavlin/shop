@@ -23,7 +23,7 @@ type Product struct {
 }
 
 // Products slice of Product.
-type Products []Product
+type Products []*Product
 
 // ProductProps represents order product editable fields.
 type ProductProps struct {

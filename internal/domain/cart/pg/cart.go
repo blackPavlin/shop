@@ -139,7 +139,7 @@ func mapDomainCartFromRow(row *ent.Cart) *cart.Cart {
 			ProductID: product.ID(row.ProductID),
 			Amount:    row.Amount,
 		},
-		Product: mapDomainProductFromRow(*row.Edges.Products),
+		Product: mapDomainProductFromRow(row.Edges.Products),
 	}
 }
 
@@ -151,7 +151,7 @@ func mapDomainCartsFromRows(rows ent.Carts) cart.Carts {
 	return result
 }
 
-func mapDomainProductFromRow(row ent.Product) *product.Product {
+func mapDomainProductFromRow(row *ent.Product) *product.Product {
 	return &product.Product{
 		ID:        product.ID(row.ID),
 		CreatedAt: row.CreatedAt,

@@ -4,19 +4,22 @@ import (
 	"context"
 
 	"github.com/blackPavlin/shop/internal/domain/user"
+	"github.com/blackPavlin/shop/pkg/paging"
 )
 
 //go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "order"
 
 // Repository represents order repository.
 type Repository interface {
-	Create(ctx context.Context) (*Order, error)
+	Create(ctx context.Context, props *Props) (*Order, error)
+	Get(ctx context.Context, filter *Filter) (*Order, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
 // QueryCriteria represents criteria for service query.
 type QueryCriteria struct {
-	Filter Filter
+	Filter     Filter
+	Pagination paging.Pagination
 }
 
 // Filter represents order filter.
@@ -34,4 +37,5 @@ type IDFilter struct {
 // QueryResult represents a result for order query.
 type QueryResult struct {
 	Items Orders
+	Count int
 }

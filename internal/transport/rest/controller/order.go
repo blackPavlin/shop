@@ -3,10 +3,11 @@ package controller
 import (
 	"net/http"
 
-	"github.com/blackPavlin/shop/internal/domain/order"
-	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+
+	"github.com/blackPavlin/shop/internal/domain/order"
+	"github.com/blackPavlin/shop/internal/transport/rest/middleware"
 )
 
 // OrderController represents order controller.

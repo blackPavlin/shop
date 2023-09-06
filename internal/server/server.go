@@ -28,6 +28,8 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/category"
 	categorypg "github.com/blackPavlin/shop/internal/domain/category/pg"
 	imagestorage "github.com/blackPavlin/shop/internal/domain/image/storage"
+	"github.com/blackPavlin/shop/internal/domain/order"
+	orderpg "github.com/blackPavlin/shop/internal/domain/order/pg"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	productpg "github.com/blackPavlin/shop/internal/domain/product/pg"
 	"github.com/blackPavlin/shop/internal/domain/user"
@@ -79,21 +81,24 @@ func NewServer(
 
 	// Repositories
 	txManager := pg.NewTxManager(database, logger)
-	userRepository := userpg.NewUserRepository(database, logger)
-	cartRepository := cartpg.NewCartRepository(database, logger)
-	addressRepository := addresspg.NewAddressRepository(database, logger)
-	productRepository := productpg.NewProductRepository(database, logger)
-	imageRepository := productpg.NewImageRepository(database, logger)
-	categoryRepository := categorypg.NewCategoryRepository(database, logger)
+	userRepo := userpg.NewUserRepository(database, logger)
+	cartRepo := cartpg.NewCartRepository(database, logger)
+	addressRepo := addresspg.NewAddressRepository(database, logger)
+	productRepo := productpg.NewProductRepository(database, logger)
+	imageRepo := productpg.NewImageRepository(database, logger)
+	categoryRepo := categorypg.NewCategoryRepository(database, logger)
+	orderRepo := orderpg.NewOrderRepository(database, logger)
+	orderProductRepo := orderpg.NewOrderProductRepository(database, logger)
 
 	// Services
-	userService := user.NewUseCase(userRepository)
-	authService := auth.NewUseCase(logger, conf.Auth, userRepository)
-	cartService := cart.NewUseCase(cartRepository, productRepository)
-	addressService := address.NewUseCase(addressRepository)
-	productService := product.NewUseCase(productRepository, imageRepository, imageStorage, txManager)
-	imageService := product.NewImageUseCase(logger, productRepository, imageRepository, imageStorage, txManager)
-	categoryService := category.NewUseCase(categoryRepository)
+	userService := user.NewUseCase(userRepo)
+	authService := auth.NewUseCase(logger, conf.Auth, userRepo)
+	cartService := cart.NewUseCase(cartRepo, productRepo)
+	addressService := address.NewUseCase(addressRepo)
+	productService := product.NewUseCase(productRepo, imageRepo, imageStorage, txManager)
+	imageService := product.NewImageUseCase(logger, productRepo, imageRepo, imageStorage, txManager)
+	categoryService := category.NewUseCase(categoryRepo)
+	orderService := order.NewUseCase(orderRepo, cartRepo, productRepo, orderProductRepo, txManager)
 
 	// Middlewares
 	authMiddleware := restmiddleware.NewMiddleware(authService)
@@ -105,6 +110,7 @@ func NewServer(
 	addressController := controller.NewAddressController(addressService, authMiddleware)
 	productController := controller.NewProductController(productService, imageService, authMiddleware)
 	categoryController := controller.NewCategoryController(categoryService, authMiddleware)
+	orderController := controller.NewOrderController(orderService, authMiddleware)
 
 	router.Route("/api", func(r chi.Router) {
 		userController.RegisterRoutes(r)     // /api/user
@@ -113,6 +119,7 @@ func NewServer(
 		addressController.RegisterRoutes(r)  // /api/address
 		productController.RegisterRoutes(r)  // /api/product
 		categoryController.RegisterRoutes(r) // /api/category
+		orderController.RegisterRoutes(r)    // /api/order
 	})
 
 	return &Server{conf, logger, router, database, storage}

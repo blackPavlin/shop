@@ -119,14 +119,13 @@ func (r *ProductRepository) Query(
 	criteria *product.QueryCriteria,
 ) (*product.QueryResult, error) {
 	var (
-		rows  ent.Products
-		count int
-		err   error
+		result = &product.QueryResult{}
+		err    error
 	)
 	predicates := makePredicates(&criteria.Filter)
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		rows, err = r.client.Product.Query().
+		rows, err := r.client.Product.Query().
 			Where(predicates...).
 			WithProductImages().
 			Limit(int(criteria.Pagination.Limit)).
@@ -136,10 +135,11 @@ func (r *ProductRepository) Query(
 			r.logger.Error("query products count error:", zap.Error(err))
 			return errorx.ErrInternal
 		}
+		result.Items = mapDomainProductsFromRows(rows)
 		return nil
 	})
 	g.Go(func() error {
-		count, err = r.client.Product.Query().
+		result.Count, err = r.client.Product.Query().
 			Where(predicates...).
 			Count(ctx)
 		if err != nil {
@@ -150,10 +150,6 @@ func (r *ProductRepository) Query(
 	})
 	if err = g.Wait(); err != nil {
 		return nil, errorx.ErrInternal
-	}
-	result := &product.QueryResult{
-		Items: mapDomainProductsFromRows(rows),
-		Count: count,
 	}
 	return result, nil
 }
