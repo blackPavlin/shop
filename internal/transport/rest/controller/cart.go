@@ -36,7 +36,9 @@ func (ctrl *CartController) RegisterRoutes(r chi.Router) chi.Router {
 		r.Post("/", ctrl.AddProductHandler)
 		r.Patch("/", ctrl.UpdateProductHandler)
 		r.Delete("/", ctrl.DeleteProductsHandler)
-		r.Delete("/{cartID}", ctrl.DeleteProductHandler)
+		r.Route("/{cartID}", func(r chi.Router) {
+			r.Delete("/", ctrl.DeleteProductHandler)
+		})
 	})
 }
 

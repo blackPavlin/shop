@@ -51,7 +51,9 @@ func (ctrl *ProductController) RegisterRoutes(r chi.Router) chi.Router {
 			r.Route("/image", func(r chi.Router) {
 				r.Use(ctrl.authMiddleware.Authorization)
 				r.Post("/", ctrl.UploadProductImageHandler)
-				r.Delete("/{imageID}", ctrl.DeleteProductImageHandler)
+				r.Route("/{imageID}", func(r chi.Router) {
+					r.Delete("/", ctrl.DeleteProductImageHandler)
+				})
 			})
 		})
 	})

@@ -36,7 +36,9 @@ func (ctrl *CategoryController) RegisterRoutes(r chi.Router) chi.Router {
 			r.Use(ctrl.authMiddleware.Authorization)
 			r.Post("/", ctrl.CreateCategoryHandler)
 			r.Patch("/", ctrl.UpdateCategoryHandler)
-			r.Delete("/{categoryID}", ctrl.DeleteCategoryHandler)
+			r.Route("/{categoryID}", func(r chi.Router) {
+				r.Delete("/", ctrl.DeleteCategoryHandler)
+			})
 		})
 	})
 }

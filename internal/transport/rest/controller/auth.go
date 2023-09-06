@@ -20,7 +20,7 @@ type AuthController struct {
 
 // NewAuthController create instance of AuthController.
 func NewAuthController(authService auth.Service) *AuthController {
-	return &AuthController{authService: authService}
+	return &AuthController{authService}
 }
 
 // RegisterRoutes register routes to the specified router.
