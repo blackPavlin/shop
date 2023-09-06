@@ -4,7 +4,7 @@
 [![License][repo_license_img]][repo_license_url]
 [![Build][build_action_img]][build_action_url]
 
-## Packages
+## Packages and tools
 
 - **Chi**: lightweight, idiomatic and composable router for building Go HTTP services.
 - **Ent**: simple, yet powerful entity framework for Go, that makes it easy to build and maintain applications with large data-models.
@@ -13,6 +13,11 @@
 - **Jwt**: implementation of JSON Web Tokens. This library supports the parsing and verification as well as the generation and signing of JWTs.
 - **Envconfig**: golang library for managing configuration data from environment variables.
 - **Minio-go**: the MinIO Go Client SDK provides simple APIs to access any Amazon S3 compatible object storage.
+- **Oapi-codegen**: generate Go client and server boilerplate from OpenAPI 3 specifications.
+- **Enumer**: a Go tool to auto generate methods for your enums.
+- **Stringer**: is a tool to automate the creation of methods that satisfy the fmt.Stringer interface.
+- **Mockgen**: is a mocking framework for the Go programming language
+- **Testify**: a toolkit with common assertions and mocks that plays nicely with the standard library.
 
 <!-- Repository -->
 [repo_license_img]: https://img.shields.io/github/license/blackPavlin/shop?style=for-the-badge&logo=none
