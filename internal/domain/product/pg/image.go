@@ -39,7 +39,7 @@ func (r *ImageRepository) BulkCreateTx(
 	}
 	client := tx.Client()
 	rows, err := client.ProductImage.
-		CreateBulk(mapImagesToCreateBuilders(client, images)...).
+		CreateBulk(createImageBuilders(client, images)...).
 		Save(ctx)
 	if err != nil {
 		if pg.IsForeignKeyViolationErr(err, "product_image_product_fk") {
@@ -113,21 +113,6 @@ func (r *ImageRepository) Delete(ctx context.Context, filter *product.ImageFilte
 	return nil
 }
 
-func mapImagesToCreateBuilders(
-	client *ent.Client,
-	images product.Images,
-) []*ent.ProductImageCreate {
-	builders := make([]*ent.ProductImageCreate, 0)
-	for _, image := range images {
-		builder := client.ProductImage.
-			Create().
-			SetName(image.Props.Name).
-			SetProductID(int64(image.Props.ProductID))
-		builders = append(builders, builder)
-	}
-	return builders
-}
-
 func makeImagePredicates(filter *product.ImageFilter) []predicate.ProductImage {
 	predicates := make([]predicate.ProductImage, 0)
 	if len(filter.ProductID.Eq) > 0 {
@@ -155,6 +140,21 @@ func makeImagePredicates(filter *product.ImageFilter) []predicate.ProductImage {
 		)
 	}
 	return predicates
+}
+
+func createImageBuilder(client *ent.Client, image *product.Image) *ent.ProductImageCreate {
+	return client.ProductImage.
+		Create().
+		SetName(image.Props.Name).
+		SetProductID(int64(image.Props.ProductID))
+}
+
+func createImageBuilders(client *ent.Client, images product.Images) []*ent.ProductImageCreate {
+	builders := make([]*ent.ProductImageCreate, 0, len(images))
+	for _, image := range images {
+		builders = append(builders, createImageBuilder(client, image))
+	}
+	return builders
 }
 
 func mapDomainImageFromRow(row *ent.ProductImage) *product.Image {
