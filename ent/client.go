@@ -781,6 +781,22 @@ func (c *OrderClient) QueryUsers(o *Order) *UserQuery {
 	return query
 }
 
+// QueryOrderProducts queries the order_products edge of a Order.
+func (c *OrderClient) QueryOrderProducts(o *Order) *OrderProductQuery {
+	query := (&OrderProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := o.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(order.Table, order.FieldID, id),
+			sqlgraph.To(orderproduct.Table, orderproduct.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, order.OrderProductsTable, order.OrderProductsColumn),
+		)
+		fromV = sqlgraph.Neighbors(o.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *OrderClient) Hooks() []Hook {
 	return c.hooks.Order
@@ -897,6 +913,38 @@ func (c *OrderProductClient) GetX(ctx context.Context, id int64) *OrderProduct {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryOrders queries the orders edge of a OrderProduct.
+func (c *OrderProductClient) QueryOrders(op *OrderProduct) *OrderQuery {
+	query := (&OrderClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := op.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orderproduct.Table, orderproduct.FieldID, id),
+			sqlgraph.To(order.Table, order.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, orderproduct.OrdersTable, orderproduct.OrdersColumn),
+		)
+		fromV = sqlgraph.Neighbors(op.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProducts queries the products edge of a OrderProduct.
+func (c *OrderProductClient) QueryProducts(op *OrderProduct) *ProductQuery {
+	query := (&ProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := op.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orderproduct.Table, orderproduct.FieldID, id),
+			sqlgraph.To(product.Table, product.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, orderproduct.ProductsTable, orderproduct.ProductsColumn),
+		)
+		fromV = sqlgraph.Neighbors(op.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -1058,6 +1106,22 @@ func (c *ProductClient) QueryProductImages(pr *Product) *ProductImageQuery {
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(productimage.Table, productimage.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.ProductImagesTable, product.ProductImagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOrderProducts queries the order_products edge of a Product.
+func (c *ProductClient) QueryOrderProducts(pr *Product) *OrderProductQuery {
+	query := (&OrderProductClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(product.Table, product.FieldID, id),
+			sqlgraph.To(orderproduct.Table, orderproduct.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, product.OrderProductsTable, product.OrderProductsColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
