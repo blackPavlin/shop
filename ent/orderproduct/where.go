@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/blackPavlin/shop/ent/predicate"
 )
 
@@ -62,6 +63,26 @@ func CreatedAt(v time.Time) predicate.OrderProduct {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.OrderProduct {
 	return predicate.OrderProduct(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// OrderID applies equality check predicate on the "order_id" field. It's identical to OrderIDEQ.
+func OrderID(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldOrderID, v))
+}
+
+// ProductID applies equality check predicate on the "product_id" field. It's identical to ProductIDEQ.
+func ProductID(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldProductID, v))
+}
+
+// Amount applies equality check predicate on the "amount" field. It's identical to AmountEQ.
+func Amount(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldAmount, v))
+}
+
+// Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
+func Price(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldPrice, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -142,6 +163,172 @@ func UpdatedAtLT(v time.Time) predicate.OrderProduct {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.OrderProduct {
 	return predicate.OrderProduct(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// OrderIDEQ applies the EQ predicate on the "order_id" field.
+func OrderIDEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldOrderID, v))
+}
+
+// OrderIDNEQ applies the NEQ predicate on the "order_id" field.
+func OrderIDNEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNEQ(FieldOrderID, v))
+}
+
+// OrderIDIn applies the In predicate on the "order_id" field.
+func OrderIDIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldIn(FieldOrderID, vs...))
+}
+
+// OrderIDNotIn applies the NotIn predicate on the "order_id" field.
+func OrderIDNotIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNotIn(FieldOrderID, vs...))
+}
+
+// ProductIDEQ applies the EQ predicate on the "product_id" field.
+func ProductIDEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldProductID, v))
+}
+
+// ProductIDNEQ applies the NEQ predicate on the "product_id" field.
+func ProductIDNEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNEQ(FieldProductID, v))
+}
+
+// ProductIDIn applies the In predicate on the "product_id" field.
+func ProductIDIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldIn(FieldProductID, vs...))
+}
+
+// ProductIDNotIn applies the NotIn predicate on the "product_id" field.
+func ProductIDNotIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNotIn(FieldProductID, vs...))
+}
+
+// AmountEQ applies the EQ predicate on the "amount" field.
+func AmountEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldAmount, v))
+}
+
+// AmountNEQ applies the NEQ predicate on the "amount" field.
+func AmountNEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNEQ(FieldAmount, v))
+}
+
+// AmountIn applies the In predicate on the "amount" field.
+func AmountIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldIn(FieldAmount, vs...))
+}
+
+// AmountNotIn applies the NotIn predicate on the "amount" field.
+func AmountNotIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNotIn(FieldAmount, vs...))
+}
+
+// AmountGT applies the GT predicate on the "amount" field.
+func AmountGT(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldGT(FieldAmount, v))
+}
+
+// AmountGTE applies the GTE predicate on the "amount" field.
+func AmountGTE(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldGTE(FieldAmount, v))
+}
+
+// AmountLT applies the LT predicate on the "amount" field.
+func AmountLT(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldLT(FieldAmount, v))
+}
+
+// AmountLTE applies the LTE predicate on the "amount" field.
+func AmountLTE(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldLTE(FieldAmount, v))
+}
+
+// PriceEQ applies the EQ predicate on the "price" field.
+func PriceEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldEQ(FieldPrice, v))
+}
+
+// PriceNEQ applies the NEQ predicate on the "price" field.
+func PriceNEQ(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNEQ(FieldPrice, v))
+}
+
+// PriceIn applies the In predicate on the "price" field.
+func PriceIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldIn(FieldPrice, vs...))
+}
+
+// PriceNotIn applies the NotIn predicate on the "price" field.
+func PriceNotIn(vs ...int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldNotIn(FieldPrice, vs...))
+}
+
+// PriceGT applies the GT predicate on the "price" field.
+func PriceGT(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldGT(FieldPrice, v))
+}
+
+// PriceGTE applies the GTE predicate on the "price" field.
+func PriceGTE(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldGTE(FieldPrice, v))
+}
+
+// PriceLT applies the LT predicate on the "price" field.
+func PriceLT(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldLT(FieldPrice, v))
+}
+
+// PriceLTE applies the LTE predicate on the "price" field.
+func PriceLTE(v int64) predicate.OrderProduct {
+	return predicate.OrderProduct(sql.FieldLTE(FieldPrice, v))
+}
+
+// HasOrders applies the HasEdge predicate on the "orders" edge.
+func HasOrders() predicate.OrderProduct {
+	return predicate.OrderProduct(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OrdersTable, OrdersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOrdersWith applies the HasEdge predicate on the "orders" edge with a given conditions (other predicates).
+func HasOrdersWith(preds ...predicate.Order) predicate.OrderProduct {
+	return predicate.OrderProduct(func(s *sql.Selector) {
+		step := newOrdersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasProducts applies the HasEdge predicate on the "products" edge.
+func HasProducts() predicate.OrderProduct {
+	return predicate.OrderProduct(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ProductsTable, ProductsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProductsWith applies the HasEdge predicate on the "products" edge with a given conditions (other predicates).
+func HasProductsWith(preds ...predicate.Product) predicate.OrderProduct {
+	return predicate.OrderProduct(func(s *sql.Selector) {
+		step := newProductsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.
