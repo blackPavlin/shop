@@ -19,8 +19,8 @@ type S3Config struct {
 	Location        string `envconfig:"LOCATION" required:"true"`
 }
 
-// NewStorage create instance of s3 storage.
-func NewStorage(ctx context.Context, config *S3Config) (*minio.Client, error) {
+// NewClient create instance of s3 storage.
+func NewClient(ctx context.Context, config *S3Config) (*minio.Client, error) {
 	client, err := minio.New(config.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
 		Secure: config.UseSSL,

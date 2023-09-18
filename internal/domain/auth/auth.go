@@ -2,14 +2,14 @@
 package auth
 
 import (
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/blackPavlin/shop/internal/domain/user"
 )
 
 // UserClaims represents jwt claims.
 type UserClaims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 	UserID   user.ID   `json:"userId"`
 	UserRole user.Role `json:"userRole"`
 }

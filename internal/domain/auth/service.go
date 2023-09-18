@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
@@ -98,9 +98,9 @@ func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error
 // SignToken sign authorization token.
 func (s *UseCase) SignToken(usr *user.User) (string, error) {
 	claims := &UserClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Duration(s.config.ExpiresIn) * time.Second).Unix(),
-			IssuedAt:  time.Now().Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(s.config.ExpiresIn) * time.Second)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		UserID:   usr.ID,
 		UserRole: usr.Role,
