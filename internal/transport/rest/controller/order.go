@@ -44,5 +44,5 @@ func (ctrl *OrderController) CreateOrderHandler(w http.ResponseWriter, r *http.R
 	render.Status(r, http.StatusCreated)
 }
 
-// GetOrderHandler define handler for GET /api/order/{orderId}.
+// GetOrderHandler define handler for GET /api/order/{orderID}.
 func (ctrl *OrderController) GetOrderHandler(w http.ResponseWriter, r *http.Request) {}

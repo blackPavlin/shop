@@ -89,7 +89,7 @@ func (ctrl *ProductController) CreateProductHandler(w http.ResponseWriter, r *ht
 	render.Respond(w, r, mapping.CreateProductResponse(p))
 }
 
-// GetProductHandler define handler for GET /api/product/{productId}.
+// GetProductHandler define handler for GET /api/product/{productID}.
 func (ctrl *ProductController) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 	productID, err := restx.GetIDFromURLParams(r, "productID")
 	if err != nil {
@@ -106,7 +106,7 @@ func (ctrl *ProductController) GetProductHandler(w http.ResponseWriter, r *http.
 	render.Respond(w, r, mapping.CreateProductResponse(p))
 }
 
-// UpdateProductHandler define handler for PATCH /api/product/{productId}.
+// UpdateProductHandler define handler for PATCH /api/product/{productID}.
 func (ctrl *ProductController) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 	productID, err := restx.GetIDFromURLParams(r, "productID")
 	if err != nil {
@@ -134,7 +134,7 @@ func (ctrl *ProductController) UpdateProductHandler(w http.ResponseWriter, r *ht
 	render.Respond(w, r, mapping.CreateProductResponse(p))
 }
 
-// DeleteProductHandler define handler for DELETE /api/product/{productId}.
+// DeleteProductHandler define handler for DELETE /api/product/{productID}.
 func (ctrl *ProductController) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 	productID, err := restx.GetIDFromURLParams(r, "productID")
 	if err != nil {
@@ -145,11 +145,10 @@ func (ctrl *ProductController) DeleteProductHandler(w http.ResponseWriter, r *ht
 		restx.HandleError(w, r, err)
 		return
 	}
-	render.Status(r, http.StatusNoContent)
-	render.Respond(w, r, nil)
+	render.NoContent(w, r)
 }
 
-// UploadProductImageHandler define handler for POST /api/product/{productId}/image.
+// UploadProductImageHandler define handler for POST /api/product/{productID}/image.
 func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	productID, err := restx.GetIDFromURLParams(r, "productID")
 	if err != nil {
@@ -192,7 +191,7 @@ func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, 
 	render.Respond(w, r, mapping.CreateUploadImagesResponse(result))
 }
 
-// DeleteProductImageHandler define handler for DELETE /api/product/{productId}/image/{imageID}.
+// DeleteProductImageHandler define handler for DELETE /api/product/{productID}/image/{imageID}.
 func (ctrl *ProductController) DeleteProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	imageID, err := restx.GetIDFromURLParams(r, "imageID")
 	if err != nil {
@@ -203,6 +202,5 @@ func (ctrl *ProductController) DeleteProductImageHandler(w http.ResponseWriter, 
 		restx.HandleError(w, r, err)
 		return
 	}
-	render.Status(r, http.StatusNoContent)
-	render.Respond(w, r, nil)
+	render.NoContent(w, r)
 }

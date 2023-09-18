@@ -97,13 +97,12 @@ func (ctrl *CartController) DeleteProductsHandler(w http.ResponseWriter, r *http
 		restx.HandleError(w, r, err)
 		return
 	}
-	render.Status(r, http.StatusNoContent)
-	render.Respond(w, r, nil)
+	render.NoContent(w, r)
 }
 
-// DeleteProductHandler define handler for DELETE /api/cart/{cartId}.
+// DeleteProductHandler define handler for DELETE /api/cart/{cartID}.
 func (ctrl *CartController) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
-	cartID, err := restx.GetIDFromURLParams(r, "cartId")
+	cartID, err := restx.GetIDFromURLParams(r, "cartID")
 	if err != nil {
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
@@ -114,6 +113,5 @@ func (ctrl *CartController) DeleteProductHandler(w http.ResponseWriter, r *http.
 		restx.HandleError(w, r, err)
 		return
 	}
-	render.Status(r, http.StatusNoContent)
-	render.Respond(w, r, nil)
+	render.NoContent(w, r)
 }

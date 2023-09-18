@@ -94,7 +94,7 @@ func (ctrl *CategoryController) UpdateCategoryHandler(w http.ResponseWriter, r *
 	render.Respond(w, r, mapping.CreateCategoryResponse(c))
 }
 
-// DeleteCategoryHandler define handler for DELETE /api/category/{categoryId}.
+// DeleteCategoryHandler define handler for DELETE /api/category/{categoryID}.
 func (ctrl *CategoryController) DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	categoryID, err := restx.GetIDFromURLParams(r, "categoryID")
 	if err != nil {
@@ -105,6 +105,5 @@ func (ctrl *CategoryController) DeleteCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, err)
 		return
 	}
-	render.Status(r, http.StatusNoContent)
-	render.Respond(w, r, nil)
+	render.NoContent(w, r)
 }
