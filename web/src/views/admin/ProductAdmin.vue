@@ -82,13 +82,9 @@
 
         <el-table :data="products">
           <el-table-column label="ID" prop="id"></el-table-column>
-
           <el-table-column label="Название" prop="name"></el-table-column>
-
           <el-table-column label="Количество" prop="amount"></el-table-column>
-
           <el-table-column label="Цена" prop="price"></el-table-column>
-
           <el-table-column>
             <template #default="scope">
               <el-button

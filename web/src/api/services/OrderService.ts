@@ -20,6 +20,10 @@ export class OrderService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/order',
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -32,6 +36,12 @@ export class OrderService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/order',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                404: `Not Found`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -49,6 +59,12 @@ export class OrderService {
             url: '/order/{orderId}',
             path: {
                 'orderId': orderId,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                404: `Not Found`,
+                500: `Internal Server Error`,
             },
         });
     }

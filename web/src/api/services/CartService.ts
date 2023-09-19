@@ -21,6 +21,10 @@ export class CartService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/cart',
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -38,6 +42,11 @@ export class CartService {
             url: '/cart',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -55,18 +64,49 @@ export class CartService {
             url: '/cart',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
     /**
      * Очистить корзину
-     * @returns Cart OK
+     * @returns void
      * @throws ApiError
      */
-    public static deleteCart(): CancelablePromise<Cart> {
+    public static deleteCart(): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/cart',
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
+
+    /**
+     * Удалить товар из корзины
+     * @param cartId ID товара в корзине
+     * @returns void
+     * @throws ApiError
+     */
+    public static deleteCart1(
+        cartId: string,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/cart/{cartId}',
+            path: {
+                'cartId': cartId,
+            },
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 

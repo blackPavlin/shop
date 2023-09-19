@@ -21,6 +21,9 @@ export class CategoryService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/category',
+            errors: {
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -38,6 +41,11 @@ export class CategoryService {
             url: '/category',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -55,6 +63,12 @@ export class CategoryService {
             url: '/category',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                404: `Not Found`,
+                500: `Internal Server Error`,
+            },
         });
     }
 
@@ -72,6 +86,10 @@ export class CategoryService {
             url: '/category/{categoryId}',
             path: {
                 'categoryId': categoryId,
+            },
+            errors: {
+                401: `Unauthorized`,
+                500: `Internal Server Error`,
             },
         });
     }
