@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { UserService } from "@/api/services/UserService";
-
-import { User } from "@/api/models/User";
+import type { User } from "@/api";
 
 type State = {
   user: User | null;
