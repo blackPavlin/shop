@@ -4,6 +4,8 @@
 [![License][repo_license_img]][repo_license_url]
 [![Build][build_action_img]][build_action_url]
 
+<img src="https://raw.githubusercontent.com/MariaLetta/free-gophers-pack/master/illustrations/png/16.png" style="height: 300px; width:350px;" alt=""/>
+
 ## Packages and tools
 
 - **Chi**: lightweight, idiomatic and composable router for building Go HTTP services.

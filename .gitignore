@@ -14,3 +14,4 @@
 # Docker volumes
 /build/pg_data
 /build/s3_data
+/build/ms_data
