@@ -15,6 +15,11 @@
       <template #title>Вход</template>
     </el-menu-item>
 
+    <el-menu-item index="/address" route="/address" v-if="isAuth">
+      <el-icon><position /></el-icon>
+      <template #title>Адреса</template>
+    </el-menu-item>
+
     <el-menu-item index="/cart" route="/cart" v-if="isAuth">
       <el-icon><shopping-cart /></el-icon>
       <template #title>Корзина</template>
@@ -37,6 +42,7 @@ import { defineComponent, computed } from "vue";
 import {
   ArrowLeft,
   ArrowRight,
+  Position,
   ShoppingCart,
   SoldOut,
   Goods,
@@ -49,6 +55,7 @@ export default defineComponent({
   components: {
     ArrowLeft,
     ArrowRight,
+    Position,
     ShoppingCart,
     SoldOut,
     Goods,

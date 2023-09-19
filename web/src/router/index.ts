@@ -22,6 +22,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/views/Registration.vue"),
   },
   {
+    path: "/address",
+    name: "AddressView",
+    component: () => import("@/views/Address.vue"),
+  },
+  {
     path: "/cart",
     name: "CardView",
     component: () => import("@/views/Cart.vue"),
@@ -35,13 +40,6 @@ const routes: RouteRecordRaw[] = [
     path: "/products",
     name: "ProductsView",
     component: () => import("@/views/Products.vue"),
-    children: [
-      {
-        path: ":id",
-        name: "ProductList",
-        component: () => import("@/views/ProductList.vue"),
-      },
-    ],
   },
   {
     path: "/admin",

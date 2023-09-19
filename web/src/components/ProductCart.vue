@@ -84,4 +84,11 @@ export default defineComponent({
 .image-slot .el-icon {
   font-size: 30px;
 }
+
+.bottom {
+  margin-top: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 </style>
