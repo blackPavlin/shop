@@ -49,9 +49,9 @@ run:
   # If false (default) - golangci-lint acquires file lock on start.
   allow-parallel-runners: false
   # Define the Go version limit.
-  # Mainly related to generics support since go1.18.
-  # Default: use Go version from the go.mod file, fallback on the env var `GOVERSION`, fallback on 1.18
-  go: '1.18'
+  # Mainly related to generics support since go1.20.
+  # Default: use Go version from the go.mod file, fallback on the env var `GOVERSION`, fallback on 1.20
+  go: '1.20'
 
 # Output configuration options
 output:
@@ -540,7 +540,7 @@ linters-settings:
     rewrite-rules: []
   gofumpt:
     # Deprecated: use the global `run.go` instead.
-    lang-version: "1.18"
+    lang-version: "1.20"
     # Module path which contains the source code being formatted.
     # Default: ""
     module-path: ""
@@ -652,7 +652,7 @@ linters-settings:
       local_replace_directives: true
   gosimple:
     # Deprecated: use the global `run.go` instead.
-    go: "1.18"
+    go: "1.20"
     # Sxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
     # Default: ["*"]
     checks: ["*"]
@@ -922,7 +922,7 @@ linters-settings:
     # - `error` for errors
     # - `stdlib` for standard library
     # - `anon` for anonymous interfaces
-    # - `generic` for generic interfaces added in go 1.18
+    # - `generic` for generic interfaces added in go 1.20
 
     # By default, it allows using errors, empty interfaces, anonymous interfaces,
     # and interfaces provided by the standard library.
@@ -1114,13 +1114,13 @@ linters-settings:
       - github.com/jmoiron/sqlx
   staticcheck:
     # Deprecated: use the global `run.go` instead.
-    go: "1.18"
+    go: "1.20"
     # SAxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
     # Default: ["*"]
     checks: ["all"]
   # stylecheck:
   #   # Deprecated: use the global `run.go` instead.
-  #   go: "1.18"
+  #   go: "1.20"
   #   # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
   #   # Default: ["*"]
   #   checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022"]
