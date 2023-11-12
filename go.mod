@@ -19,7 +19,7 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/meilisearch/meilisearch-go v0.25.1
+	github.com/meilisearch/meilisearch-go v0.26.0
 	github.com/minio/minio-go/v7 v7.0.63
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
