@@ -3,7 +3,7 @@ module github.com/blackPavlin/shop
 go 1.20
 
 require (
-	entgo.io/ent v0.12.4
+	entgo.io/ent v0.12.5
 	github.com/brianvoe/gofakeit/v6 v6.24.0
 	github.com/deepmap/oapi-codegen v1.16.2
 	github.com/dmarkham/enumer v1.5.9
