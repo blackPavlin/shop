@@ -49,7 +49,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const objectStorageURL = process.env.VUE_APP_IMAGE_STORAGE_URI;
+    const objectStorageURL = import.meta.env.VUE_APP_IMAGE_STORAGE_URI;
     return {
       objectStorageURL,
     };

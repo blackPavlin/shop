@@ -322,7 +322,10 @@ export default defineComponent({
       });
 
       productStore
-        .updateProduct(String(updateForm.id), updateForm)
+        .updateProduct(
+          String(updateForm.id),
+          updateForm as unknown as CreateProductRequest,
+        )
         .then(async () => {
           formEl.resetFields();
           isUpdateDialogVisible.value = false;
