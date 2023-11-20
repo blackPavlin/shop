@@ -123,10 +123,10 @@ func makePredicates(filter *cart.Filter) []predicate.Cart {
 		predicates = append(predicates, entcart.UserIDNotIn(filter.UserID.Neq.ToInt64()...))
 	}
 	if len(filter.ID.Eq) > 0 {
-		predicates = append(predicates, entcart.IDIn(filter.UserID.Eq.ToInt64()...))
+		predicates = append(predicates, entcart.IDIn(filter.ID.Eq.ToInt64()...))
 	}
 	if len(filter.ID.Neq) > 0 {
-		predicates = append(predicates, entcart.IDNotIn(filter.UserID.Neq.ToInt64()...))
+		predicates = append(predicates, entcart.IDNotIn(filter.ID.Neq.ToInt64()...))
 	}
 	return predicates
 }
