@@ -12,6 +12,7 @@ import (
 	"github.com/blackPavlin/shop/internal/server"
 	"github.com/blackPavlin/shop/pkg/pgutil"
 	"github.com/blackPavlin/shop/pkg/s3x"
+	"github.com/blackPavlin/shop/pkg/searchx"
 	"github.com/blackPavlin/shop/pkg/zapx"
 )
 
@@ -43,7 +44,12 @@ func main() {
 		log.Fatalf("failed to connect file storage: %+v", err)
 	}
 
-	if err := server.NewServer(conf, logger, database, storage).Run(); err != nil {
+	search, err := searchx.NewClient(context.Background(), conf.Search)
+	if err != nil {
+		log.Fatalf("failed to connect search engine: %+v", err)
+	}
+
+	if err := server.NewServer(conf, logger, database, storage, search).Run(); err != nil {
 		log.Fatalf("failed to shutdown server: %+v", err)
 	}
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/meilisearch/meilisearch-go"
 	"github.com/minio/minio-go/v7"
 	"go.uber.org/zap"
 
@@ -47,6 +48,7 @@ type Server struct {
 
 	database *ent.Client
 	storage  *minio.Client
+	search   *meilisearch.Client
 }
 
 // NewServer create instance of http server.
@@ -55,6 +57,7 @@ func NewServer(
 	logger *zap.Logger,
 	database *ent.Client,
 	storage *minio.Client,
+	search *meilisearch.Client,
 ) *Server {
 	router := chi.NewRouter()
 
@@ -122,7 +125,7 @@ func NewServer(
 		orderController.RegisterRoutes(r)    // /api/order
 	})
 
-	return &Server{conf, logger, router, database, storage}
+	return &Server{conf, logger, router, database, storage, search}
 }
 
 // Run http server.

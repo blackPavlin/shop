@@ -9,6 +9,7 @@ import (
 
 	"github.com/blackPavlin/shop/pkg/pgutil"
 	"github.com/blackPavlin/shop/pkg/s3x"
+	"github.com/blackPavlin/shop/pkg/searchx"
 	"github.com/blackPavlin/shop/pkg/zapx"
 )
 
@@ -20,6 +21,7 @@ type Config struct {
 	Postgres *pgutil.PostgresConfig `envconfig:"POSTGRES" required:"true"`
 	Auth     *AuthConfig            `envconfig:"AUTH" required:"true"`
 	S3       *s3x.S3Config          `envconfig:"S3" required:"true"`
+	Search   *searchx.SearchConfig  `envconfig:"SEARCH" required:"true"`
 }
 
 // ServerConfig is HTTP server configuration.
