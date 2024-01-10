@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	user "github.com/blackPavlin/shop/internal/domain/user"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -52,6 +53,21 @@ func (m *MockService) Login(ctx context.Context, props *LoginProps) (string, err
 func (mr *MockServiceMockRecorder) Login(ctx, props any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockService)(nil).Login), ctx, props)
+}
+
+// SignToken mocks base method.
+func (m *MockService) SignToken(usr *user.User) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SignToken", usr)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SignToken indicates an expected call of SignToken.
+func (mr *MockServiceMockRecorder) SignToken(usr any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignToken", reflect.TypeOf((*MockService)(nil).SignToken), usr)
 }
 
 // Signup mocks base method.

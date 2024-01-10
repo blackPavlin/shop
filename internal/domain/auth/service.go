@@ -24,6 +24,7 @@ const passwordCost = 14
 type Service interface {
 	Login(ctx context.Context, props *LoginProps) (string, error)
 	Signup(ctx context.Context, props *SignupProps) (string, error)
+	SignToken(usr *user.User) (string, error)
 	ValidateToken(accessToken string) (*UserClaims, error)
 }
 
