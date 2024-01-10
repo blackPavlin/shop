@@ -16,7 +16,7 @@ import (
 	"github.com/blackPavlin/shop/pkg/errorx"
 )
 
-//go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "auth"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "service_mock.go" -package "auth"
 
 const passwordCost = 14
 

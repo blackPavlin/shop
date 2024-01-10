@@ -2,8 +2,8 @@
 package testutilx
 
 import (
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 )
 
 // BaseSuite base suite for reuse.

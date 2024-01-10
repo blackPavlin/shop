@@ -7,7 +7,7 @@ import (
 	"github.com/blackPavlin/shop/pkg/paging"
 )
 
-//go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "order"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "repository_mock.go" -package "order"
 
 // Repository represents order repository.
 type Repository interface {

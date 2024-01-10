@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "user"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "service_mock.go" -package "user"
 
 // Service represents user use cases.
 type Service interface {

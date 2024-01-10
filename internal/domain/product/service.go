@@ -9,7 +9,7 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
-//go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "product"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "service_mock.go" -package "product"
 
 // Service represents product use cases.
 type Service interface {

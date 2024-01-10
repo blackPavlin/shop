@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "service_mock.go" -package "address"
+
 // Service represents address use cases.
 type Service interface {
 	Create(ctx context.Context, props *Props) (*Address, error)

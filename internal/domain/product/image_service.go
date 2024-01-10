@@ -15,7 +15,7 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
-//go:generate mockgen -source $GOFILE -destination "image_service_mock.go" -package "product"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "image_service_mock.go" -package "product"
 
 // ImageService represents product image use cases.
 type ImageService interface {

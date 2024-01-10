@@ -7,7 +7,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/user"
 )
 
-//go:generate enumer -sql -linecomment -type Status -trimprefix Status -output status_string.go order.go
+//go:generate go run github.com/dmarkham/enumer@v1.5.9 -sql -linecomment -type Status -trimprefix Status -output status_string.go order.go
 
 const (
 	StatusCreated  Status = iota // CREATED

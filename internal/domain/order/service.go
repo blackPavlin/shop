@@ -9,6 +9,8 @@ import (
 	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "service_mock.go" -package "order"
+
 // Service represents order use cases.
 type Service interface {
 	Get(ctx context.Context, filter *Filter) (*Order, error)

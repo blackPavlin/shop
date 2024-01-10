@@ -6,7 +6,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/product"
 )
 
-//go:generate mockgen -source $GOFILE -destination "product_repository_mock.go" -package "order"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "product_repository_mock.go" -package "order"
 
 // ProductRepository represents order product repository.
 type ProductRepository interface {

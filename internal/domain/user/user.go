@@ -3,7 +3,7 @@ package user
 
 import "time"
 
-//go:generate enumer -sql -linecomment -type Role -trimprefix Role -output role_string.go user.go
+//go:generate go run github.com/dmarkham/enumer@v1.5.9 -sql -linecomment -type Role -trimprefix Role -output role_string.go
 
 const (
 	RoleUser  Role = iota // USER

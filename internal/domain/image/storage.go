@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-//go:generate mockgen -source $GOFILE -destination "storage_mock.go" -package "image"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "storage_mock.go" -package "image"
 
 // Storage represents file store.
 type Storage interface {

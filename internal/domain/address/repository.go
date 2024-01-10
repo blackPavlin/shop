@@ -6,7 +6,7 @@ import (
 	"github.com/blackPavlin/shop/internal/domain/user"
 )
 
-//go:generate mockgen -source $GOFILE -destination "repository_mock.go" -package "address"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "repository_mock.go" -package "address"
 
 // Repository represents address repository.
 type Repository interface {

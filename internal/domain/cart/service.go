@@ -8,7 +8,7 @@ import (
 	"github.com/blackPavlin/shop/pkg/errorx"
 )
 
-//go:generate mockgen -source $GOFILE -destination "service_mock.go" -package "cart"
+//go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "service_mock.go" -package "cart"
 
 // Service represents cart use cases.
 type Service interface {
