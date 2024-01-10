@@ -51,7 +51,7 @@ run:
   # Define the Go version limit.
   # Mainly related to generics support since go1.20.
   # Default: use Go version from the go.mod file, fallback on the env var `GOVERSION`, fallback on 1.20
-  go: '1.20'
+  go: '1.21'
 
 # Output configuration options
 output:
@@ -540,7 +540,7 @@ linters-settings:
     rewrite-rules: []
   gofumpt:
     # Deprecated: use the global `run.go` instead.
-    lang-version: "1.20"
+    lang-version: "1.21"
     # Module path which contains the source code being formatted.
     # Default: ""
     module-path: ""
@@ -652,7 +652,7 @@ linters-settings:
       local_replace_directives: true
   gosimple:
     # Deprecated: use the global `run.go` instead.
-    go: "1.20"
+    go: "1.21"
     # Sxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
     # Default: ["*"]
     checks: ["*"]
@@ -1114,7 +1114,7 @@ linters-settings:
       - github.com/jmoiron/sqlx
   staticcheck:
     # Deprecated: use the global `run.go` instead.
-    go: "1.20"
+    go: "1.21"
     # SAxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
     # Default: ["*"]
     checks: ["all"]

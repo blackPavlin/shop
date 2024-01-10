@@ -20,6 +20,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/meilisearch/meilisearch-go v0.26.0
 	github.com/minio/minio-go/v7 v7.0.66
+	github.com/oapi-codegen/runtime v1.1.1
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/mock v0.4.0
 	go.uber.org/zap v1.26.0

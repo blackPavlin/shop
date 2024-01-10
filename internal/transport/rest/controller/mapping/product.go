@@ -30,9 +30,7 @@ func CreateProductsResponse(products product.Products) []rest.Product {
 // CreateGetProductsResponse transform domain entity to rest response.
 func CreateGetProductsResponse(products *product.QueryResult) rest.ProductList {
 	return rest.ProductList{
-		PaginationResponse: rest.PaginationResponse{
-			Quantity: products.Count,
-		},
-		Items: CreateProductsResponse(products.Items),
+		Quantity: products.Count,
+		Items:    CreateProductsResponse(products.Items),
 	}
 }
