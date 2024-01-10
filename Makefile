@@ -31,7 +31,7 @@ go/generate:
 
 .PHONY: openapi/generate
 openapi/generate:
-	@oapi-codegen -generate types -o ./internal/transport/rest/types.gen.go -package rest ./api/openapi.v1.yaml
+	@go run github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@v2.0.0 -generate types -o ./internal/transport/rest/types.gen.go -package rest ./api/openapi.v1.yaml
 
 ## tests: Run tests.
 .PHONY: test tests
