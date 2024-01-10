@@ -42,6 +42,14 @@ func (ou *OrderUpdate) SetUserID(i int64) *OrderUpdate {
 	return ou
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (ou *OrderUpdate) SetNillableUserID(i *int64) *OrderUpdate {
+	if i != nil {
+		ou.SetUserID(*i)
+	}
+	return ou
+}
+
 // SetStatus sets the "status" field.
 func (ou *OrderUpdate) SetStatus(o order.Status) *OrderUpdate {
 	ou.mutation.SetStatus(o)
@@ -284,6 +292,14 @@ func (ouo *OrderUpdateOne) SetUpdatedAt(t time.Time) *OrderUpdateOne {
 // SetUserID sets the "user_id" field.
 func (ouo *OrderUpdateOne) SetUserID(i int64) *OrderUpdateOne {
 	ouo.mutation.SetUserID(i)
+	return ouo
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (ouo *OrderUpdateOne) SetNillableUserID(i *int64) *OrderUpdateOne {
+	if i != nil {
+		ouo.SetUserID(*i)
+	}
 	return ouo
 }
 

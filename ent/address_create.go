@@ -727,12 +727,16 @@ func (u *AddressUpsertOne) IDX(ctx context.Context) int64 {
 // AddressCreateBulk is the builder for creating many Address entities in bulk.
 type AddressCreateBulk struct {
 	config
+	err      error
 	builders []*AddressCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Address entities in the database.
 func (acb *AddressCreateBulk) Save(ctx context.Context) ([]*Address, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*Address, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
@@ -1061,6 +1065,9 @@ func (u *AddressUpsertBulk) UpdateStreet() *AddressUpsertBulk {
 
 // Exec executes the query.
 func (u *AddressUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AddressCreateBulk instead", i)

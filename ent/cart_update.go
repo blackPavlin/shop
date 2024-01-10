@@ -42,9 +42,25 @@ func (cu *CartUpdate) SetUserID(i int64) *CartUpdate {
 	return cu
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (cu *CartUpdate) SetNillableUserID(i *int64) *CartUpdate {
+	if i != nil {
+		cu.SetUserID(*i)
+	}
+	return cu
+}
+
 // SetProductID sets the "product_id" field.
 func (cu *CartUpdate) SetProductID(i int64) *CartUpdate {
 	cu.mutation.SetProductID(i)
+	return cu
+}
+
+// SetNillableProductID sets the "product_id" field if the given value is not nil.
+func (cu *CartUpdate) SetNillableProductID(i *int64) *CartUpdate {
+	if i != nil {
+		cu.SetProductID(*i)
+	}
 	return cu
 }
 
@@ -52,6 +68,14 @@ func (cu *CartUpdate) SetProductID(i int64) *CartUpdate {
 func (cu *CartUpdate) SetAmount(i int64) *CartUpdate {
 	cu.mutation.ResetAmount()
 	cu.mutation.SetAmount(i)
+	return cu
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (cu *CartUpdate) SetNillableAmount(i *int64) *CartUpdate {
+	if i != nil {
+		cu.SetAmount(*i)
+	}
 	return cu
 }
 
@@ -263,9 +287,25 @@ func (cuo *CartUpdateOne) SetUserID(i int64) *CartUpdateOne {
 	return cuo
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (cuo *CartUpdateOne) SetNillableUserID(i *int64) *CartUpdateOne {
+	if i != nil {
+		cuo.SetUserID(*i)
+	}
+	return cuo
+}
+
 // SetProductID sets the "product_id" field.
 func (cuo *CartUpdateOne) SetProductID(i int64) *CartUpdateOne {
 	cuo.mutation.SetProductID(i)
+	return cuo
+}
+
+// SetNillableProductID sets the "product_id" field if the given value is not nil.
+func (cuo *CartUpdateOne) SetNillableProductID(i *int64) *CartUpdateOne {
+	if i != nil {
+		cuo.SetProductID(*i)
+	}
 	return cuo
 }
 
@@ -273,6 +313,14 @@ func (cuo *CartUpdateOne) SetProductID(i int64) *CartUpdateOne {
 func (cuo *CartUpdateOne) SetAmount(i int64) *CartUpdateOne {
 	cuo.mutation.ResetAmount()
 	cuo.mutation.SetAmount(i)
+	return cuo
+}
+
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (cuo *CartUpdateOne) SetNillableAmount(i *int64) *CartUpdateOne {
+	if i != nil {
+		cuo.SetAmount(*i)
+	}
 	return cuo
 }
 

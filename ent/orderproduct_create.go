@@ -557,12 +557,16 @@ func (u *OrderProductUpsertOne) IDX(ctx context.Context) int64 {
 // OrderProductCreateBulk is the builder for creating many OrderProduct entities in bulk.
 type OrderProductCreateBulk struct {
 	config
+	err      error
 	builders []*OrderProductCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the OrderProduct entities in the database.
 func (opcb *OrderProductCreateBulk) Save(ctx context.Context) ([]*OrderProduct, error) {
+	if opcb.err != nil {
+		return nil, opcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(opcb.builders))
 	nodes := make([]*OrderProduct, len(opcb.builders))
 	mutators := make([]Mutator, len(opcb.builders))
@@ -814,6 +818,9 @@ func (u *OrderProductUpsertBulk) UpdatePrice() *OrderProductUpsertBulk {
 
 // Exec executes the query.
 func (u *OrderProductUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the OrderProductCreateBulk instead", i)

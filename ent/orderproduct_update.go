@@ -42,9 +42,25 @@ func (opu *OrderProductUpdate) SetOrderID(i int64) *OrderProductUpdate {
 	return opu
 }
 
+// SetNillableOrderID sets the "order_id" field if the given value is not nil.
+func (opu *OrderProductUpdate) SetNillableOrderID(i *int64) *OrderProductUpdate {
+	if i != nil {
+		opu.SetOrderID(*i)
+	}
+	return opu
+}
+
 // SetProductID sets the "product_id" field.
 func (opu *OrderProductUpdate) SetProductID(i int64) *OrderProductUpdate {
 	opu.mutation.SetProductID(i)
+	return opu
+}
+
+// SetNillableProductID sets the "product_id" field if the given value is not nil.
+func (opu *OrderProductUpdate) SetNillableProductID(i *int64) *OrderProductUpdate {
+	if i != nil {
+		opu.SetProductID(*i)
+	}
 	return opu
 }
 
@@ -73,6 +89,14 @@ func (opu *OrderProductUpdate) AddAmount(i int64) *OrderProductUpdate {
 func (opu *OrderProductUpdate) SetPrice(i int64) *OrderProductUpdate {
 	opu.mutation.ResetPrice()
 	opu.mutation.SetPrice(i)
+	return opu
+}
+
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (opu *OrderProductUpdate) SetNillablePrice(i *int64) *OrderProductUpdate {
+	if i != nil {
+		opu.SetPrice(*i)
+	}
 	return opu
 }
 
@@ -295,9 +319,25 @@ func (opuo *OrderProductUpdateOne) SetOrderID(i int64) *OrderProductUpdateOne {
 	return opuo
 }
 
+// SetNillableOrderID sets the "order_id" field if the given value is not nil.
+func (opuo *OrderProductUpdateOne) SetNillableOrderID(i *int64) *OrderProductUpdateOne {
+	if i != nil {
+		opuo.SetOrderID(*i)
+	}
+	return opuo
+}
+
 // SetProductID sets the "product_id" field.
 func (opuo *OrderProductUpdateOne) SetProductID(i int64) *OrderProductUpdateOne {
 	opuo.mutation.SetProductID(i)
+	return opuo
+}
+
+// SetNillableProductID sets the "product_id" field if the given value is not nil.
+func (opuo *OrderProductUpdateOne) SetNillableProductID(i *int64) *OrderProductUpdateOne {
+	if i != nil {
+		opuo.SetProductID(*i)
+	}
 	return opuo
 }
 
@@ -326,6 +366,14 @@ func (opuo *OrderProductUpdateOne) AddAmount(i int64) *OrderProductUpdateOne {
 func (opuo *OrderProductUpdateOne) SetPrice(i int64) *OrderProductUpdateOne {
 	opuo.mutation.ResetPrice()
 	opuo.mutation.SetPrice(i)
+	return opuo
+}
+
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (opuo *OrderProductUpdateOne) SetNillablePrice(i *int64) *OrderProductUpdateOne {
+	if i != nil {
+		opuo.SetPrice(*i)
+	}
 	return opuo
 }
 

@@ -488,12 +488,16 @@ func (u *CartUpsertOne) IDX(ctx context.Context) int64 {
 // CartCreateBulk is the builder for creating many Cart entities in bulk.
 type CartCreateBulk struct {
 	config
+	err      error
 	builders []*CartCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Cart entities in the database.
 func (ccb *CartCreateBulk) Save(ctx context.Context) ([]*Cart, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Cart, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
@@ -724,6 +728,9 @@ func (u *CartUpsertBulk) UpdateAmount() *CartUpsertBulk {
 
 // Exec executes the query.
 func (u *CartUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the CartCreateBulk instead", i)

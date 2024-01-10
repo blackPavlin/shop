@@ -41,9 +41,25 @@ func (piu *ProductImageUpdate) SetProductID(i int64) *ProductImageUpdate {
 	return piu
 }
 
+// SetNillableProductID sets the "product_id" field if the given value is not nil.
+func (piu *ProductImageUpdate) SetNillableProductID(i *int64) *ProductImageUpdate {
+	if i != nil {
+		piu.SetProductID(*i)
+	}
+	return piu
+}
+
 // SetName sets the "name" field.
 func (piu *ProductImageUpdate) SetName(s string) *ProductImageUpdate {
 	piu.mutation.SetName(s)
+	return piu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (piu *ProductImageUpdate) SetNillableName(s *string) *ProductImageUpdate {
+	if s != nil {
+		piu.SetName(*s)
+	}
 	return piu
 }
 
@@ -192,9 +208,25 @@ func (piuo *ProductImageUpdateOne) SetProductID(i int64) *ProductImageUpdateOne 
 	return piuo
 }
 
+// SetNillableProductID sets the "product_id" field if the given value is not nil.
+func (piuo *ProductImageUpdateOne) SetNillableProductID(i *int64) *ProductImageUpdateOne {
+	if i != nil {
+		piuo.SetProductID(*i)
+	}
+	return piuo
+}
+
 // SetName sets the "name" field.
 func (piuo *ProductImageUpdateOne) SetName(s string) *ProductImageUpdateOne {
 	piuo.mutation.SetName(s)
+	return piuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (piuo *ProductImageUpdateOne) SetNillableName(s *string) *ProductImageUpdateOne {
+	if s != nil {
+		piuo.SetName(*s)
+	}
 	return piuo
 }
 

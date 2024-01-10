@@ -620,6 +620,7 @@ func (m *AddressMutation) SetUsersID(id int64) {
 // ClearUsers clears the "users" edge to the User entity.
 func (m *AddressMutation) ClearUsers() {
 	m.clearedusers = true
+	m.clearedFields[address.FieldUserID] = struct{}{}
 }
 
 // UsersCleared reports if the "users" edge to the User entity was cleared.
@@ -1389,6 +1390,7 @@ func (m *CartMutation) SetUsersID(id int64) {
 // ClearUsers clears the "users" edge to the User entity.
 func (m *CartMutation) ClearUsers() {
 	m.clearedusers = true
+	m.clearedFields[cart.FieldUserID] = struct{}{}
 }
 
 // UsersCleared reports if the "users" edge to the User entity was cleared.
@@ -1428,6 +1430,7 @@ func (m *CartMutation) SetProductsID(id int64) {
 // ClearProducts clears the "products" edge to the Product entity.
 func (m *CartMutation) ClearProducts() {
 	m.clearedproducts = true
+	m.clearedFields[cart.FieldProductID] = struct{}{}
 }
 
 // ProductsCleared reports if the "products" edge to the Product entity was cleared.
@@ -2562,6 +2565,7 @@ func (m *OrderMutation) SetUsersID(id int64) {
 // ClearUsers clears the "users" edge to the User entity.
 func (m *OrderMutation) ClearUsers() {
 	m.clearedusers = true
+	m.clearedFields[order.FieldUserID] = struct{}{}
 }
 
 // UsersCleared reports if the "users" edge to the User entity was cleared.
@@ -3318,6 +3322,7 @@ func (m *OrderProductMutation) SetOrdersID(id int64) {
 // ClearOrders clears the "orders" edge to the Order entity.
 func (m *OrderProductMutation) ClearOrders() {
 	m.clearedorders = true
+	m.clearedFields[orderproduct.FieldOrderID] = struct{}{}
 }
 
 // OrdersCleared reports if the "orders" edge to the Order entity was cleared.
@@ -3357,6 +3362,7 @@ func (m *OrderProductMutation) SetProductsID(id int64) {
 // ClearProducts clears the "products" edge to the Product entity.
 func (m *OrderProductMutation) ClearProducts() {
 	m.clearedproducts = true
+	m.clearedFields[orderproduct.FieldProductID] = struct{}{}
 }
 
 // ProductsCleared reports if the "products" edge to the Product entity was cleared.
@@ -4165,6 +4171,7 @@ func (m *ProductMutation) SetCategoriesID(id int64) {
 // ClearCategories clears the "categories" edge to the Category entity.
 func (m *ProductMutation) ClearCategories() {
 	m.clearedcategories = true
+	m.clearedFields[product.FieldCategoryID] = struct{}{}
 }
 
 // CategoriesCleared reports if the "categories" edge to the Category entity was cleared.
@@ -5048,6 +5055,7 @@ func (m *ProductImageMutation) SetProductsID(id int64) {
 // ClearProducts clears the "products" edge to the Product entity.
 func (m *ProductImageMutation) ClearProducts() {
 	m.clearedproducts = true
+	m.clearedFields[productimage.FieldProductID] = struct{}{}
 }
 
 // ProductsCleared reports if the "products" edge to the Product entity was cleared.

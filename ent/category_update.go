@@ -41,6 +41,14 @@ func (cu *CategoryUpdate) SetName(s string) *CategoryUpdate {
 	return cu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableName(s *string) *CategoryUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
 // AddProductIDs adds the "products" edge to the Product entity by IDs.
 func (cu *CategoryUpdate) AddProductIDs(ids ...int64) *CategoryUpdate {
 	cu.mutation.AddProductIDs(ids...)
@@ -220,6 +228,14 @@ func (cuo *CategoryUpdateOne) SetUpdatedAt(t time.Time) *CategoryUpdateOne {
 // SetName sets the "name" field.
 func (cuo *CategoryUpdateOne) SetName(s string) *CategoryUpdateOne {
 	cuo.mutation.SetName(s)
+	return cuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableName(s *string) *CategoryUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
 	return cuo
 }
 

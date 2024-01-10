@@ -44,9 +44,25 @@ func (pu *ProductUpdate) SetCategoryID(i int64) *ProductUpdate {
 	return pu
 }
 
+// SetNillableCategoryID sets the "category_id" field if the given value is not nil.
+func (pu *ProductUpdate) SetNillableCategoryID(i *int64) *ProductUpdate {
+	if i != nil {
+		pu.SetCategoryID(*i)
+	}
+	return pu
+}
+
 // SetName sets the "name" field.
 func (pu *ProductUpdate) SetName(s string) *ProductUpdate {
 	pu.mutation.SetName(s)
+	return pu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (pu *ProductUpdate) SetNillableName(s *string) *ProductUpdate {
+	if s != nil {
+		pu.SetName(*s)
+	}
 	return pu
 }
 
@@ -95,6 +111,14 @@ func (pu *ProductUpdate) AddAmount(i int64) *ProductUpdate {
 func (pu *ProductUpdate) SetPrice(i int64) *ProductUpdate {
 	pu.mutation.ResetPrice()
 	pu.mutation.SetPrice(i)
+	return pu
+}
+
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (pu *ProductUpdate) SetNillablePrice(i *int64) *ProductUpdate {
+	if i != nil {
+		pu.SetPrice(*i)
+	}
 	return pu
 }
 
@@ -525,9 +549,25 @@ func (puo *ProductUpdateOne) SetCategoryID(i int64) *ProductUpdateOne {
 	return puo
 }
 
+// SetNillableCategoryID sets the "category_id" field if the given value is not nil.
+func (puo *ProductUpdateOne) SetNillableCategoryID(i *int64) *ProductUpdateOne {
+	if i != nil {
+		puo.SetCategoryID(*i)
+	}
+	return puo
+}
+
 // SetName sets the "name" field.
 func (puo *ProductUpdateOne) SetName(s string) *ProductUpdateOne {
 	puo.mutation.SetName(s)
+	return puo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (puo *ProductUpdateOne) SetNillableName(s *string) *ProductUpdateOne {
+	if s != nil {
+		puo.SetName(*s)
+	}
 	return puo
 }
 
@@ -576,6 +616,14 @@ func (puo *ProductUpdateOne) AddAmount(i int64) *ProductUpdateOne {
 func (puo *ProductUpdateOne) SetPrice(i int64) *ProductUpdateOne {
 	puo.mutation.ResetPrice()
 	puo.mutation.SetPrice(i)
+	return puo
+}
+
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (puo *ProductUpdateOne) SetNillablePrice(i *int64) *ProductUpdateOne {
+	if i != nil {
+		puo.SetPrice(*i)
+	}
 	return puo
 }
 

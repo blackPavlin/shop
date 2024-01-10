@@ -41,15 +41,39 @@ func (au *AddressUpdate) SetUserID(i int64) *AddressUpdate {
 	return au
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableUserID(i *int64) *AddressUpdate {
+	if i != nil {
+		au.SetUserID(*i)
+	}
+	return au
+}
+
 // SetCity sets the "city" field.
 func (au *AddressUpdate) SetCity(s string) *AddressUpdate {
 	au.mutation.SetCity(s)
 	return au
 }
 
+// SetNillableCity sets the "city" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableCity(s *string) *AddressUpdate {
+	if s != nil {
+		au.SetCity(*s)
+	}
+	return au
+}
+
 // SetCountry sets the "country" field.
 func (au *AddressUpdate) SetCountry(s string) *AddressUpdate {
 	au.mutation.SetCountry(s)
+	return au
+}
+
+// SetNillableCountry sets the "country" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableCountry(s *string) *AddressUpdate {
+	if s != nil {
+		au.SetCountry(*s)
+	}
 	return au
 }
 
@@ -87,6 +111,14 @@ func (au *AddressUpdate) SetHouse(i int) *AddressUpdate {
 	return au
 }
 
+// SetNillableHouse sets the "house" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableHouse(i *int) *AddressUpdate {
+	if i != nil {
+		au.SetHouse(*i)
+	}
+	return au
+}
+
 // AddHouse adds i to the "house" field.
 func (au *AddressUpdate) AddHouse(i int) *AddressUpdate {
 	au.mutation.AddHouse(i)
@@ -120,6 +152,14 @@ func (au *AddressUpdate) SetPostcode(i int) *AddressUpdate {
 	return au
 }
 
+// SetNillablePostcode sets the "postcode" field if the given value is not nil.
+func (au *AddressUpdate) SetNillablePostcode(i *int) *AddressUpdate {
+	if i != nil {
+		au.SetPostcode(*i)
+	}
+	return au
+}
+
 // AddPostcode adds i to the "postcode" field.
 func (au *AddressUpdate) AddPostcode(i int) *AddressUpdate {
 	au.mutation.AddPostcode(i)
@@ -129,6 +169,14 @@ func (au *AddressUpdate) AddPostcode(i int) *AddressUpdate {
 // SetStreet sets the "street" field.
 func (au *AddressUpdate) SetStreet(s string) *AddressUpdate {
 	au.mutation.SetStreet(s)
+	return au
+}
+
+// SetNillableStreet sets the "street" field if the given value is not nil.
+func (au *AddressUpdate) SetNillableStreet(s *string) *AddressUpdate {
+	if s != nil {
+		au.SetStreet(*s)
+	}
 	return au
 }
 
@@ -325,15 +373,39 @@ func (auo *AddressUpdateOne) SetUserID(i int64) *AddressUpdateOne {
 	return auo
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableUserID(i *int64) *AddressUpdateOne {
+	if i != nil {
+		auo.SetUserID(*i)
+	}
+	return auo
+}
+
 // SetCity sets the "city" field.
 func (auo *AddressUpdateOne) SetCity(s string) *AddressUpdateOne {
 	auo.mutation.SetCity(s)
 	return auo
 }
 
+// SetNillableCity sets the "city" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableCity(s *string) *AddressUpdateOne {
+	if s != nil {
+		auo.SetCity(*s)
+	}
+	return auo
+}
+
 // SetCountry sets the "country" field.
 func (auo *AddressUpdateOne) SetCountry(s string) *AddressUpdateOne {
 	auo.mutation.SetCountry(s)
+	return auo
+}
+
+// SetNillableCountry sets the "country" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableCountry(s *string) *AddressUpdateOne {
+	if s != nil {
+		auo.SetCountry(*s)
+	}
 	return auo
 }
 
@@ -371,6 +443,14 @@ func (auo *AddressUpdateOne) SetHouse(i int) *AddressUpdateOne {
 	return auo
 }
 
+// SetNillableHouse sets the "house" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableHouse(i *int) *AddressUpdateOne {
+	if i != nil {
+		auo.SetHouse(*i)
+	}
+	return auo
+}
+
 // AddHouse adds i to the "house" field.
 func (auo *AddressUpdateOne) AddHouse(i int) *AddressUpdateOne {
 	auo.mutation.AddHouse(i)
@@ -404,6 +484,14 @@ func (auo *AddressUpdateOne) SetPostcode(i int) *AddressUpdateOne {
 	return auo
 }
 
+// SetNillablePostcode sets the "postcode" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillablePostcode(i *int) *AddressUpdateOne {
+	if i != nil {
+		auo.SetPostcode(*i)
+	}
+	return auo
+}
+
 // AddPostcode adds i to the "postcode" field.
 func (auo *AddressUpdateOne) AddPostcode(i int) *AddressUpdateOne {
 	auo.mutation.AddPostcode(i)
@@ -413,6 +501,14 @@ func (auo *AddressUpdateOne) AddPostcode(i int) *AddressUpdateOne {
 // SetStreet sets the "street" field.
 func (auo *AddressUpdateOne) SetStreet(s string) *AddressUpdateOne {
 	auo.mutation.SetStreet(s)
+	return auo
+}
+
+// SetNillableStreet sets the "street" field if the given value is not nil.
+func (auo *AddressUpdateOne) SetNillableStreet(s *string) *AddressUpdateOne {
+	if s != nil {
+		auo.SetStreet(*s)
+	}
 	return auo
 }
 

@@ -403,12 +403,16 @@ func (u *ProductImageUpsertOne) IDX(ctx context.Context) int64 {
 // ProductImageCreateBulk is the builder for creating many ProductImage entities in bulk.
 type ProductImageCreateBulk struct {
 	config
+	err      error
 	builders []*ProductImageCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the ProductImage entities in the database.
 func (picb *ProductImageCreateBulk) Save(ctx context.Context) ([]*ProductImage, error) {
+	if picb.err != nil {
+		return nil, picb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(picb.builders))
 	nodes := make([]*ProductImage, len(picb.builders))
 	mutators := make([]Mutator, len(picb.builders))
@@ -618,6 +622,9 @@ func (u *ProductImageUpsertBulk) UpdateName() *ProductImageUpsertBulk {
 
 // Exec executes the query.
 func (u *ProductImageUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ProductImageCreateBulk instead", i)
