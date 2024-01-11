@@ -2,8 +2,6 @@ module github.com/blackPavlin/shop
 
 go 1.21
 
-toolchain go1.21.4
-
 require (
 	entgo.io/ent v0.12.5
 	github.com/brianvoe/gofakeit/v6 v6.26.3
