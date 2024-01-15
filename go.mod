@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	entgo.io/ent v0.12.5
-	github.com/brianvoe/gofakeit/v6 v6.26.3
+	github.com/brianvoe/gofakeit/v6 v6.26.4
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.3
