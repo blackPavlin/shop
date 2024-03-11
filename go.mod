@@ -17,7 +17,7 @@ require (
 	github.com/jackc/pgx/v4 v4.18.2
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/meilisearch/meilisearch-go v0.26.2
-	github.com/minio/minio-go/v7 v7.0.68
+	github.com/minio/minio-go/v7 v7.0.69
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/mock v0.4.0
