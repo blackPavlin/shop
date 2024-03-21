@@ -19,7 +19,7 @@ require (
 	github.com/meilisearch/meilisearch-go v0.26.2
 	github.com/minio/minio-go/v7 v7.0.69
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	go.uber.org/mock v0.4.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.21.0
