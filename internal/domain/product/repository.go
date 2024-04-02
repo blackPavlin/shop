@@ -5,6 +5,7 @@ import (
 
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/pkg/paging"
+	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
 //go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "repository_mock.go" -package "product"
@@ -18,7 +19,7 @@ type Repository interface {
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
-// QueryCriteria represents criteria for product query.
+// QueryCriteria represents criteria for products query.
 type QueryCriteria struct {
 	Filter     Filter
 	Ordering   Ordering
@@ -44,4 +45,6 @@ type IDFilter struct {
 }
 
 // Ordering represents order criteria.
-type Ordering struct{}
+type Ordering struct {
+	Price *repositoryx.Order
+}

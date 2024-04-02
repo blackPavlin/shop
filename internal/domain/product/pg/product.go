@@ -4,6 +4,7 @@ package pg
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
@@ -47,7 +48,7 @@ func (r *ProductRepository) Create(
 		if pg.IsForeignKeyViolationErr(err, "product_category_fk") {
 			return nil, errorx.ErrNotFound
 		}
-		r.logger.Error("create product error:", zap.Error(err))
+		r.logger.Error("create product error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
 	return mapDomainProductFromRow(row), nil
@@ -70,7 +71,7 @@ func (r *ProductRepository) Update(
 		if pg.IsForeignKeyViolationErr(err, "product_category_fk") {
 			return nil, errorx.ErrNotFound
 		}
-		r.logger.Error("update product error:", zap.Error(err))
+		r.logger.Error("update product error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}
 	return mapDomainProductFromRow(row), nil
@@ -87,7 +88,7 @@ func (r *ProductRepository) Delete(ctx context.Context, filter *product.Filter) 
 		Where(makePredicates(filter)...).
 		Exec(ctx)
 	if err != nil {
-		r.logger.Error("delete product error:", zap.Error(err))
+		r.logger.Error("delete product error", zap.Error(err))
 		return errorx.ErrInternal
 	}
 	return nil
@@ -123,14 +124,17 @@ func (r *ProductRepository) Query(
 		err    error
 	)
 	predicates := makePredicates(&criteria.Filter)
-	g, ctx := errgroup.WithContext(ctx)
-	g.Go(func() error {
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
 		rows, err := r.client.Product.Query().
 			Where(predicates...).
 			WithProductImages().
 			Limit(int(criteria.Pagination.Limit)).
 			Offset(int(criteria.Pagination.Offset)).
-			All(ctx)
+			Order(func(selector *sql.Selector) {
+				selector.OrderBy(makeOrdering(&criteria.Ordering))
+			}).
+			All(groupCtx)
 		if err != nil {
 			r.logger.Error("query products count error:", zap.Error(err))
 			return errorx.ErrInternal
@@ -138,17 +142,17 @@ func (r *ProductRepository) Query(
 		result.Items = mapDomainProductsFromRows(rows)
 		return nil
 	})
-	g.Go(func() error {
+	group.Go(func() error {
 		result.Count, err = r.client.Product.Query().
 			Where(predicates...).
-			Count(ctx)
+			Count(groupCtx)
 		if err != nil {
-			r.logger.Error("get products count error:", zap.Error(err))
+			r.logger.Error("get products count error", zap.Error(err))
 			return errorx.ErrInternal
 		}
 		return nil
 	})
-	if err = g.Wait(); err != nil {
+	if err = group.Wait(); err != nil {
 		return nil, errorx.ErrInternal
 	}
 	return result, nil
@@ -175,6 +179,13 @@ func makePredicates(filter *product.Filter) []predicate.Product {
 		)
 	}
 	return predicates
+}
+
+func makeOrdering(ordering *product.Ordering) string {
+	if ordering.Price != nil {
+		return ordering.Price.ToString(entproduct.FieldPrice)
+	}
+	return sql.Asc(entproduct.FieldID)
 }
 
 func mapDomainProductFromRow(row *ent.Product) *product.Product {
