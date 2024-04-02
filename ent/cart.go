@@ -49,12 +49,10 @@ type CartEdges struct {
 // UsersOrErr returns the Users value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e CartEdges) UsersOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.Users == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.Users != nil {
 		return e.Users, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "users"}
 }
@@ -62,12 +60,10 @@ func (e CartEdges) UsersOrErr() (*User, error) {
 // ProductsOrErr returns the Products value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e CartEdges) ProductsOrErr() (*Product, error) {
-	if e.loadedTypes[1] {
-		if e.Products == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: product.Label}
-		}
+	if e.Products != nil {
 		return e.Products, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: product.Label}
 	}
 	return nil, &NotLoadedError{edge: "products"}
 }

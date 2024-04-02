@@ -56,12 +56,10 @@ type ProductEdges struct {
 // CategoriesOrErr returns the Categories value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProductEdges) CategoriesOrErr() (*Category, error) {
-	if e.loadedTypes[0] {
-		if e.Categories == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: category.Label}
-		}
+	if e.Categories != nil {
 		return e.Categories, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: category.Label}
 	}
 	return nil, &NotLoadedError{edge: "categories"}
 }
