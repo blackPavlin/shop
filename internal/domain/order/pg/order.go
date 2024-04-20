@@ -29,13 +29,13 @@ func NewOrderRepository(client *ent.Client, logger *zap.Logger) *OrderRepository
 }
 
 // Create order in db.
-func (r *OrderRepository) Create(ctx context.Context, props *order.Props) (*order.Order, error) {
+func (r *OrderRepository) Create(ctx context.Context, or *order.Order) (*order.Order, error) {
 	client := r.client
 	if tx := ent.TxFromContext(ctx); tx != nil {
 		client = tx.Client()
 	}
 	row, err := client.Order.Create().
-		SetUserID(int64(props.UserID)).
+		SetUserID(or.UserID.ToInt64()).
 		SetStatus(entorder.StatusCREATED).
 		Save(ctx)
 	if err != nil {
@@ -141,10 +141,10 @@ func mapDomainOrderFromRow(row *ent.Order) (*order.Order, error) {
 	}
 	return &order.Order{
 		ID:        order.ID(row.ID),
+		UserID:    user.ID(row.UserID),
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
 		Props: &order.Props{
-			UserID: user.ID(row.UserID),
 			Status: status,
 		},
 	}, nil

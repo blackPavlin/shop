@@ -20,33 +20,33 @@ type Service interface {
 
 // UseCase represents order service.
 type UseCase struct {
-	orderRepo        Repository
-	cartRepo         cart.Repository
-	productRepo      product.Repository
-	orderProductRepo ProductRepository
-	txManager        repositoryx.TxManager
+	repository             Repository
+	cartRepository         cart.Repository
+	productRepository      product.Repository
+	orderProductRepository ProductRepository
+	txManager              repositoryx.TxManager
 }
 
 // NewUseCase  create instance of UseCase.
 func NewUseCase(
-	orderRepo Repository,
-	cartRepo cart.Repository,
-	productRepo product.Repository,
-	orderProductRepo ProductRepository,
+	repository Repository,
+	cartRepository cart.Repository,
+	productRepository product.Repository,
+	orderProductRepository ProductRepository,
 	txManager repositoryx.TxManager,
 ) *UseCase {
 	return &UseCase{
-		orderRepo:        orderRepo,
-		cartRepo:         cartRepo,
-		productRepo:      productRepo,
-		orderProductRepo: orderProductRepo,
-		txManager:        txManager,
+		repository:             repository,
+		cartRepository:         cartRepository,
+		productRepository:      productRepository,
+		orderProductRepository: orderProductRepository,
+		txManager:              txManager,
 	}
 }
 
 // Get order.
-func (s *UseCase) Get(ctx context.Context, filter *Filter) (*Order, error) {
-	result, err := s.orderRepo.Get(ctx, filter)
+func (uc *UseCase) Get(ctx context.Context, filter *Filter) (*Order, error) {
+	result, err := uc.repository.Get(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("get order error: %w", err)
 	}
@@ -54,8 +54,8 @@ func (s *UseCase) Get(ctx context.Context, filter *Filter) (*Order, error) {
 }
 
 // Query orders.
-func (s *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
-	result, err := s.orderRepo.Query(ctx, criteria)
+func (uc *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
+	result, err := uc.repository.Query(ctx, criteria)
 	if err != nil {
 		return nil, fmt.Errorf("query orders error: %w", err)
 	}
@@ -63,6 +63,6 @@ func (s *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryRes
 }
 
 // Create order.
-func (s *UseCase) Create(ctx context.Context) (*Order, error) {
+func (uc *UseCase) Create(ctx context.Context) (*Order, error) {
 	return nil, nil
 }

@@ -15,8 +15,9 @@ var _StatusIndex = [...]uint8{0, 7, 15, 23}
 const _StatusLowerName = "createdacceptedcanceled"
 
 func (i Status) String() string {
+	i -= 1
 	if i >= Status(len(_StatusIndex)-1) {
-		return fmt.Sprintf("Status(%d)", i)
+		return fmt.Sprintf("Status(%d)", i+1)
 	}
 	return _StatusName[_StatusIndex[i]:_StatusIndex[i+1]]
 }
@@ -25,9 +26,9 @@ func (i Status) String() string {
 // Re-run the stringer command to generate them again.
 func _StatusNoOp() {
 	var x [1]struct{}
-	_ = x[StatusCreated-(0)]
-	_ = x[StatusAccepted-(1)]
-	_ = x[StatusCanceled-(2)]
+	_ = x[StatusCreated-(1)]
+	_ = x[StatusAccepted-(2)]
+	_ = x[StatusCanceled-(3)]
 }
 
 var _StatusValues = []Status{StatusCreated, StatusAccepted, StatusCanceled}

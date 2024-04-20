@@ -14,3 +14,11 @@ func GetUser(ctx context.Context) (*User, bool) {
 	user, ok := ctx.Value(contextKey{}).(*User)
 	return user, ok
 }
+
+// GetUserID from context.
+func GetUserID(ctx context.Context) (ID, bool) {
+	if user, ok := ctx.Value(contextKey{}).(*User); ok {
+		return user.ID, true
+	}
+	return 0, false
+}

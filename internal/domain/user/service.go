@@ -15,17 +15,17 @@ type Service interface {
 
 // UseCase represents user service.
 type UseCase struct {
-	userRepo Repository
+	repository Repository
 }
 
 // NewUseCase create instance of UseCase.
-func NewUseCase(userRepo Repository) *UseCase {
-	return &UseCase{userRepo: userRepo}
+func NewUseCase(repository Repository) *UseCase {
+	return &UseCase{repository: repository}
 }
 
 // Create user.
-func (s *UseCase) Create(ctx context.Context, props *Props) (*User, error) {
-	result, err := s.userRepo.Create(ctx, props)
+func (uc *UseCase) Create(ctx context.Context, props *Props) (*User, error) {
+	result, err := uc.repository.Create(ctx, props)
 	if err != nil {
 		return nil, fmt.Errorf("create user error: %w", err)
 	}
@@ -33,8 +33,8 @@ func (s *UseCase) Create(ctx context.Context, props *Props) (*User, error) {
 }
 
 // Get user.
-func (s *UseCase) Get(ctx context.Context, filter *Filter) (*User, error) {
-	result, err := s.userRepo.Get(ctx, filter)
+func (uc *UseCase) Get(ctx context.Context, filter *Filter) (*User, error) {
+	result, err := uc.repository.Get(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("get user error: %w", err)
 	}

@@ -6,7 +6,7 @@ import "context"
 
 // ImageRepository represents product image repository.
 type ImageRepository interface {
-	BulkCreateTx(ctx context.Context, images Images) (Images, error)
+	BulkCreate(ctx context.Context, images Images) (Images, error)
 	Get(ctx context.Context, filter *ImageFilter) (*Image, error)
 	Query(ctx context.Context, criteria *ImageQueryCriteria) (Images, error)
 	Delete(ctx context.Context, filter *ImageFilter) error

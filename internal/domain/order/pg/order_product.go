@@ -25,7 +25,7 @@ func NewOrderProductRepository(client *ent.Client, logger *zap.Logger) *OrderPro
 	return &OrderProductRepository{client: client, logger: logger}
 }
 
-// BulkCreateTx order products in db with transaction..
+// BulkCreateTx order products in db with transaction.
 func (r *OrderProductRepository) BulkCreateTx(ctx context.Context, products order.Products) (order.Products, error) {
 	if len(products) == 0 {
 		return nil, nil
@@ -75,12 +75,12 @@ func makeOrderProductPredicates(filter order.ProductFilter) []predicate.OrderPro
 	return predicates
 }
 
-func createOrderProductBuilder(client *ent.Client, prod *order.Product) *ent.OrderProductCreate {
+func createOrderProductBuilder(client *ent.Client, pt *order.Product) *ent.OrderProductCreate {
 	return client.OrderProduct.Create().
-		SetOrderID(int64(prod.Props.OrderID)).
-		SetProductID(int64(prod.Props.ProductID)).
-		SetAmount(prod.Props.Amount).
-		SetPrice(prod.Props.Price)
+		SetOrderID(pt.OrderID.ToInt64()).
+		SetProductID(pt.ProductID.ToInt64()).
+		SetAmount(pt.Props.Amount).
+		SetPrice(pt.Props.Price)
 }
 
 func createOrderProductBuilders(client *ent.Client, products order.Products) []*ent.OrderProductCreate {
@@ -94,13 +94,13 @@ func createOrderProductBuilders(client *ent.Client, products order.Products) []*
 func mapDomainOrderProductFromRow(row *ent.OrderProduct) *order.Product {
 	return &order.Product{
 		ID:        order.ProductID(row.ID),
+		OrderID:   order.ID(row.OrderID),
+		ProductID: product.ID(row.ProductID),
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
 		Props: &order.ProductProps{
-			OrderID:   order.ID(row.OrderID),
-			ProductID: product.ID(row.ProductID),
-			Amount:    row.Amount,
-			Price:     row.Price,
+			Amount: row.Amount,
+			Price:  row.Price,
 		},
 	}
 }

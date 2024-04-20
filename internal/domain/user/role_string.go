@@ -15,8 +15,9 @@ var _RoleIndex = [...]uint8{0, 4, 9}
 const _RoleLowerName = "useradmin"
 
 func (i Role) String() string {
+	i -= 1
 	if i >= Role(len(_RoleIndex)-1) {
-		return fmt.Sprintf("Role(%d)", i)
+		return fmt.Sprintf("Role(%d)", i+1)
 	}
 	return _RoleName[_RoleIndex[i]:_RoleIndex[i+1]]
 }
@@ -25,8 +26,8 @@ func (i Role) String() string {
 // Re-run the stringer command to generate them again.
 func _RoleNoOp() {
 	var x [1]struct{}
-	_ = x[RoleUser-(0)]
-	_ = x[RoleAdmin-(1)]
+	_ = x[RoleUser-(1)]
+	_ = x[RoleAdmin-(2)]
 }
 
 var _RoleValues = []Role{RoleUser, RoleAdmin}

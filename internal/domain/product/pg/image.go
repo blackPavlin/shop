@@ -24,8 +24,8 @@ func NewImageRepository(client *ent.Client, logger *zap.Logger) *ImageRepository
 	return &ImageRepository{client: client, logger: logger}
 }
 
-// BulkCreateTx create product images in db with transaction.
-func (r *ImageRepository) BulkCreateTx(
+// BulkCreate create product images in db with transaction.
+func (r *ImageRepository) BulkCreate(
 	ctx context.Context,
 	images product.Images,
 ) (product.Images, error) {

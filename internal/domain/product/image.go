@@ -5,20 +5,18 @@ import "time"
 // ImageID represents an id for product image.
 type ImageID int64
 
-// ImageIDs defines a slice of ImageID.
+// ImageIDs represents a slice of ImageID.
 type ImageIDs []ImageID
 
 // Image represents the product image.
 type Image struct {
-	ID ImageID
-
+	ID        ImageID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-
-	Props *ImageProps
+	Props     *ImageProps
 }
 
-// Images slice of Product.
+// Images represents slice of Product.
 type Images []*Image
 
 // ImageProps represents product image editable fields.
@@ -27,11 +25,16 @@ type ImageProps struct {
 	Name      string
 }
 
+// ToInt64 convert ImageID to int64.
+func (id ImageID) ToInt64() int64 {
+	return int64(id)
+}
+
 // ToInt64 convert slice of ImageIDs to slice int64.
 func (ids ImageIDs) ToInt64() []int64 {
 	result := make([]int64, 0, len(ids))
 	for _, id := range ids {
-		result = append(result, int64(id))
+		result = append(result, id.ToInt64())
 	}
 	return result
 }

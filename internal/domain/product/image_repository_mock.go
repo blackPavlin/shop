@@ -39,19 +39,19 @@ func (m *MockImageRepository) EXPECT() *MockImageRepositoryMockRecorder {
 	return m.recorder
 }
 
-// BulkCreateTx mocks base method.
-func (m *MockImageRepository) BulkCreateTx(ctx context.Context, images Images) (Images, error) {
+// BulkCreate mocks base method.
+func (m *MockImageRepository) BulkCreate(ctx context.Context, images Images) (Images, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BulkCreateTx", ctx, images)
+	ret := m.ctrl.Call(m, "BulkCreate", ctx, images)
 	ret0, _ := ret[0].(Images)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// BulkCreateTx indicates an expected call of BulkCreateTx.
-func (mr *MockImageRepositoryMockRecorder) BulkCreateTx(ctx, images any) *gomock.Call {
+// BulkCreate indicates an expected call of BulkCreate.
+func (mr *MockImageRepositoryMockRecorder) BulkCreate(ctx, images any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreateTx", reflect.TypeOf((*MockImageRepository)(nil).BulkCreateTx), ctx, images)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockImageRepository)(nil).BulkCreate), ctx, images)
 }
 
 // Delete mocks base method.

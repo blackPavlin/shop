@@ -52,9 +52,6 @@ func (r *UserRepository) Create(ctx context.Context, props *user.Props) (*user.U
 
 // Get user from db.
 func (r *UserRepository) Get(ctx context.Context, filter *user.Filter) (*user.User, error) {
-	if userFromCtx, ok := user.GetUser(ctx); ok {
-		filter.ID.Eq = user.IDs{userFromCtx.ID}
-	}
 	row, err := r.client.User.Query().
 		Where(makeUserPredicate(filter)...).
 		First(ctx)

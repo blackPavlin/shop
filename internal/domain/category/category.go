@@ -6,20 +6,18 @@ import "time"
 // ID represents an id for category.
 type ID int64
 
-// IDs defines a slice of ID.
+// IDs represents a slice of ID.
 type IDs []ID
 
 // Category represents the category.
 type Category struct {
-	ID ID
-
+	ID        ID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-
-	Props *Props
+	Props     *Props
 }
 
-// Categories slice of Category.
+// Categories represents slice of Category.
 type Categories []*Category
 
 // Props represents category editable fields.

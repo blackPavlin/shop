@@ -11,7 +11,7 @@ import (
 
 // Repository represents order repository.
 type Repository interface {
-	Create(ctx context.Context, props *Props) (*Order, error)
+	Create(ctx context.Context, order *Order) (*Order, error)
 	Get(ctx context.Context, filter *Filter) (*Order, error)
 	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
