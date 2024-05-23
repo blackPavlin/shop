@@ -27,7 +27,7 @@
     "eslint-plugin-vue": "^8.0.3",
     "openapi-typescript-codegen": "^0.29.0",
     "prettier": "^3.2.5",
-    "sass": "^1.72.0",
+    "sass": "^1.77.2",
     "typescript": "~5.4.5",
     "vite": "^5.2.11",
     "vue-tsc": "^2.0.14"
