@@ -65,7 +65,7 @@ func (r *ImageRepository) Get(
 	}
 	row, err := client.ProductImage.Query().
 		Where(makeImagePredicates(filter)...).
-		First(ctx)
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errorx.ErrNotFound

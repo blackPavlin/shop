@@ -27,7 +27,7 @@ func NewUserRepository(client *ent.Client, logger *zap.Logger) *UserRepository {
 }
 
 // Create user in db.
-func (r *UserRepository) Create(ctx context.Context, props *user.Props) (*user.User, error) {
+func (r UserRepository) Create(ctx context.Context, props *user.Props) (*user.User, error) {
 	row, err := r.client.User.Create().
 		SetName(props.Name).
 		SetPhone(props.Phone).
@@ -51,10 +51,10 @@ func (r *UserRepository) Create(ctx context.Context, props *user.Props) (*user.U
 }
 
 // Get user from db.
-func (r *UserRepository) Get(ctx context.Context, filter *user.Filter) (*user.User, error) {
+func (r UserRepository) Get(ctx context.Context, filter *user.Filter) (*user.User, error) {
 	row, err := r.client.User.Query().
 		Where(makeUserPredicate(filter)...).
-		First(ctx)
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errorx.ErrNotFound
@@ -72,7 +72,7 @@ func (r *UserRepository) Get(ctx context.Context, filter *user.Filter) (*user.Us
 }
 
 // Exist user in db.
-func (r *UserRepository) Exist(ctx context.Context, filter *user.Filter) (bool, error) {
+func (r UserRepository) Exist(ctx context.Context, filter *user.Filter) (bool, error) {
 	exist, err := r.client.User.Query().
 		Where(makeUserPredicate(filter)...).
 		Exist(ctx)

@@ -29,7 +29,7 @@ func NewProductRepository(client *ent.Client, logger *zap.Logger) *ProductReposi
 }
 
 // Create product in db.
-func (r *ProductRepository) Create(
+func (r ProductRepository) Create(
 	ctx context.Context,
 	props *product.Props,
 ) (*product.Product, error) {
@@ -55,7 +55,7 @@ func (r *ProductRepository) Create(
 }
 
 // Update product in db.
-func (r *ProductRepository) Update(
+func (r ProductRepository) Update(
 	ctx context.Context,
 	productID product.ID,
 	props *product.Props,
@@ -68,7 +68,7 @@ func (r *ProductRepository) Update(
 		SetPrice(props.Price).
 		Save(ctx)
 	if err != nil {
-		if pg.IsForeignKeyViolationErr(err, "product_category_fk") {
+		if ent.IsConstraintError(err) {
 			return nil, errorx.ErrNotFound
 		}
 		r.logger.Error("update product error", zap.Error(err))
@@ -78,7 +78,7 @@ func (r *ProductRepository) Update(
 }
 
 // Delete product in db.
-func (r *ProductRepository) Delete(ctx context.Context, filter *product.Filter) error {
+func (r ProductRepository) Delete(ctx context.Context, filter *product.Filter) error {
 	client := r.client
 	if tx := ent.TxFromContext(ctx); tx != nil {
 		client = tx.Client()
@@ -95,15 +95,12 @@ func (r *ProductRepository) Delete(ctx context.Context, filter *product.Filter) 
 }
 
 // Get product from db.
-func (r *ProductRepository) Get(
-	ctx context.Context,
-	filter *product.Filter,
-) (*product.Product, error) {
+func (r ProductRepository) Get(ctx context.Context, filter *product.Filter) (*product.Product, error) {
 	row, err := r.client.Product.
 		Query().
 		Where(makePredicates(filter)...).
 		WithProductImages().
-		First(ctx)
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errorx.ErrNotFound
@@ -115,7 +112,7 @@ func (r *ProductRepository) Get(
 }
 
 // Query products from db.
-func (r *ProductRepository) Query(
+func (r ProductRepository) Query(
 	ctx context.Context,
 	criteria *product.QueryCriteria,
 ) (*product.QueryResult, error) {

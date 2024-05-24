@@ -29,7 +29,7 @@ func NewOrderRepository(client *ent.Client, logger *zap.Logger) *OrderRepository
 }
 
 // Create order in db.
-func (r *OrderRepository) Create(ctx context.Context, or *order.Order) (*order.Order, error) {
+func (r OrderRepository) Create(ctx context.Context, or *order.Order) (*order.Order, error) {
 	client := r.client
 	if tx := ent.TxFromContext(ctx); tx != nil {
 		client = tx.Client()
@@ -54,10 +54,10 @@ func (r *OrderRepository) Create(ctx context.Context, or *order.Order) (*order.O
 }
 
 // Get order from db.
-func (r *OrderRepository) Get(ctx context.Context, filter *order.Filter) (*order.Order, error) {
+func (r OrderRepository) Get(ctx context.Context, filter *order.Filter) (*order.Order, error) {
 	row, err := r.client.Order.Query().
 		Where(makeOrderPredicates(filter)...).
-		First(ctx)
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, errorx.ErrNotFound
@@ -74,7 +74,7 @@ func (r *OrderRepository) Get(ctx context.Context, filter *order.Filter) (*order
 }
 
 // Query orders from db.
-func (r *OrderRepository) Query(ctx context.Context, criteria *order.QueryCriteria) (*order.QueryResult, error) {
+func (r OrderRepository) Query(ctx context.Context, criteria *order.QueryCriteria) (*order.QueryResult, error) {
 	var (
 		result = &order.QueryResult{}
 		err    error

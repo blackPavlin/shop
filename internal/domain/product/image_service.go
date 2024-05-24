@@ -44,7 +44,7 @@ func NewImageUseCase(
 }
 
 // BulkCreate product images.
-func (s *ImageUseCase) BulkCreate(
+func (s ImageUseCase) BulkCreate(
 	ctx context.Context,
 	productID ID,
 	props []*image.StorageProps,
@@ -92,7 +92,7 @@ func (s *ImageUseCase) BulkCreate(
 }
 
 // Delete image from db and file storage.
-func (s *ImageUseCase) Delete(ctx context.Context, imageID ImageID) error {
+func (s ImageUseCase) Delete(ctx context.Context, imageID ImageID) error {
 	img, err := s.imageRepo.Get(ctx, &ImageFilter{
 		ImageID: ImageIDFilter{Eq: ImageIDs{imageID}},
 	})

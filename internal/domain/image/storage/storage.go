@@ -26,7 +26,7 @@ func NewStorage(client *minio.Client, config *s3x.S3Config, logger *zap.Logger) 
 }
 
 // Upload file to storage.
-func (s *Storage) Upload(ctx context.Context, props *image.StorageProps) error {
+func (s Storage) Upload(ctx context.Context, props *image.StorageProps) error {
 	_, err := s.client.PutObject(ctx, s.config.BucketName, props.Name, props.Reader, props.Size, minio.PutObjectOptions{
 		ContentType: props.ContentType,
 	})
@@ -38,7 +38,7 @@ func (s *Storage) Upload(ctx context.Context, props *image.StorageProps) error {
 }
 
 // BulkUpload files to storage.
-func (s *Storage) BulkUpload(ctx context.Context, props []*image.StorageProps) error {
+func (s Storage) BulkUpload(ctx context.Context, props []*image.StorageProps) error {
 	g, ctx := errgroup.WithContext(ctx)
 	for _, prop := range props {
 		prop := prop
@@ -57,7 +57,7 @@ func (s *Storage) BulkUpload(ctx context.Context, props []*image.StorageProps) e
 }
 
 // Remove file from storage.
-func (s *Storage) Remove(ctx context.Context, name string) error {
+func (s Storage) Remove(ctx context.Context, name string) error {
 	err := s.client.RemoveObject(ctx, s.config.BucketName, name, minio.RemoveObjectOptions{})
 	if err != nil {
 		s.logger.Error("remove image from storage error", zap.Error(err))
@@ -67,7 +67,7 @@ func (s *Storage) Remove(ctx context.Context, name string) error {
 }
 
 // BulkRemove files from storage.
-func (s *Storage) BulkRemove(ctx context.Context, names []string) error {
+func (s Storage) BulkRemove(ctx context.Context, names []string) error {
 	g, ctx := errgroup.WithContext(ctx)
 	for _, name := range names {
 		name := name

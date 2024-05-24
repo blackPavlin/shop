@@ -13,11 +13,11 @@ import (
 
 // Service represents product use cases.
 type Service interface {
+	Get(ctx context.Context, filter *Filter) (*Product, error)
+	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 	Create(ctx context.Context, props *Props) (*Product, error)
 	Update(ctx context.Context, productID ID, props *Props) (*Product, error)
 	Delete(ctx context.Context, productID ID) error
-	Get(ctx context.Context, filter *Filter) (*Product, error)
-	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
 // UseCase represents product service.
@@ -43,8 +43,26 @@ func NewUseCase(
 	}
 }
 
+// Get product.
+func (s UseCase) Get(ctx context.Context, filter *Filter) (*Product, error) {
+	result, err := s.productRepo.Get(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("get product error: %w", err)
+	}
+	return result, nil
+}
+
+// Query products.
+func (s UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
+	result, err := s.productRepo.Query(ctx, criteria)
+	if err != nil {
+		return nil, fmt.Errorf("query products error: %w", err)
+	}
+	return result, nil
+}
+
 // Create product.
-func (s *UseCase) Create(ctx context.Context, props *Props) (*Product, error) {
+func (s UseCase) Create(ctx context.Context, props *Props) (*Product, error) {
 	product, err := s.productRepo.Create(ctx, props)
 	if err != nil {
 		return nil, fmt.Errorf("create product error: %w", err)
@@ -53,7 +71,7 @@ func (s *UseCase) Create(ctx context.Context, props *Props) (*Product, error) {
 }
 
 // Update product.
-func (s *UseCase) Update(ctx context.Context, productID ID, props *Props) (*Product, error) {
+func (s UseCase) Update(ctx context.Context, productID ID, props *Props) (*Product, error) {
 	result, err := s.productRepo.Update(ctx, productID, props)
 	if err != nil {
 		return nil, fmt.Errorf("update product error: %w", err)
@@ -62,7 +80,7 @@ func (s *UseCase) Update(ctx context.Context, productID ID, props *Props) (*Prod
 }
 
 // Delete product.
-func (s *UseCase) Delete(ctx context.Context, productID ID) error {
+func (s UseCase) Delete(ctx context.Context, productID ID) error {
 	images, err := s.productImageRepo.Query(ctx, &ImageQueryCriteria{
 		Filter: ImageFilter{
 			ProductID: IDFilter{Eq: IDs{productID}},
@@ -72,12 +90,12 @@ func (s *UseCase) Delete(ctx context.Context, productID ID) error {
 		return fmt.Errorf("query product images error: %w", err)
 	}
 	err = s.txManager.RunTransaction(ctx, &sql.TxOptions{}, func(ctx context.Context) error {
-		if err := s.productRepo.Delete(ctx, &Filter{
+		if err = s.productRepo.Delete(ctx, &Filter{
 			ID: IDFilter{Eq: IDs{productID}},
 		}); err != nil {
 			return fmt.Errorf("delete product error: %w", err)
 		}
-		if err := s.imageStorage.BulkRemove(ctx, images.Names()); err != nil {
+		if err = s.imageStorage.BulkRemove(ctx, images.Names()); err != nil {
 			return fmt.Errorf("bulkRemove images errro: %w", err)
 		}
 		return nil
@@ -86,22 +104,4 @@ func (s *UseCase) Delete(ctx context.Context, productID ID) error {
 		return fmt.Errorf("delete product transaction error: %w", err)
 	}
 	return nil
-}
-
-// Get product.
-func (s *UseCase) Get(ctx context.Context, filter *Filter) (*Product, error) {
-	result, err := s.productRepo.Get(ctx, filter)
-	if err != nil {
-		return nil, fmt.Errorf("get product error: %w", err)
-	}
-	return result, nil
-}
-
-// Query products.
-func (s *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
-	result, err := s.productRepo.Query(ctx, criteria)
-	if err != nil {
-		return nil, fmt.Errorf("query products error: %w", err)
-	}
-	return result, nil
 }

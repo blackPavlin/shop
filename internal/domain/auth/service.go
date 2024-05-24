@@ -41,7 +41,7 @@ func NewUseCase(logger *zap.Logger, conf *config.AuthConfig, userRepo user.Repos
 }
 
 // Login user.
-func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) {
+func (s UseCase) Login(ctx context.Context, props *LoginProps) (string, error) {
 	usr, err := s.userRepo.Get(ctx, &user.Filter{Email: user.EmailFilter{
 		Eq: []string{strings.ToLower(props.Email)}},
 	})
@@ -65,7 +65,7 @@ func (s *UseCase) Login(ctx context.Context, props *LoginProps) (string, error) 
 }
 
 // Signup user.
-func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error) {
+func (s UseCase) Signup(ctx context.Context, props *SignupProps) (string, error) {
 	exist, err := s.userRepo.Exist(ctx, &user.Filter{Email: user.EmailFilter{
 		Eq: []string{strings.ToLower(props.Email)}},
 	})
@@ -97,7 +97,7 @@ func (s *UseCase) Signup(ctx context.Context, props *SignupProps) (string, error
 }
 
 // SignToken sign authorization token.
-func (s *UseCase) SignToken(usr *user.User) (string, error) {
+func (s UseCase) SignToken(usr *user.User) (string, error) {
 	claims := &UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(s.config.ExpiresIn) * time.Second)),
@@ -117,7 +117,7 @@ func (s *UseCase) SignToken(usr *user.User) (string, error) {
 }
 
 // ValidateToken check and parse authorization token.
-func (s *UseCase) ValidateToken(accessToken string) (*UserClaims, error) {
+func (s UseCase) ValidateToken(accessToken string) (*UserClaims, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())

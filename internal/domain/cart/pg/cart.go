@@ -30,7 +30,7 @@ func NewCartRepository(client *ent.Client, logger *zap.Logger) *CartRepository {
 }
 
 // Save cart in db.
-func (r *CartRepository) Save(ctx context.Context, props *cart.Props) (*cart.Cart, error) {
+func (r CartRepository) Save(ctx context.Context, props *cart.Props) (*cart.Cart, error) {
 	userFromCtx, ok := user.GetUser(ctx)
 	if !ok {
 		return nil, errorx.ErrUnauthorized
@@ -59,7 +59,7 @@ func (r *CartRepository) Save(ctx context.Context, props *cart.Props) (*cart.Car
 }
 
 // Delete carts from db.
-func (r *CartRepository) Delete(ctx context.Context, filter *cart.Filter) error {
+func (r CartRepository) Delete(ctx context.Context, filter *cart.Filter) error {
 	if userFromCtx, ok := user.GetUser(ctx); ok {
 		filter.UserID.Eq = user.IDs{userFromCtx.ID}
 	}
@@ -74,7 +74,7 @@ func (r *CartRepository) Delete(ctx context.Context, filter *cart.Filter) error 
 }
 
 // Get cart from db.
-func (r *CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Cart, error) {
+func (r CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Cart, error) {
 	row, err := r.client.Cart.
 		Query().
 		Where(makePredicates(filter)...).
@@ -90,7 +90,7 @@ func (r *CartRepository) Get(ctx context.Context, filter *cart.Filter) (*cart.Ca
 }
 
 // Query carts from db based on criteria.
-func (r *CartRepository) Query(
+func (r CartRepository) Query(
 	ctx context.Context,
 	criteria *cart.QueryCriteria,
 ) (*cart.QueryResult, error) {

@@ -45,7 +45,7 @@ func NewUseCase(
 }
 
 // Get order.
-func (uc *UseCase) Get(ctx context.Context, filter *Filter) (*Order, error) {
+func (uc UseCase) Get(ctx context.Context, filter *Filter) (*Order, error) {
 	result, err := uc.repository.Get(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("get order error: %w", err)
@@ -54,7 +54,7 @@ func (uc *UseCase) Get(ctx context.Context, filter *Filter) (*Order, error) {
 }
 
 // Query orders.
-func (uc *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
+func (uc UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error) {
 	result, err := uc.repository.Query(ctx, criteria)
 	if err != nil {
 		return nil, fmt.Errorf("query orders error: %w", err)
@@ -63,6 +63,6 @@ func (uc *UseCase) Query(ctx context.Context, criteria *QueryCriteria) (*QueryRe
 }
 
 // Create order.
-func (uc *UseCase) Create(ctx context.Context) (*Order, error) {
+func (uc UseCase) Create(ctx context.Context) (*Order, error) {
 	return nil, nil
 }

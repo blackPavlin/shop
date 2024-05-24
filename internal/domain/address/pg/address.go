@@ -27,7 +27,7 @@ func NewAddressRepository(client *ent.Client, logger *zap.Logger) *AddressReposi
 }
 
 // Create address in db.
-func (r *AddressRepository) Create(
+func (r AddressRepository) Create(
 	ctx context.Context,
 	props *address.Props,
 ) (*address.Address, error) {
@@ -56,7 +56,7 @@ func (r *AddressRepository) Create(
 }
 
 // Get address from db.
-func (r *AddressRepository) Get(
+func (r AddressRepository) Get(
 	ctx context.Context,
 	filter *address.Filter,
 ) (*address.Address, error) {
@@ -78,7 +78,7 @@ func (r *AddressRepository) Get(
 }
 
 // Query addresses from db based on criteria.
-func (r *AddressRepository) Query(
+func (r AddressRepository) Query(
 	ctx context.Context,
 	criteria *address.QueryCriteria,
 ) (address.Addresses, error) {

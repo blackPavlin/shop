@@ -11,9 +11,9 @@ import (
 // Repository represents cart repository.
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Cart, error)
+	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 	Save(ctx context.Context, props *Props) (*Cart, error)
 	Delete(ctx context.Context, filter *Filter) error
-	Query(ctx context.Context, criteria *QueryCriteria) (*QueryResult, error)
 }
 
 // QueryCriteria  represents a criteria for cart query.

@@ -6,8 +6,8 @@ import "context"
 
 // Repository represents user repository.
 type Repository interface {
-	Create(ctx context.Context, props *Props) (*User, error)
 	Get(ctx context.Context, filter *Filter) (*User, error)
+	Create(ctx context.Context, props *Props) (*User, error)
 	Exist(ctx context.Context, filter *Filter) (bool, error)
 }
 

@@ -9,8 +9,8 @@ import (
 
 // Service represents user use cases.
 type Service interface {
-	Create(ctx context.Context, props *Props) (*User, error)
 	Get(ctx context.Context, filter *Filter) (*User, error)
+	Create(ctx context.Context, props *Props) (*User, error)
 }
 
 // UseCase represents user service.
@@ -23,20 +23,20 @@ func NewUseCase(repository Repository) *UseCase {
 	return &UseCase{repository: repository}
 }
 
-// Create user.
-func (uc *UseCase) Create(ctx context.Context, props *Props) (*User, error) {
-	result, err := uc.repository.Create(ctx, props)
+// Get user.
+func (uc UseCase) Get(ctx context.Context, filter *Filter) (*User, error) {
+	result, err := uc.repository.Get(ctx, filter)
 	if err != nil {
-		return nil, fmt.Errorf("create user error: %w", err)
+		return nil, fmt.Errorf("get user error: %w", err)
 	}
 	return result, nil
 }
 
-// Get user.
-func (uc *UseCase) Get(ctx context.Context, filter *Filter) (*User, error) {
-	result, err := uc.repository.Get(ctx, filter)
+// Create user.
+func (uc UseCase) Create(ctx context.Context, props *Props) (*User, error) {
+	result, err := uc.repository.Create(ctx, props)
 	if err != nil {
-		return nil, fmt.Errorf("get user error: %w", err)
+		return nil, fmt.Errorf("create user error: %w", err)
 	}
 	return result, nil
 }
