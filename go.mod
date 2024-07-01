@@ -5,7 +5,7 @@ go 1.22
 require (
 	entgo.io/ent v0.13.1
 	github.com/brianvoe/gofakeit/v6 v6.28.0
-	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
