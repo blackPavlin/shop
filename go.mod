@@ -1,6 +1,6 @@
 module github.com/blackPavlin/shop
 
-go 1.22
+go 1.24
 
 require (
 	entgo.io/ent v0.13.1
