@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
@@ -9,6 +9,10 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -v ./cmd/shop
 
-EXPOSE 3000
+FROM alpine:3.21
+
+WORKDIR /app
+
+COPY --from=builder /app/shop .
 
 ENTRYPOINT ["./shop"]
