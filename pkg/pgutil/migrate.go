@@ -9,7 +9,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 
-	"github.com/blackPavlin/shop/ent"
+	"github.com/blackPavlin/shop/migration"
 )
 
 // MakeMigrate applies migrations to the specified database.
@@ -18,7 +18,7 @@ func MakeMigrate(ctx context.Context, config *PostgresConfig) error {
 	if err != nil {
 		return fmt.Errorf("connect postgres error: %w", err)
 	}
-	source, err := iofs.New(ent.Migrations, "migrations")
+	source, err := iofs.New(migration.MigrationsFS, "migrations")
 	if err != nil {
 		return fmt.Errorf("init source error: %w", err)
 	}
