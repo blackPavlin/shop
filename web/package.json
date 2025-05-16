@@ -10,7 +10,7 @@
     "generate": "openapi --input ../api/openapi.v1.yaml --output ./src/api --client axios"
   },
   "dependencies": {
-    "axios": "^1.7.1",
+    "axios": "^1.8.2",
     "element-plus": "^2.7.3",
     "pinia": "^2.1.7",
     "vue": "^3.4.27",
