@@ -28,7 +28,7 @@ func NewClient(ctx context.Context, config *S3Config) (*minio.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("connect to s3 bucket error: %w", err)
 	}
-	if err := client.MakeBucket(ctx, config.BucketName, minio.MakeBucketOptions{
+	if err = client.MakeBucket(ctx, config.BucketName, minio.MakeBucketOptions{
 		Region: config.Location,
 	}); err != nil {
 		exists, err := client.BucketExists(ctx, config.BucketName)

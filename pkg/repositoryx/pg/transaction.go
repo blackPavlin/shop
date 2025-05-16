@@ -45,13 +45,13 @@ func (p *TxManager) RunTransaction(
 			panic(v)
 		}
 	}()
-	if err := fn(ctx); err != nil {
-		if err := tx.Rollback(); err != nil {
+	if err = fn(ctx); err != nil {
+		if err = tx.Rollback(); err != nil {
 			return fmt.Errorf("rolling back transaction error: %w", err)
 		}
 		return err
 	}
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("commit transaction error: %w", err)
 	}
 	return nil

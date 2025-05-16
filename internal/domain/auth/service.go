@@ -51,7 +51,7 @@ func (s UseCase) Login(ctx context.Context, props *LoginProps) (string, error) {
 		}
 		return "", errorx.ErrInternal
 	}
-	if err := bcrypt.CompareHashAndPassword(
+	if err = bcrypt.CompareHashAndPassword(
 		[]byte(usr.Props.Password),
 		[]byte(props.Password),
 	); err != nil {
@@ -86,7 +86,7 @@ func (s UseCase) Signup(ctx context.Context, props *SignupProps) (string, error)
 		Phone:    props.Phone,
 		Password: string(passwordHash),
 	}
-	if _, err := s.userRepo.Create(ctx, userProps); err != nil {
+	if _, err = s.userRepo.Create(ctx, userProps); err != nil {
 		return "", fmt.Errorf("create user error: %w", err)
 	}
 	loginProps := &LoginProps{

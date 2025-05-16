@@ -41,7 +41,6 @@ func (s Storage) Upload(ctx context.Context, props *image.StorageProps) error {
 func (s Storage) BulkUpload(ctx context.Context, props []*image.StorageProps) error {
 	g, ctx := errgroup.WithContext(ctx)
 	for _, prop := range props {
-		prop := prop
 		g.Go(func() error {
 			if err := s.Upload(ctx, prop); err != nil {
 				s.logger.Error("bulkUpload image to storage error", zap.Error(err))
@@ -70,7 +69,6 @@ func (s Storage) Remove(ctx context.Context, name string) error {
 func (s Storage) BulkRemove(ctx context.Context, names []string) error {
 	g, ctx := errgroup.WithContext(ctx)
 	for _, name := range names {
-		name := name
 		g.Go(func() error {
 			if err := s.Remove(ctx, name); err != nil {
 				s.logger.Error("bulkRemove image from storage error", zap.Error(err))

@@ -121,11 +121,11 @@ func (ctrl *ProductController) UpdateProductHandler(w http.ResponseWriter, r *ht
 		return
 	}
 	request := &rest.CreateProductRequest{}
-	if err := render.DecodeJSON(r.Body, request); err != nil {
+	if err = render.DecodeJSON(r.Body, request); err != nil {
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	if err := request.Validate(); err != nil {
+	if err = request.Validate(); err != nil {
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
@@ -148,7 +148,7 @@ func (ctrl *ProductController) DeleteProductHandler(w http.ResponseWriter, r *ht
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	if err := ctrl.productService.Delete(r.Context(), product.ID(productID)); err != nil {
+	if err = ctrl.productService.Delete(r.Context(), product.ID(productID)); err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
@@ -162,7 +162,7 @@ func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, 
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	if err := r.ParseMultipartForm(maxFileSize); err != nil {
+	if err = r.ParseMultipartForm(maxFileSize); err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}
@@ -179,7 +179,7 @@ func (ctrl *ProductController) UploadProductImageHandler(w http.ResponseWriter, 
 			return
 		}
 		defer func() {
-			if err := f.Close(); err != nil {
+			if err = f.Close(); err != nil {
 				restx.HandleError(w, r, errorx.ErrInternal)
 			}
 		}()
@@ -205,7 +205,7 @@ func (ctrl *ProductController) DeleteProductImageHandler(w http.ResponseWriter, 
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	if err := ctrl.imageService.Delete(r.Context(), product.ImageID(imageID)); err != nil {
+	if err = ctrl.imageService.Delete(r.Context(), product.ImageID(imageID)); err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}

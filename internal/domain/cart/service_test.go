@@ -53,7 +53,7 @@ func (s *CartServiceSuite) TestSave() {
 			args.ctx = prepare(args.ctx)
 
 			got, err := s.cartService.Save(args.ctx, args.props)
-			s.Equal(got, want.res)
+			s.Equal(want.res, got)
 			s.ErrorIs(err, want.err)
 		}
 	}
@@ -138,7 +138,6 @@ func (s *CartServiceSuite) TestSave() {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		s.T().Run(tt.name, test(tt.prepare, tt.args, tt.want))
 	}
 }

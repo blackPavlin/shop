@@ -101,7 +101,7 @@ func (ctrl *CategoryController) DeleteCategoryHandler(w http.ResponseWriter, r *
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	if err := ctrl.categoryService.Delete(r.Context(), category.ID(categoryID)); err != nil {
+	if err = ctrl.categoryService.Delete(r.Context(), category.ID(categoryID)); err != nil {
 		restx.HandleError(w, r, err)
 		return
 	}

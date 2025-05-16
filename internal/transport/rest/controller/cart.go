@@ -107,7 +107,7 @@ func (ctrl *CartController) DeleteProductHandler(w http.ResponseWriter, r *http.
 		restx.HandleError(w, r, errorx.NewBadRequestError(err.Error()))
 		return
 	}
-	if err := ctrl.cartService.Delete(r.Context(), &cart.Filter{
+	if err = ctrl.cartService.Delete(r.Context(), &cart.Filter{
 		ID: cart.IDFilter{Eq: cart.IDs{cart.ID(cartID)}},
 	}); err != nil {
 		restx.HandleError(w, r, err)

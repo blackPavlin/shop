@@ -62,7 +62,7 @@ func (s *AuthServiceSuite) TestSignup() {
 			args.ctx = prepare(args.ctx)
 
 			got, err := s.authService.Signup(args.ctx, args.props)
-			s.Equal(got, want.res)
+			s.Equal(want.res, got)
 			s.ErrorIs(err, want.err)
 		}
 	}
@@ -99,7 +99,6 @@ func (s *AuthServiceSuite) TestSignup() {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		s.T().Run(tt.name, test(tt.prepare, tt.args, tt.want))
 	}
 }
@@ -119,7 +118,7 @@ func (s *AuthServiceSuite) TestLogin() {
 			args.ctx = prepare(args.ctx)
 
 			got, err := s.authService.Login(args.ctx, args.props)
-			s.Equal(got, want.res)
+			s.Equal(want.res, got)
 			s.ErrorIs(err, want.err)
 		}
 	}
@@ -187,7 +186,6 @@ func (s *AuthServiceSuite) TestLogin() {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		s.T().Run(tt.name, test(tt.prepare, tt.args, tt.want))
 	}
 }

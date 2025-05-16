@@ -30,7 +30,7 @@ func MakeMigrations(pool *pgxpool.Pool, config *config.DatabaseConfig) error {
 		return fmt.Errorf("create migration with instance: %w", err)
 	}
 
-	if err := migration.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	if err = migration.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("migratorion up: %w", err)
 	}
 

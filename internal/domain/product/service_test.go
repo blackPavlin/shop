@@ -116,7 +116,6 @@ func (s *ProductServiceSuite) DeleteTest() {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		s.T().Run(tt.name, test(tt.prepare, tt.args, tt.want))
 	}
 }
