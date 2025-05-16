@@ -1,10 +1,10 @@
 package product_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"golang.org/x/net/context"
 
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/internal/domain/product"

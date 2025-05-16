@@ -3,4 +3,4 @@
 package: rest
 generate:
   models: true
-output: types.gen.go
+output: ./internal/transport/rest/types.gen.go

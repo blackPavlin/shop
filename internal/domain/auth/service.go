@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
@@ -106,6 +106,7 @@ func (s UseCase) SignToken(usr *user.User) (string, error) {
 		UserID:   usr.ID,
 		UserRole: usr.Role,
 	}
+
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(
 		[]byte(s.config.SigningKey),
 	)
@@ -113,6 +114,7 @@ func (s UseCase) SignToken(usr *user.User) (string, error) {
 		s.logger.Error("sign auth token error:", zap.Error(err))
 		return "", errorx.ErrInternal
 	}
+	
 	return token, nil
 }
 
@@ -122,13 +124,16 @@ func (s UseCase) ValidateToken(accessToken string) (*UserClaims, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())
 		}
+
 		return []byte(s.config.SigningKey), nil
 	})
 	if err != nil {
 		return nil, errorx.ErrUnauthorized
 	}
+
 	if claims, ok := token.Claims.(*UserClaims); ok && token.Valid {
 		return claims, nil
 	}
+
 	return nil, errorx.ErrUnauthorized
 }

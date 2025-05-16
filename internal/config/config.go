@@ -3,7 +3,6 @@ package config
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -15,32 +14,12 @@ import (
 // Config is application configuration.
 type Config struct {
 	Logger   *zapx.Config
-	Server   *ServerConfig         `envconfig:"REST_SRV" required:"true"`
+	Server   *HttpServerConfig     `envconfig:"HTTP_SERVER" required:"true"`
 	Cors     *CorsConfig           `envconfig:"CORS" required:"true"`
 	Postgres *DatabaseConfig       `envconfig:"POSTGRES" required:"true"`
 	Auth     *AuthConfig           `envconfig:"AUTH" required:"true"`
 	S3       *s3x.S3Config         `envconfig:"S3" required:"true"`
 	Search   *searchx.SearchConfig `envconfig:"SEARCH" required:"true"`
-}
-
-// ServerConfig is HTTP server configuration.
-type ServerConfig struct {
-	Address      string        `envconfig:"ADDRESS" required:"true"`
-	ReadTimeout  time.Duration `envconfig:"READ_TIMEOUT" required:"true"`
-	WriteTimeout time.Duration `envconfig:"WRITE_TIMEOUT" required:"true"`
-	IdleTimeout  time.Duration `envconfig:"IDLE_TIMEOUT" required:"true"`
-}
-
-// CorsConfig defines parameters for CORS related request handler.
-type CorsConfig struct {
-	AllowedOrigins     []string `envconfig:"ALLOWED_ORIGINS" required:"true"`
-	AllowedMethods     []string `envconfig:"ALLOWED_METHODS" required:"true"`
-	AllowedHeaders     []string `envconfig:"ALLOWED_HEADERS" required:"true"`
-	ExposedHeaders     []string `envconfig:"EXPOSED_HEADERS" required:"true"`
-	AllowCredentials   bool     `envconfig:"ALLOW_CREDENTIALS" required:"true"`
-	MaxAge             int      `envconfig:"MAX_AGE" required:"true"`
-	OptionsPassthrough bool     `envconfig:"OPTIONS_PASSTHROUGH" required:"true"`
-	Debug              bool     `envconfig:"DEBUG" required:"true"`
 }
 
 // AuthConfig is authentication configuration.
@@ -51,9 +30,11 @@ type AuthConfig struct {
 
 // NewConfig create application config.
 func NewConfig() (*Config, error) {
-	config := &Config{}
+	config := new(Config)
+
 	if err := envconfig.Process("", config); err != nil {
-		return nil, fmt.Errorf("read config error: %w", err)
+		return nil, fmt.Errorf("read config: %w", err)
 	}
+
 	return config, nil
 }
