@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 
+	_ "go.uber.org/automaxprocs"
+
 	"github.com/blackPavlin/shop/internal/config"
 	"github.com/blackPavlin/shop/internal/database"
 	"github.com/blackPavlin/shop/internal/server"
