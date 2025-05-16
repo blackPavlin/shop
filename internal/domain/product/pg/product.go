@@ -8,13 +8,12 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/blackPavlin/shop/ent"
-	"github.com/blackPavlin/shop/ent/predicate"
-	entproduct "github.com/blackPavlin/shop/ent/product"
+	"github.com/blackPavlin/shop/internal/database/ent"
+	"github.com/blackPavlin/shop/internal/database/ent/predicate"
+	entproduct "github.com/blackPavlin/shop/internal/database/ent/product"
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // ProductRepository pg repository implementation.
@@ -45,9 +44,6 @@ func (r ProductRepository) Create(
 		SetPrice(props.Price).
 		Save(ctx)
 	if err != nil {
-		if pg.IsForeignKeyViolationErr(err, "product_category_fk") {
-			return nil, errorx.ErrNotFound
-		}
 		r.logger.Error("create product error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}

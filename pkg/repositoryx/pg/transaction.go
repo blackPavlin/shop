@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/blackPavlin/shop/ent"
+	"github.com/blackPavlin/shop/internal/database/ent"
 )
 
 // TxManager pg transaction manager implementation.

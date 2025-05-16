@@ -5,12 +5,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/blackPavlin/shop/ent"
-	"github.com/blackPavlin/shop/ent/predicate"
-	entproductimage "github.com/blackPavlin/shop/ent/productimage"
+	"github.com/blackPavlin/shop/internal/database/ent"
+	"github.com/blackPavlin/shop/internal/database/ent/predicate"
+	entproductimage "github.com/blackPavlin/shop/internal/database/ent/productimage"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // ImageRepository pg repository implementation.
@@ -42,12 +41,6 @@ func (r *ImageRepository) BulkCreate(
 		CreateBulk(createImageBuilders(client, images)...).
 		Save(ctx)
 	if err != nil {
-		if pg.IsForeignKeyViolationErr(err, "product_image_product_fk") {
-			return nil, errorx.ErrNotFound
-		}
-		if pg.IsForeignKeyViolationErr(err, "product_image_image_fk") {
-			return nil, errorx.ErrNotFound
-		}
 		r.logger.Error("bulk create product images error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}

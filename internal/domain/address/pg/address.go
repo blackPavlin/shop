@@ -6,13 +6,12 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/blackPavlin/shop/ent"
-	entaddress "github.com/blackPavlin/shop/ent/address"
-	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/internal/database/ent"
+	entaddress "github.com/blackPavlin/shop/internal/database/ent/address"
+	"github.com/blackPavlin/shop/internal/database/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/address"
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // AddressRepository pg repository implementation.
@@ -46,9 +45,6 @@ func (r AddressRepository) Create(
 		SetStreet(props.Street).
 		Save(ctx)
 	if err != nil {
-		if pg.IsForeignKeyViolationErr(err, "address_user_fk") {
-			return nil, errorx.ErrNotFound
-		}
 		r.logger.Error("create address error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}

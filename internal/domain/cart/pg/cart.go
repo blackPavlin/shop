@@ -7,15 +7,14 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"go.uber.org/zap"
 
-	"github.com/blackPavlin/shop/ent"
-	entcart "github.com/blackPavlin/shop/ent/cart"
-	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/internal/database/ent"
+	entcart "github.com/blackPavlin/shop/internal/database/ent/cart"
+	"github.com/blackPavlin/shop/internal/database/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/cart"
 	"github.com/blackPavlin/shop/internal/domain/category"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // CartRepository pg repository implementation.
@@ -46,12 +45,6 @@ func (r CartRepository) Save(ctx context.Context, props *cart.Props) (*cart.Cart
 		UpdateUpdatedAt().
 		Exec(ctx)
 	if err != nil {
-		if pg.IsForeignKeyViolationErr(err, "cart_user_fk") {
-			return nil, errorx.ErrNotFound
-		}
-		if pg.IsForeignKeyViolationErr(err, "cart_product_fk") {
-			return nil, errorx.ErrNotFound
-		}
 		r.logger.Error("create cart error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}

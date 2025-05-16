@@ -7,7 +7,6 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/blackPavlin/shop/pkg/pgutil"
 	"github.com/blackPavlin/shop/pkg/s3x"
 	"github.com/blackPavlin/shop/pkg/searchx"
 	"github.com/blackPavlin/shop/pkg/zapx"
@@ -16,12 +15,12 @@ import (
 // Config is application configuration.
 type Config struct {
 	Logger   *zapx.Config
-	Server   *ServerConfig          `envconfig:"REST_SRV" required:"true"`
-	Cors     *CorsConfig            `envconfig:"CORS" required:"true"`
-	Postgres *pgutil.PostgresConfig `envconfig:"POSTGRES" required:"true"`
-	Auth     *AuthConfig            `envconfig:"AUTH" required:"true"`
-	S3       *s3x.S3Config          `envconfig:"S3" required:"true"`
-	Search   *searchx.SearchConfig  `envconfig:"SEARCH" required:"true"`
+	Server   *ServerConfig         `envconfig:"REST_SRV" required:"true"`
+	Cors     *CorsConfig           `envconfig:"CORS" required:"true"`
+	Postgres *DatabaseConfig       `envconfig:"POSTGRES" required:"true"`
+	Auth     *AuthConfig           `envconfig:"AUTH" required:"true"`
+	S3       *s3x.S3Config         `envconfig:"S3" required:"true"`
+	Search   *searchx.SearchConfig `envconfig:"SEARCH" required:"true"`
 }
 
 // ServerConfig is HTTP server configuration.

@@ -4,13 +4,9 @@ import (
 	"context"
 	"log"
 
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
-
-	"github.com/blackPavlin/shop/ent"
 	"github.com/blackPavlin/shop/internal/config"
+	"github.com/blackPavlin/shop/internal/database"
 	"github.com/blackPavlin/shop/internal/server"
-	"github.com/blackPavlin/shop/pkg/pgutil"
 	"github.com/blackPavlin/shop/pkg/s3x"
 	"github.com/blackPavlin/shop/pkg/searchx"
 	"github.com/blackPavlin/shop/pkg/zapx"
@@ -27,17 +23,16 @@ func main() {
 		log.Fatalf("failed to create zapx: %+v", err)
 	}
 
-	if err := pgutil.MakeMigrate(context.Background(), conf.Postgres); err != nil {
+	db, err := database.NewDatabase(context.Background(), conf.Postgres)
+	if err != nil {
+		log.Fatalf("failed connect to database: %v", err)
+	}
+
+	if err := database.MakeMigrations(db, conf.Postgres); err != nil {
 		log.Fatalf("failed to make migrations: %+v", err)
 	}
 
-	db, err := pgutil.NewDatabase(context.Background(), conf.Postgres)
-	if err != nil {
-		log.Fatalf("failed to connect database: %+v", err)
-	}
-
-	driver := sql.OpenDB(dialect.Postgres, db)
-	database := ent.NewClient(ent.Driver(driver))
+	dbClient := database.NewClient(db)
 
 	storage, err := s3x.NewClient(context.Background(), conf.S3)
 	if err != nil {
@@ -49,7 +44,7 @@ func main() {
 		log.Fatalf("failed to connect search engine: %+v", err)
 	}
 
-	if err := server.NewServer(conf, logger, database, storage, search).Run(); err != nil {
+	if err := server.NewServer(conf, logger, dbClient, storage, search).Run(); err != nil {
 		log.Fatalf("failed to shutdown server: %+v", err)
 	}
 }

@@ -19,7 +19,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"go.uber.org/zap"
 
-	"github.com/blackPavlin/shop/ent"
+	"github.com/blackPavlin/shop/internal/database/ent"
 	"github.com/blackPavlin/shop/internal/config"
 	"github.com/blackPavlin/shop/internal/domain/address"
 	addresspg "github.com/blackPavlin/shop/internal/domain/address/pg"

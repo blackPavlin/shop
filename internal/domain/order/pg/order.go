@@ -8,13 +8,12 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/blackPavlin/shop/ent"
-	entorder "github.com/blackPavlin/shop/ent/order"
-	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/internal/database/ent"
+	entorder "github.com/blackPavlin/shop/internal/database/ent/order"
+	"github.com/blackPavlin/shop/internal/database/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/order"
 	"github.com/blackPavlin/shop/internal/domain/user"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // OrderRepository pg repository implementation.
@@ -39,9 +38,6 @@ func (r OrderRepository) Create(ctx context.Context, or *order.Order) (*order.Or
 		SetStatus(entorder.StatusCREATED).
 		Save(ctx)
 	if err != nil {
-		if pg.IsForeignKeyViolationErr(err, "order_user_fk") {
-			return nil, errorx.ErrNotFound
-		}
 		r.logger.Error("create order error", zap.Error(err))
 		return nil, errorx.ErrInternal
 	}

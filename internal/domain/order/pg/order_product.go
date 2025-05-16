@@ -5,13 +5,12 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/blackPavlin/shop/ent"
-	entorderproduct "github.com/blackPavlin/shop/ent/orderproduct"
-	"github.com/blackPavlin/shop/ent/predicate"
+	"github.com/blackPavlin/shop/internal/database/ent"
+	entorderproduct "github.com/blackPavlin/shop/internal/database/ent/orderproduct"
+	"github.com/blackPavlin/shop/internal/database/ent/predicate"
 	"github.com/blackPavlin/shop/internal/domain/order"
 	"github.com/blackPavlin/shop/internal/domain/product"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx/pg"
 )
 
 // OrderProductRepository pg repository implementation.
@@ -40,12 +39,6 @@ func (r *OrderProductRepository) BulkCreateTx(ctx context.Context, products orde
 		CreateBulk(createOrderProductBuilders(client, products)...).
 		Save(ctx)
 	if err != nil {
-		if pg.IsForeignKeyViolationErr(err, "order_product_order_fk") {
-			return nil, errorx.ErrNotFound
-		}
-		if pg.IsForeignKeyViolationErr(err, "order_product_product_fk") {
-			return nil, errorx.ErrNotFound
-		}
 		r.logger.Error("bulkCreate order products error", zap.Error(err))
 		return nil, errorx.ErrUnauthorized
 	}
