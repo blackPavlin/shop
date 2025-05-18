@@ -15,11 +15,11 @@ import (
 // ProductEngine is a search engine.
 type ProductEngine struct {
 	logger *zap.Logger
-	client *meilisearch.Client
+	client meilisearch.ServiceManager
 }
 
 // NewProductEngine creates a new search engine.
-func NewProductEngine(logger *zap.Logger, client *meilisearch.Client) *ProductEngine {
+func NewProductEngine(logger *zap.Logger, client meilisearch.ServiceManager) *ProductEngine {
 	return &ProductEngine{logger: logger, client: client}
 }
 

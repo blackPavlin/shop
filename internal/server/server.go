@@ -19,8 +19,8 @@ import (
 	"github.com/minio/minio-go/v7"
 	"go.uber.org/zap"
 
-	"github.com/blackPavlin/shop/internal/database/ent"
 	"github.com/blackPavlin/shop/internal/config"
+	"github.com/blackPavlin/shop/internal/database/ent"
 	"github.com/blackPavlin/shop/internal/domain/address"
 	addresspg "github.com/blackPavlin/shop/internal/domain/address/pg"
 	"github.com/blackPavlin/shop/internal/domain/auth"
@@ -48,7 +48,7 @@ type Server struct {
 
 	database *ent.Client
 	storage  *minio.Client
-	search   *meilisearch.Client
+	search   meilisearch.ServiceManager
 }
 
 // NewServer create instance of http server.
@@ -57,7 +57,7 @@ func NewServer(
 	logger *zap.Logger,
 	database *ent.Client,
 	storage *minio.Client,
-	search *meilisearch.Client,
+	search meilisearch.ServiceManager,
 ) *Server {
 	router := chi.NewRouter()
 

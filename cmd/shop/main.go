@@ -8,9 +8,9 @@ import (
 
 	"github.com/blackPavlin/shop/internal/config"
 	"github.com/blackPavlin/shop/internal/database"
+	"github.com/blackPavlin/shop/internal/search"
 	"github.com/blackPavlin/shop/internal/server"
 	"github.com/blackPavlin/shop/pkg/s3x"
-	"github.com/blackPavlin/shop/pkg/searchx"
 	"github.com/blackPavlin/shop/pkg/zapx"
 )
 
@@ -41,7 +41,7 @@ func main() {
 		log.Fatalf("failed to connect file storage: %+v", err)
 	}
 
-	search, err := searchx.NewClient(context.Background(), conf.Search)
+	search, err := search.NewSearchEngine(conf.Search)
 	if err != nil {
 		log.Fatalf("failed to connect search engine: %+v", err)
 	}
