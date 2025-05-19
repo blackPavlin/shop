@@ -17,7 +17,7 @@ require (
 	github.com/meilisearch/meilisearch-go v0.32.0
 	github.com/minio/minio-go/v7 v7.0.91
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/mock v0.4.0
 	go.uber.org/zap v1.27.0
