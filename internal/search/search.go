@@ -3,8 +3,9 @@ package search
 import (
 	"fmt"
 
-	"github.com/blackPavlin/shop/internal/config"
 	"github.com/meilisearch/meilisearch-go"
+
+	"github.com/blackPavlin/shop/internal/config"
 )
 
 func NewSearchEngine(config *config.SearchEngineConfig) (meilisearch.ServiceManager, error) {

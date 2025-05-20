@@ -8,20 +8,20 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/blackPavlin/shop/internal/config"
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/s3x"
 )
 
 // Storage s3 storage implementation.
 type Storage struct {
 	client *minio.Client
-	config *s3x.S3Config
+	config *config.S3Config
 	logger *zap.Logger
 }
 
 // NewStorage create instance of Storage.
-func NewStorage(client *minio.Client, config *s3x.S3Config, logger *zap.Logger) *Storage {
+func NewStorage(client *minio.Client, config *config.S3Config, logger *zap.Logger) *Storage {
 	return &Storage{client: client, config: config, logger: logger}
 }
 

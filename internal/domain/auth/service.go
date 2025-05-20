@@ -114,7 +114,7 @@ func (s UseCase) SignToken(usr *user.User) (string, error) {
 		s.logger.Error("sign auth token error:", zap.Error(err))
 		return "", errorx.ErrInternal
 	}
-	
+
 	return token, nil
 }
 

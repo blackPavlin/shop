@@ -15,6 +15,10 @@ func NewNopTransactionManager() *NopTransactionManager {
 	return &NopTransactionManager{}
 }
 
-func (NopTransactionManager) RunTransaction(ctx context.Context, _ *sql.TxOptions, fn func(context.Context) error) error {
+func (NopTransactionManager) RunTransaction(
+	ctx context.Context,
+	_ *sql.TxOptions,
+	fn func(context.Context) error,
+) error {
 	return fn(ctx)
 }

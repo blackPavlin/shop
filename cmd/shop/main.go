@@ -8,9 +8,9 @@ import (
 
 	"github.com/blackPavlin/shop/internal/config"
 	"github.com/blackPavlin/shop/internal/database"
+	"github.com/blackPavlin/shop/internal/s3"
 	"github.com/blackPavlin/shop/internal/search"
 	"github.com/blackPavlin/shop/internal/server"
-	"github.com/blackPavlin/shop/pkg/s3x"
 	"github.com/blackPavlin/shop/pkg/zapx"
 )
 
@@ -36,7 +36,7 @@ func main() {
 
 	dbClient := database.NewClient(db)
 
-	storage, err := s3x.NewClient(context.Background(), conf.S3)
+	storage, err := s3.NewClient(context.Background(), conf.S3)
 	if err != nil {
 		log.Fatalf("failed to connect file storage: %+v", err)
 	}
