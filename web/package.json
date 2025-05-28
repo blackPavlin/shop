@@ -30,7 +30,7 @@
     "sass": "^1.89.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
-    "vue-tsc": "^2.0.19"
+    "vue-tsc": "^2.2.10"
   },
   "eslintConfig": {
     "root": true,
