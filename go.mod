@@ -1,6 +1,6 @@
 module github.com/blackPavlin/shop
 
-go 1.24
+go 1.24.0
 
 require (
 	entgo.io/ent v0.14.4
@@ -22,7 +22,7 @@ require (
 	go.uber.org/mock v0.5.2
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.39.0
-	golang.org/x/sync v0.15.0
+	golang.org/x/sync v0.17.0
 )
 
 require (
