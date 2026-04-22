@@ -40,9 +40,9 @@ func (p *ProductEngine) Search(
 
 // Index products.
 func (p *ProductEngine) Index(_ context.Context, products product.Products) error {
-	documents := make([]map[string]interface{}, 0, len(products))
+	documents := make([]map[string]any, 0, len(products))
 	for _, p := range products {
-		documents = append(documents, map[string]interface{}{
+		documents = append(documents, map[string]any{
 			"id":          strconv.FormatInt(int64(p.ID), 10),
 			"name":        p.Props.Name,
 			"description": p.Props.Description,

@@ -120,7 +120,7 @@ func (s UseCase) SignToken(usr *user.User) (string, error) {
 
 // ValidateToken check and parse authorization token.
 func (s UseCase) ValidateToken(accessToken string) (*UserClaims, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Method.Alg())
 		}
