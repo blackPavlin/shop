@@ -1,18 +1,40 @@
-FROM golang:1.24-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
-WORKDIR /app
+# Install build dependencies
+RUN apk add --no-cache git ca-certificates tzdata
 
-COPY go.mod go.sum /
-RUN go mod download
+# Set working directory
+WORKDIR /build
 
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download and verify dependencies
+RUN go mod download && go mod verify
+
+# Copy source code
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -v ./cmd/shop
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags='-w -s -extldflags "-static"' \
+    -a \
+    -o /build/bin/shop \
+    ./cmd/shop
 
-FROM alpine:3.21
+FROM scratch
 
-WORKDIR /app
+# Copy CA certificates for HTTPS requests
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY --from=builder /app/shop .
+# Copy timezone data
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
-ENTRYPOINT ["./shop"]
+# Copy the binary from builder
+COPY --from=builder /build/bin/shop /usr/local/bin
+
+# Expose port
+EXPOSE 3000
+
+# Set the entrypoint
+ENTRYPOINT [ "/usr/local/bin/shop" ]
