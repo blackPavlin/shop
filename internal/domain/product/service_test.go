@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	"github.com/blackPavlin/shop/internal/database"
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/internal/domain/product"
-	"github.com/blackPavlin/shop/pkg/repositoryx"
 	"github.com/blackPavlin/shop/pkg/testutilx"
 )
 
@@ -21,7 +21,7 @@ type ProductServiceBaseSuite struct {
 	productRepo      *product.MockRepository
 	productImageRepo *product.MockImageRepository
 	imageStorage     *image.MockStorage
-	txManages        repositoryx.TxManager
+	txManages        database.TransactionManager
 }
 
 func (s *ProductServiceBaseSuite) SetupTest() {
@@ -29,7 +29,7 @@ func (s *ProductServiceBaseSuite) SetupTest() {
 	s.productRepo = product.NewMockRepository(s.Ctrl)
 	s.productImageRepo = product.NewMockImageRepository(s.Ctrl)
 	s.imageStorage = image.NewMockStorage(s.Ctrl)
-	s.txManages = repositoryx.NewNopTxManager()
+	s.txManages = database.NewNopTransactionManager()
 }
 
 type ProductServiceSuite struct {

@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/blackPavlin/shop/internal/database"
 	"github.com/blackPavlin/shop/internal/domain/image"
-	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
 //go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "service_mock.go" -package "product"
@@ -25,7 +25,7 @@ type UseCase struct {
 	productRepo      Repository
 	productImageRepo ImageRepository
 	imageStorage     image.Storage
-	txManager        repositoryx.TxManager
+	txManager        database.TransactionManager
 }
 
 // NewUseCase create instance of UseCase.
@@ -33,7 +33,7 @@ func NewUseCase(
 	productRepo Repository,
 	productImageRepo ImageRepository,
 	imageStorage image.Storage,
-	txManager repositoryx.TxManager,
+	txManager database.TransactionManager,
 ) *UseCase {
 	return &UseCase{
 		productRepo:      productRepo,

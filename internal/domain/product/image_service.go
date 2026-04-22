@@ -10,9 +10,9 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
+	"github.com/blackPavlin/shop/internal/database"
 	"github.com/blackPavlin/shop/internal/domain/image"
 	"github.com/blackPavlin/shop/pkg/errorx"
-	"github.com/blackPavlin/shop/pkg/repositoryx"
 )
 
 //go:generate go run go.uber.org/mock/mockgen@v0.4.0 -source $GOFILE -destination "image_service_mock.go" -package "product"
@@ -29,7 +29,7 @@ type ImageUseCase struct {
 	productRepo  Repository
 	imageRepo    ImageRepository
 	imageStorage image.Storage
-	txManager    repositoryx.TxManager
+	txManager    database.TransactionManager
 }
 
 // NewImageUseCase create instance of ImageUseCase.
@@ -38,7 +38,7 @@ func NewImageUseCase(
 	productRepo Repository,
 	imageRepo ImageRepository,
 	imageStorage image.Storage,
-	txManager repositoryx.TxManager,
+	txManager database.TransactionManager,
 ) *ImageUseCase {
 	return &ImageUseCase{logger, productRepo, imageRepo, imageStorage, txManager}
 }
