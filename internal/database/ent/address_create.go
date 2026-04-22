@@ -24,122 +24,122 @@ type AddressCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (ac *AddressCreate) SetCreatedAt(t time.Time) *AddressCreate {
-	ac.mutation.SetCreatedAt(t)
-	return ac
+func (_c *AddressCreate) SetCreatedAt(v time.Time) *AddressCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ac *AddressCreate) SetNillableCreatedAt(t *time.Time) *AddressCreate {
-	if t != nil {
-		ac.SetCreatedAt(*t)
+func (_c *AddressCreate) SetNillableCreatedAt(v *time.Time) *AddressCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (ac *AddressCreate) SetUpdatedAt(t time.Time) *AddressCreate {
-	ac.mutation.SetUpdatedAt(t)
-	return ac
+func (_c *AddressCreate) SetUpdatedAt(v time.Time) *AddressCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ac *AddressCreate) SetNillableUpdatedAt(t *time.Time) *AddressCreate {
-	if t != nil {
-		ac.SetUpdatedAt(*t)
+func (_c *AddressCreate) SetNillableUpdatedAt(v *time.Time) *AddressCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetUserID sets the "user_id" field.
-func (ac *AddressCreate) SetUserID(i int64) *AddressCreate {
-	ac.mutation.SetUserID(i)
-	return ac
+func (_c *AddressCreate) SetUserID(v int64) *AddressCreate {
+	_c.mutation.SetUserID(v)
+	return _c
 }
 
 // SetCity sets the "city" field.
-func (ac *AddressCreate) SetCity(s string) *AddressCreate {
-	ac.mutation.SetCity(s)
-	return ac
+func (_c *AddressCreate) SetCity(v string) *AddressCreate {
+	_c.mutation.SetCity(v)
+	return _c
 }
 
 // SetCountry sets the "country" field.
-func (ac *AddressCreate) SetCountry(s string) *AddressCreate {
-	ac.mutation.SetCountry(s)
-	return ac
+func (_c *AddressCreate) SetCountry(v string) *AddressCreate {
+	_c.mutation.SetCountry(v)
+	return _c
 }
 
 // SetFlat sets the "flat" field.
-func (ac *AddressCreate) SetFlat(i int) *AddressCreate {
-	ac.mutation.SetFlat(i)
-	return ac
+func (_c *AddressCreate) SetFlat(v int) *AddressCreate {
+	_c.mutation.SetFlat(v)
+	return _c
 }
 
 // SetNillableFlat sets the "flat" field if the given value is not nil.
-func (ac *AddressCreate) SetNillableFlat(i *int) *AddressCreate {
-	if i != nil {
-		ac.SetFlat(*i)
+func (_c *AddressCreate) SetNillableFlat(v *int) *AddressCreate {
+	if v != nil {
+		_c.SetFlat(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetHouse sets the "house" field.
-func (ac *AddressCreate) SetHouse(i int) *AddressCreate {
-	ac.mutation.SetHouse(i)
-	return ac
+func (_c *AddressCreate) SetHouse(v int) *AddressCreate {
+	_c.mutation.SetHouse(v)
+	return _c
 }
 
 // SetLetter sets the "letter" field.
-func (ac *AddressCreate) SetLetter(s string) *AddressCreate {
-	ac.mutation.SetLetter(s)
-	return ac
+func (_c *AddressCreate) SetLetter(v string) *AddressCreate {
+	_c.mutation.SetLetter(v)
+	return _c
 }
 
 // SetNillableLetter sets the "letter" field if the given value is not nil.
-func (ac *AddressCreate) SetNillableLetter(s *string) *AddressCreate {
-	if s != nil {
-		ac.SetLetter(*s)
+func (_c *AddressCreate) SetNillableLetter(v *string) *AddressCreate {
+	if v != nil {
+		_c.SetLetter(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetPostcode sets the "postcode" field.
-func (ac *AddressCreate) SetPostcode(i int) *AddressCreate {
-	ac.mutation.SetPostcode(i)
-	return ac
+func (_c *AddressCreate) SetPostcode(v int) *AddressCreate {
+	_c.mutation.SetPostcode(v)
+	return _c
 }
 
 // SetStreet sets the "street" field.
-func (ac *AddressCreate) SetStreet(s string) *AddressCreate {
-	ac.mutation.SetStreet(s)
-	return ac
+func (_c *AddressCreate) SetStreet(v string) *AddressCreate {
+	_c.mutation.SetStreet(v)
+	return _c
 }
 
 // SetUsersID sets the "users" edge to the User entity by ID.
-func (ac *AddressCreate) SetUsersID(id int64) *AddressCreate {
-	ac.mutation.SetUsersID(id)
-	return ac
+func (_c *AddressCreate) SetUsersID(id int64) *AddressCreate {
+	_c.mutation.SetUsersID(id)
+	return _c
 }
 
 // SetUsers sets the "users" edge to the User entity.
-func (ac *AddressCreate) SetUsers(u *User) *AddressCreate {
-	return ac.SetUsersID(u.ID)
+func (_c *AddressCreate) SetUsers(v *User) *AddressCreate {
+	return _c.SetUsersID(v.ID)
 }
 
 // Mutation returns the AddressMutation object of the builder.
-func (ac *AddressCreate) Mutation() *AddressMutation {
-	return ac.mutation
+func (_c *AddressCreate) Mutation() *AddressMutation {
+	return _c.mutation
 }
 
 // Save creates the Address in the database.
-func (ac *AddressCreate) Save(ctx context.Context) (*Address, error) {
-	ac.defaults()
-	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
+func (_c *AddressCreate) Save(ctx context.Context) (*Address, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (ac *AddressCreate) SaveX(ctx context.Context) *Address {
-	v, err := ac.Save(ctx)
+func (_c *AddressCreate) SaveX(ctx context.Context) *Address {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -147,83 +147,83 @@ func (ac *AddressCreate) SaveX(ctx context.Context) *Address {
 }
 
 // Exec executes the query.
-func (ac *AddressCreate) Exec(ctx context.Context) error {
-	_, err := ac.Save(ctx)
+func (_c *AddressCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ac *AddressCreate) ExecX(ctx context.Context) {
-	if err := ac.Exec(ctx); err != nil {
+func (_c *AddressCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (ac *AddressCreate) defaults() {
-	if _, ok := ac.mutation.CreatedAt(); !ok {
+func (_c *AddressCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := address.DefaultCreatedAt()
-		ac.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := address.DefaultUpdatedAt()
-		ac.mutation.SetUpdatedAt(v)
+		_c.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ac *AddressCreate) check() error {
-	if _, ok := ac.mutation.CreatedAt(); !ok {
+func (_c *AddressCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Address.created_at"`)}
 	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Address.updated_at"`)}
 	}
-	if _, ok := ac.mutation.UserID(); !ok {
+	if _, ok := _c.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Address.user_id"`)}
 	}
-	if _, ok := ac.mutation.City(); !ok {
+	if _, ok := _c.mutation.City(); !ok {
 		return &ValidationError{Name: "city", err: errors.New(`ent: missing required field "Address.city"`)}
 	}
-	if v, ok := ac.mutation.City(); ok {
+	if v, ok := _c.mutation.City(); ok {
 		if err := address.CityValidator(v); err != nil {
 			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.Country(); !ok {
+	if _, ok := _c.mutation.Country(); !ok {
 		return &ValidationError{Name: "country", err: errors.New(`ent: missing required field "Address.country"`)}
 	}
-	if v, ok := ac.mutation.Country(); ok {
+	if v, ok := _c.mutation.Country(); ok {
 		if err := address.CountryValidator(v); err != nil {
 			return &ValidationError{Name: "country", err: fmt.Errorf(`ent: validator failed for field "Address.country": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.House(); !ok {
+	if _, ok := _c.mutation.House(); !ok {
 		return &ValidationError{Name: "house", err: errors.New(`ent: missing required field "Address.house"`)}
 	}
-	if _, ok := ac.mutation.Postcode(); !ok {
+	if _, ok := _c.mutation.Postcode(); !ok {
 		return &ValidationError{Name: "postcode", err: errors.New(`ent: missing required field "Address.postcode"`)}
 	}
-	if _, ok := ac.mutation.Street(); !ok {
+	if _, ok := _c.mutation.Street(); !ok {
 		return &ValidationError{Name: "street", err: errors.New(`ent: missing required field "Address.street"`)}
 	}
-	if v, ok := ac.mutation.Street(); ok {
+	if v, ok := _c.mutation.Street(); ok {
 		if err := address.StreetValidator(v); err != nil {
 			return &ValidationError{Name: "street", err: fmt.Errorf(`ent: validator failed for field "Address.street": %w`, err)}
 		}
 	}
-	if len(ac.mutation.UsersIDs()) == 0 {
+	if len(_c.mutation.UsersIDs()) == 0 {
 		return &ValidationError{Name: "users", err: errors.New(`ent: missing required edge "Address.users"`)}
 	}
 	return nil
 }
 
-func (ac *AddressCreate) sqlSave(ctx context.Context) (*Address, error) {
-	if err := ac.check(); err != nil {
+func (_c *AddressCreate) sqlSave(ctx context.Context) (*Address, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := ac.createSpec()
-	if err := sqlgraph.CreateNode(ctx, ac.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -231,54 +231,54 @@ func (ac *AddressCreate) sqlSave(ctx context.Context) (*Address, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int64(id)
-	ac.mutation.id = &_node.ID
-	ac.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (ac *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
+func (_c *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Address{config: ac.config}
+		_node = &Address{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(address.Table, sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt64))
 	)
-	_spec.OnConflict = ac.conflict
-	if value, ok := ac.mutation.CreatedAt(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(address.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := ac.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := ac.mutation.City(); ok {
+	if value, ok := _c.mutation.City(); ok {
 		_spec.SetField(address.FieldCity, field.TypeString, value)
 		_node.City = value
 	}
-	if value, ok := ac.mutation.Country(); ok {
+	if value, ok := _c.mutation.Country(); ok {
 		_spec.SetField(address.FieldCountry, field.TypeString, value)
 		_node.Country = value
 	}
-	if value, ok := ac.mutation.Flat(); ok {
+	if value, ok := _c.mutation.Flat(); ok {
 		_spec.SetField(address.FieldFlat, field.TypeInt, value)
 		_node.Flat = value
 	}
-	if value, ok := ac.mutation.House(); ok {
+	if value, ok := _c.mutation.House(); ok {
 		_spec.SetField(address.FieldHouse, field.TypeInt, value)
 		_node.House = value
 	}
-	if value, ok := ac.mutation.Letter(); ok {
+	if value, ok := _c.mutation.Letter(); ok {
 		_spec.SetField(address.FieldLetter, field.TypeString, value)
 		_node.Letter = value
 	}
-	if value, ok := ac.mutation.Postcode(); ok {
+	if value, ok := _c.mutation.Postcode(); ok {
 		_spec.SetField(address.FieldPostcode, field.TypeInt, value)
 		_node.Postcode = value
 	}
-	if value, ok := ac.mutation.Street(); ok {
+	if value, ok := _c.mutation.Street(); ok {
 		_spec.SetField(address.FieldStreet, field.TypeString, value)
 		_node.Street = value
 	}
-	if nodes := ac.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -314,10 +314,10 @@ func (ac *AddressCreate) createSpec() (*Address, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ac *AddressCreate) OnConflict(opts ...sql.ConflictOption) *AddressUpsertOne {
-	ac.conflict = opts
+func (_c *AddressCreate) OnConflict(opts ...sql.ConflictOption) *AddressUpsertOne {
+	_c.conflict = opts
 	return &AddressUpsertOne{
-		create: ac,
+		create: _c,
 	}
 }
 
@@ -327,10 +327,10 @@ func (ac *AddressCreate) OnConflict(opts ...sql.ConflictOption) *AddressUpsertOn
 //	client.Address.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ac *AddressCreate) OnConflictColumns(columns ...string) *AddressUpsertOne {
-	ac.conflict = append(ac.conflict, sql.ConflictColumns(columns...))
+func (_c *AddressCreate) OnConflictColumns(columns ...string) *AddressUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AddressUpsertOne{
-		create: ac,
+		create: _c,
 	}
 }
 
@@ -733,16 +733,16 @@ type AddressCreateBulk struct {
 }
 
 // Save creates the Address entities in the database.
-func (acb *AddressCreateBulk) Save(ctx context.Context) ([]*Address, error) {
-	if acb.err != nil {
-		return nil, acb.err
+func (_c *AddressCreateBulk) Save(ctx context.Context) ([]*Address, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
-	nodes := make([]*Address, len(acb.builders))
-	mutators := make([]Mutator, len(acb.builders))
-	for i := range acb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Address, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := acb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*AddressMutation)
@@ -756,12 +756,12 @@ func (acb *AddressCreateBulk) Save(ctx context.Context) ([]*Address, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = acb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, acb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -785,7 +785,7 @@ func (acb *AddressCreateBulk) Save(ctx context.Context) ([]*Address, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, acb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -793,8 +793,8 @@ func (acb *AddressCreateBulk) Save(ctx context.Context) ([]*Address, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (acb *AddressCreateBulk) SaveX(ctx context.Context) []*Address {
-	v, err := acb.Save(ctx)
+func (_c *AddressCreateBulk) SaveX(ctx context.Context) []*Address {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -802,14 +802,14 @@ func (acb *AddressCreateBulk) SaveX(ctx context.Context) []*Address {
 }
 
 // Exec executes the query.
-func (acb *AddressCreateBulk) Exec(ctx context.Context) error {
-	_, err := acb.Save(ctx)
+func (_c *AddressCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (acb *AddressCreateBulk) ExecX(ctx context.Context) {
-	if err := acb.Exec(ctx); err != nil {
+func (_c *AddressCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -829,10 +829,10 @@ func (acb *AddressCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (acb *AddressCreateBulk) OnConflict(opts ...sql.ConflictOption) *AddressUpsertBulk {
-	acb.conflict = opts
+func (_c *AddressCreateBulk) OnConflict(opts ...sql.ConflictOption) *AddressUpsertBulk {
+	_c.conflict = opts
 	return &AddressUpsertBulk{
-		create: acb,
+		create: _c,
 	}
 }
 
@@ -842,10 +842,10 @@ func (acb *AddressCreateBulk) OnConflict(opts ...sql.ConflictOption) *AddressUps
 //	client.Address.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (acb *AddressCreateBulk) OnConflictColumns(columns ...string) *AddressUpsertBulk {
-	acb.conflict = append(acb.conflict, sql.ConflictColumns(columns...))
+func (_c *AddressCreateBulk) OnConflictColumns(columns ...string) *AddressUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AddressUpsertBulk{
-		create: acb,
+		create: _c,
 	}
 }
 

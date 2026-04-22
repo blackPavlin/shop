@@ -88,7 +88,7 @@ func (*OrderProduct) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the OrderProduct fields.
-func (op *OrderProduct) assignValues(columns []string, values []any) error {
+func (_m *OrderProduct) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -99,45 +99,45 @@ func (op *OrderProduct) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			op.ID = int64(value.Int64)
+			_m.ID = int64(value.Int64)
 		case orderproduct.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				op.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case orderproduct.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				op.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case orderproduct.FieldOrderID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field order_id", values[i])
 			} else if value.Valid {
-				op.OrderID = value.Int64
+				_m.OrderID = value.Int64
 			}
 		case orderproduct.FieldProductID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field product_id", values[i])
 			} else if value.Valid {
-				op.ProductID = value.Int64
+				_m.ProductID = value.Int64
 			}
 		case orderproduct.FieldAmount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				op.Amount = value.Int64
+				_m.Amount = value.Int64
 			}
 		case orderproduct.FieldPrice:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field price", values[i])
 			} else if value.Valid {
-				op.Price = value.Int64
+				_m.Price = value.Int64
 			}
 		default:
-			op.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -145,60 +145,60 @@ func (op *OrderProduct) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the OrderProduct.
 // This includes values selected through modifiers, order, etc.
-func (op *OrderProduct) Value(name string) (ent.Value, error) {
-	return op.selectValues.Get(name)
+func (_m *OrderProduct) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryOrders queries the "orders" edge of the OrderProduct entity.
-func (op *OrderProduct) QueryOrders() *OrderQuery {
-	return NewOrderProductClient(op.config).QueryOrders(op)
+func (_m *OrderProduct) QueryOrders() *OrderQuery {
+	return NewOrderProductClient(_m.config).QueryOrders(_m)
 }
 
 // QueryProducts queries the "products" edge of the OrderProduct entity.
-func (op *OrderProduct) QueryProducts() *ProductQuery {
-	return NewOrderProductClient(op.config).QueryProducts(op)
+func (_m *OrderProduct) QueryProducts() *ProductQuery {
+	return NewOrderProductClient(_m.config).QueryProducts(_m)
 }
 
 // Update returns a builder for updating this OrderProduct.
 // Note that you need to call OrderProduct.Unwrap() before calling this method if this OrderProduct
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (op *OrderProduct) Update() *OrderProductUpdateOne {
-	return NewOrderProductClient(op.config).UpdateOne(op)
+func (_m *OrderProduct) Update() *OrderProductUpdateOne {
+	return NewOrderProductClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the OrderProduct entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (op *OrderProduct) Unwrap() *OrderProduct {
-	_tx, ok := op.config.driver.(*txDriver)
+func (_m *OrderProduct) Unwrap() *OrderProduct {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: OrderProduct is not a transactional entity")
 	}
-	op.config.driver = _tx.drv
-	return op
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (op *OrderProduct) String() string {
+func (_m *OrderProduct) String() string {
 	var builder strings.Builder
 	builder.WriteString("OrderProduct(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", op.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(op.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(op.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("order_id=")
-	builder.WriteString(fmt.Sprintf("%v", op.OrderID))
+	builder.WriteString(fmt.Sprintf("%v", _m.OrderID))
 	builder.WriteString(", ")
 	builder.WriteString("product_id=")
-	builder.WriteString(fmt.Sprintf("%v", op.ProductID))
+	builder.WriteString(fmt.Sprintf("%v", _m.ProductID))
 	builder.WriteString(", ")
 	builder.WriteString("amount=")
-	builder.WriteString(fmt.Sprintf("%v", op.Amount))
+	builder.WriteString(fmt.Sprintf("%v", _m.Amount))
 	builder.WriteString(", ")
 	builder.WriteString("price=")
-	builder.WriteString(fmt.Sprintf("%v", op.Price))
+	builder.WriteString(fmt.Sprintf("%v", _m.Price))
 	builder.WriteByte(')')
 	return builder.String()
 }

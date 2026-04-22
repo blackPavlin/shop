@@ -24,193 +24,193 @@ type AddressUpdate struct {
 }
 
 // Where appends a list predicates to the AddressUpdate builder.
-func (au *AddressUpdate) Where(ps ...predicate.Address) *AddressUpdate {
-	au.mutation.Where(ps...)
-	return au
+func (_u *AddressUpdate) Where(ps ...predicate.Address) *AddressUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (au *AddressUpdate) SetUpdatedAt(t time.Time) *AddressUpdate {
-	au.mutation.SetUpdatedAt(t)
-	return au
+func (_u *AddressUpdate) SetUpdatedAt(v time.Time) *AddressUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetUserID sets the "user_id" field.
-func (au *AddressUpdate) SetUserID(i int64) *AddressUpdate {
-	au.mutation.SetUserID(i)
-	return au
+func (_u *AddressUpdate) SetUserID(v int64) *AddressUpdate {
+	_u.mutation.SetUserID(v)
+	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableUserID(i *int64) *AddressUpdate {
-	if i != nil {
-		au.SetUserID(*i)
+func (_u *AddressUpdate) SetNillableUserID(v *int64) *AddressUpdate {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
-	return au
+	return _u
 }
 
 // SetCity sets the "city" field.
-func (au *AddressUpdate) SetCity(s string) *AddressUpdate {
-	au.mutation.SetCity(s)
-	return au
+func (_u *AddressUpdate) SetCity(v string) *AddressUpdate {
+	_u.mutation.SetCity(v)
+	return _u
 }
 
 // SetNillableCity sets the "city" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableCity(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetCity(*s)
+func (_u *AddressUpdate) SetNillableCity(v *string) *AddressUpdate {
+	if v != nil {
+		_u.SetCity(*v)
 	}
-	return au
+	return _u
 }
 
 // SetCountry sets the "country" field.
-func (au *AddressUpdate) SetCountry(s string) *AddressUpdate {
-	au.mutation.SetCountry(s)
-	return au
+func (_u *AddressUpdate) SetCountry(v string) *AddressUpdate {
+	_u.mutation.SetCountry(v)
+	return _u
 }
 
 // SetNillableCountry sets the "country" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableCountry(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetCountry(*s)
+func (_u *AddressUpdate) SetNillableCountry(v *string) *AddressUpdate {
+	if v != nil {
+		_u.SetCountry(*v)
 	}
-	return au
+	return _u
 }
 
 // SetFlat sets the "flat" field.
-func (au *AddressUpdate) SetFlat(i int) *AddressUpdate {
-	au.mutation.ResetFlat()
-	au.mutation.SetFlat(i)
-	return au
+func (_u *AddressUpdate) SetFlat(v int) *AddressUpdate {
+	_u.mutation.ResetFlat()
+	_u.mutation.SetFlat(v)
+	return _u
 }
 
 // SetNillableFlat sets the "flat" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableFlat(i *int) *AddressUpdate {
-	if i != nil {
-		au.SetFlat(*i)
+func (_u *AddressUpdate) SetNillableFlat(v *int) *AddressUpdate {
+	if v != nil {
+		_u.SetFlat(*v)
 	}
-	return au
+	return _u
 }
 
-// AddFlat adds i to the "flat" field.
-func (au *AddressUpdate) AddFlat(i int) *AddressUpdate {
-	au.mutation.AddFlat(i)
-	return au
+// AddFlat adds value to the "flat" field.
+func (_u *AddressUpdate) AddFlat(v int) *AddressUpdate {
+	_u.mutation.AddFlat(v)
+	return _u
 }
 
 // ClearFlat clears the value of the "flat" field.
-func (au *AddressUpdate) ClearFlat() *AddressUpdate {
-	au.mutation.ClearFlat()
-	return au
+func (_u *AddressUpdate) ClearFlat() *AddressUpdate {
+	_u.mutation.ClearFlat()
+	return _u
 }
 
 // SetHouse sets the "house" field.
-func (au *AddressUpdate) SetHouse(i int) *AddressUpdate {
-	au.mutation.ResetHouse()
-	au.mutation.SetHouse(i)
-	return au
+func (_u *AddressUpdate) SetHouse(v int) *AddressUpdate {
+	_u.mutation.ResetHouse()
+	_u.mutation.SetHouse(v)
+	return _u
 }
 
 // SetNillableHouse sets the "house" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableHouse(i *int) *AddressUpdate {
-	if i != nil {
-		au.SetHouse(*i)
+func (_u *AddressUpdate) SetNillableHouse(v *int) *AddressUpdate {
+	if v != nil {
+		_u.SetHouse(*v)
 	}
-	return au
+	return _u
 }
 
-// AddHouse adds i to the "house" field.
-func (au *AddressUpdate) AddHouse(i int) *AddressUpdate {
-	au.mutation.AddHouse(i)
-	return au
+// AddHouse adds value to the "house" field.
+func (_u *AddressUpdate) AddHouse(v int) *AddressUpdate {
+	_u.mutation.AddHouse(v)
+	return _u
 }
 
 // SetLetter sets the "letter" field.
-func (au *AddressUpdate) SetLetter(s string) *AddressUpdate {
-	au.mutation.SetLetter(s)
-	return au
+func (_u *AddressUpdate) SetLetter(v string) *AddressUpdate {
+	_u.mutation.SetLetter(v)
+	return _u
 }
 
 // SetNillableLetter sets the "letter" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableLetter(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetLetter(*s)
+func (_u *AddressUpdate) SetNillableLetter(v *string) *AddressUpdate {
+	if v != nil {
+		_u.SetLetter(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearLetter clears the value of the "letter" field.
-func (au *AddressUpdate) ClearLetter() *AddressUpdate {
-	au.mutation.ClearLetter()
-	return au
+func (_u *AddressUpdate) ClearLetter() *AddressUpdate {
+	_u.mutation.ClearLetter()
+	return _u
 }
 
 // SetPostcode sets the "postcode" field.
-func (au *AddressUpdate) SetPostcode(i int) *AddressUpdate {
-	au.mutation.ResetPostcode()
-	au.mutation.SetPostcode(i)
-	return au
+func (_u *AddressUpdate) SetPostcode(v int) *AddressUpdate {
+	_u.mutation.ResetPostcode()
+	_u.mutation.SetPostcode(v)
+	return _u
 }
 
 // SetNillablePostcode sets the "postcode" field if the given value is not nil.
-func (au *AddressUpdate) SetNillablePostcode(i *int) *AddressUpdate {
-	if i != nil {
-		au.SetPostcode(*i)
+func (_u *AddressUpdate) SetNillablePostcode(v *int) *AddressUpdate {
+	if v != nil {
+		_u.SetPostcode(*v)
 	}
-	return au
+	return _u
 }
 
-// AddPostcode adds i to the "postcode" field.
-func (au *AddressUpdate) AddPostcode(i int) *AddressUpdate {
-	au.mutation.AddPostcode(i)
-	return au
+// AddPostcode adds value to the "postcode" field.
+func (_u *AddressUpdate) AddPostcode(v int) *AddressUpdate {
+	_u.mutation.AddPostcode(v)
+	return _u
 }
 
 // SetStreet sets the "street" field.
-func (au *AddressUpdate) SetStreet(s string) *AddressUpdate {
-	au.mutation.SetStreet(s)
-	return au
+func (_u *AddressUpdate) SetStreet(v string) *AddressUpdate {
+	_u.mutation.SetStreet(v)
+	return _u
 }
 
 // SetNillableStreet sets the "street" field if the given value is not nil.
-func (au *AddressUpdate) SetNillableStreet(s *string) *AddressUpdate {
-	if s != nil {
-		au.SetStreet(*s)
+func (_u *AddressUpdate) SetNillableStreet(v *string) *AddressUpdate {
+	if v != nil {
+		_u.SetStreet(*v)
 	}
-	return au
+	return _u
 }
 
 // SetUsersID sets the "users" edge to the User entity by ID.
-func (au *AddressUpdate) SetUsersID(id int64) *AddressUpdate {
-	au.mutation.SetUsersID(id)
-	return au
+func (_u *AddressUpdate) SetUsersID(id int64) *AddressUpdate {
+	_u.mutation.SetUsersID(id)
+	return _u
 }
 
 // SetUsers sets the "users" edge to the User entity.
-func (au *AddressUpdate) SetUsers(u *User) *AddressUpdate {
-	return au.SetUsersID(u.ID)
+func (_u *AddressUpdate) SetUsers(v *User) *AddressUpdate {
+	return _u.SetUsersID(v.ID)
 }
 
 // Mutation returns the AddressMutation object of the builder.
-func (au *AddressUpdate) Mutation() *AddressMutation {
-	return au.mutation
+func (_u *AddressUpdate) Mutation() *AddressMutation {
+	return _u.mutation
 }
 
 // ClearUsers clears the "users" edge to the User entity.
-func (au *AddressUpdate) ClearUsers() *AddressUpdate {
-	au.mutation.ClearUsers()
-	return au
+func (_u *AddressUpdate) ClearUsers() *AddressUpdate {
+	_u.mutation.ClearUsers()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (au *AddressUpdate) Save(ctx context.Context) (int, error) {
-	au.defaults()
-	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
+func (_u *AddressUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (au *AddressUpdate) SaveX(ctx context.Context) int {
-	affected, err := au.Save(ctx)
+func (_u *AddressUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -218,101 +218,101 @@ func (au *AddressUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (au *AddressUpdate) Exec(ctx context.Context) error {
-	_, err := au.Save(ctx)
+func (_u *AddressUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (au *AddressUpdate) ExecX(ctx context.Context) {
-	if err := au.Exec(ctx); err != nil {
+func (_u *AddressUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (au *AddressUpdate) defaults() {
-	if _, ok := au.mutation.UpdatedAt(); !ok {
+func (_u *AddressUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := address.UpdateDefaultUpdatedAt()
-		au.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (au *AddressUpdate) check() error {
-	if v, ok := au.mutation.City(); ok {
+func (_u *AddressUpdate) check() error {
+	if v, ok := _u.mutation.City(); ok {
 		if err := address.CityValidator(v); err != nil {
 			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.Country(); ok {
+	if v, ok := _u.mutation.Country(); ok {
 		if err := address.CountryValidator(v); err != nil {
 			return &ValidationError{Name: "country", err: fmt.Errorf(`ent: validator failed for field "Address.country": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.Street(); ok {
+	if v, ok := _u.mutation.Street(); ok {
 		if err := address.StreetValidator(v); err != nil {
 			return &ValidationError{Name: "street", err: fmt.Errorf(`ent: validator failed for field "Address.street": %w`, err)}
 		}
 	}
-	if au.mutation.UsersCleared() && len(au.mutation.UsersIDs()) > 0 {
+	if _u.mutation.UsersCleared() && len(_u.mutation.UsersIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Address.users"`)
 	}
 	return nil
 }
 
-func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := au.check(); err != nil {
-		return n, err
+func (_u *AddressUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt64))
-	if ps := au.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := au.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := au.mutation.City(); ok {
+	if value, ok := _u.mutation.City(); ok {
 		_spec.SetField(address.FieldCity, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Country(); ok {
+	if value, ok := _u.mutation.Country(); ok {
 		_spec.SetField(address.FieldCountry, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Flat(); ok {
+	if value, ok := _u.mutation.Flat(); ok {
 		_spec.SetField(address.FieldFlat, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.AddedFlat(); ok {
+	if value, ok := _u.mutation.AddedFlat(); ok {
 		_spec.AddField(address.FieldFlat, field.TypeInt, value)
 	}
-	if au.mutation.FlatCleared() {
+	if _u.mutation.FlatCleared() {
 		_spec.ClearField(address.FieldFlat, field.TypeInt)
 	}
-	if value, ok := au.mutation.House(); ok {
+	if value, ok := _u.mutation.House(); ok {
 		_spec.SetField(address.FieldHouse, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.AddedHouse(); ok {
+	if value, ok := _u.mutation.AddedHouse(); ok {
 		_spec.AddField(address.FieldHouse, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.Letter(); ok {
+	if value, ok := _u.mutation.Letter(); ok {
 		_spec.SetField(address.FieldLetter, field.TypeString, value)
 	}
-	if au.mutation.LetterCleared() {
+	if _u.mutation.LetterCleared() {
 		_spec.ClearField(address.FieldLetter, field.TypeString)
 	}
-	if value, ok := au.mutation.Postcode(); ok {
+	if value, ok := _u.mutation.Postcode(); ok {
 		_spec.SetField(address.FieldPostcode, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.AddedPostcode(); ok {
+	if value, ok := _u.mutation.AddedPostcode(); ok {
 		_spec.AddField(address.FieldPostcode, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.Street(); ok {
+	if value, ok := _u.mutation.Street(); ok {
 		_spec.SetField(address.FieldStreet, field.TypeString, value)
 	}
-	if au.mutation.UsersCleared() {
+	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -325,7 +325,7 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -341,7 +341,7 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{address.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -349,8 +349,8 @@ func (au *AddressUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	au.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // AddressUpdateOne is the builder for updating a single Address entity.
@@ -362,200 +362,200 @@ type AddressUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (auo *AddressUpdateOne) SetUpdatedAt(t time.Time) *AddressUpdateOne {
-	auo.mutation.SetUpdatedAt(t)
-	return auo
+func (_u *AddressUpdateOne) SetUpdatedAt(v time.Time) *AddressUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetUserID sets the "user_id" field.
-func (auo *AddressUpdateOne) SetUserID(i int64) *AddressUpdateOne {
-	auo.mutation.SetUserID(i)
-	return auo
+func (_u *AddressUpdateOne) SetUserID(v int64) *AddressUpdateOne {
+	_u.mutation.SetUserID(v)
+	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableUserID(i *int64) *AddressUpdateOne {
-	if i != nil {
-		auo.SetUserID(*i)
+func (_u *AddressUpdateOne) SetNillableUserID(v *int64) *AddressUpdateOne {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetCity sets the "city" field.
-func (auo *AddressUpdateOne) SetCity(s string) *AddressUpdateOne {
-	auo.mutation.SetCity(s)
-	return auo
+func (_u *AddressUpdateOne) SetCity(v string) *AddressUpdateOne {
+	_u.mutation.SetCity(v)
+	return _u
 }
 
 // SetNillableCity sets the "city" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableCity(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetCity(*s)
+func (_u *AddressUpdateOne) SetNillableCity(v *string) *AddressUpdateOne {
+	if v != nil {
+		_u.SetCity(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetCountry sets the "country" field.
-func (auo *AddressUpdateOne) SetCountry(s string) *AddressUpdateOne {
-	auo.mutation.SetCountry(s)
-	return auo
+func (_u *AddressUpdateOne) SetCountry(v string) *AddressUpdateOne {
+	_u.mutation.SetCountry(v)
+	return _u
 }
 
 // SetNillableCountry sets the "country" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableCountry(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetCountry(*s)
+func (_u *AddressUpdateOne) SetNillableCountry(v *string) *AddressUpdateOne {
+	if v != nil {
+		_u.SetCountry(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetFlat sets the "flat" field.
-func (auo *AddressUpdateOne) SetFlat(i int) *AddressUpdateOne {
-	auo.mutation.ResetFlat()
-	auo.mutation.SetFlat(i)
-	return auo
+func (_u *AddressUpdateOne) SetFlat(v int) *AddressUpdateOne {
+	_u.mutation.ResetFlat()
+	_u.mutation.SetFlat(v)
+	return _u
 }
 
 // SetNillableFlat sets the "flat" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableFlat(i *int) *AddressUpdateOne {
-	if i != nil {
-		auo.SetFlat(*i)
+func (_u *AddressUpdateOne) SetNillableFlat(v *int) *AddressUpdateOne {
+	if v != nil {
+		_u.SetFlat(*v)
 	}
-	return auo
+	return _u
 }
 
-// AddFlat adds i to the "flat" field.
-func (auo *AddressUpdateOne) AddFlat(i int) *AddressUpdateOne {
-	auo.mutation.AddFlat(i)
-	return auo
+// AddFlat adds value to the "flat" field.
+func (_u *AddressUpdateOne) AddFlat(v int) *AddressUpdateOne {
+	_u.mutation.AddFlat(v)
+	return _u
 }
 
 // ClearFlat clears the value of the "flat" field.
-func (auo *AddressUpdateOne) ClearFlat() *AddressUpdateOne {
-	auo.mutation.ClearFlat()
-	return auo
+func (_u *AddressUpdateOne) ClearFlat() *AddressUpdateOne {
+	_u.mutation.ClearFlat()
+	return _u
 }
 
 // SetHouse sets the "house" field.
-func (auo *AddressUpdateOne) SetHouse(i int) *AddressUpdateOne {
-	auo.mutation.ResetHouse()
-	auo.mutation.SetHouse(i)
-	return auo
+func (_u *AddressUpdateOne) SetHouse(v int) *AddressUpdateOne {
+	_u.mutation.ResetHouse()
+	_u.mutation.SetHouse(v)
+	return _u
 }
 
 // SetNillableHouse sets the "house" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableHouse(i *int) *AddressUpdateOne {
-	if i != nil {
-		auo.SetHouse(*i)
+func (_u *AddressUpdateOne) SetNillableHouse(v *int) *AddressUpdateOne {
+	if v != nil {
+		_u.SetHouse(*v)
 	}
-	return auo
+	return _u
 }
 
-// AddHouse adds i to the "house" field.
-func (auo *AddressUpdateOne) AddHouse(i int) *AddressUpdateOne {
-	auo.mutation.AddHouse(i)
-	return auo
+// AddHouse adds value to the "house" field.
+func (_u *AddressUpdateOne) AddHouse(v int) *AddressUpdateOne {
+	_u.mutation.AddHouse(v)
+	return _u
 }
 
 // SetLetter sets the "letter" field.
-func (auo *AddressUpdateOne) SetLetter(s string) *AddressUpdateOne {
-	auo.mutation.SetLetter(s)
-	return auo
+func (_u *AddressUpdateOne) SetLetter(v string) *AddressUpdateOne {
+	_u.mutation.SetLetter(v)
+	return _u
 }
 
 // SetNillableLetter sets the "letter" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableLetter(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetLetter(*s)
+func (_u *AddressUpdateOne) SetNillableLetter(v *string) *AddressUpdateOne {
+	if v != nil {
+		_u.SetLetter(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearLetter clears the value of the "letter" field.
-func (auo *AddressUpdateOne) ClearLetter() *AddressUpdateOne {
-	auo.mutation.ClearLetter()
-	return auo
+func (_u *AddressUpdateOne) ClearLetter() *AddressUpdateOne {
+	_u.mutation.ClearLetter()
+	return _u
 }
 
 // SetPostcode sets the "postcode" field.
-func (auo *AddressUpdateOne) SetPostcode(i int) *AddressUpdateOne {
-	auo.mutation.ResetPostcode()
-	auo.mutation.SetPostcode(i)
-	return auo
+func (_u *AddressUpdateOne) SetPostcode(v int) *AddressUpdateOne {
+	_u.mutation.ResetPostcode()
+	_u.mutation.SetPostcode(v)
+	return _u
 }
 
 // SetNillablePostcode sets the "postcode" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillablePostcode(i *int) *AddressUpdateOne {
-	if i != nil {
-		auo.SetPostcode(*i)
+func (_u *AddressUpdateOne) SetNillablePostcode(v *int) *AddressUpdateOne {
+	if v != nil {
+		_u.SetPostcode(*v)
 	}
-	return auo
+	return _u
 }
 
-// AddPostcode adds i to the "postcode" field.
-func (auo *AddressUpdateOne) AddPostcode(i int) *AddressUpdateOne {
-	auo.mutation.AddPostcode(i)
-	return auo
+// AddPostcode adds value to the "postcode" field.
+func (_u *AddressUpdateOne) AddPostcode(v int) *AddressUpdateOne {
+	_u.mutation.AddPostcode(v)
+	return _u
 }
 
 // SetStreet sets the "street" field.
-func (auo *AddressUpdateOne) SetStreet(s string) *AddressUpdateOne {
-	auo.mutation.SetStreet(s)
-	return auo
+func (_u *AddressUpdateOne) SetStreet(v string) *AddressUpdateOne {
+	_u.mutation.SetStreet(v)
+	return _u
 }
 
 // SetNillableStreet sets the "street" field if the given value is not nil.
-func (auo *AddressUpdateOne) SetNillableStreet(s *string) *AddressUpdateOne {
-	if s != nil {
-		auo.SetStreet(*s)
+func (_u *AddressUpdateOne) SetNillableStreet(v *string) *AddressUpdateOne {
+	if v != nil {
+		_u.SetStreet(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetUsersID sets the "users" edge to the User entity by ID.
-func (auo *AddressUpdateOne) SetUsersID(id int64) *AddressUpdateOne {
-	auo.mutation.SetUsersID(id)
-	return auo
+func (_u *AddressUpdateOne) SetUsersID(id int64) *AddressUpdateOne {
+	_u.mutation.SetUsersID(id)
+	return _u
 }
 
 // SetUsers sets the "users" edge to the User entity.
-func (auo *AddressUpdateOne) SetUsers(u *User) *AddressUpdateOne {
-	return auo.SetUsersID(u.ID)
+func (_u *AddressUpdateOne) SetUsers(v *User) *AddressUpdateOne {
+	return _u.SetUsersID(v.ID)
 }
 
 // Mutation returns the AddressMutation object of the builder.
-func (auo *AddressUpdateOne) Mutation() *AddressMutation {
-	return auo.mutation
+func (_u *AddressUpdateOne) Mutation() *AddressMutation {
+	return _u.mutation
 }
 
 // ClearUsers clears the "users" edge to the User entity.
-func (auo *AddressUpdateOne) ClearUsers() *AddressUpdateOne {
-	auo.mutation.ClearUsers()
-	return auo
+func (_u *AddressUpdateOne) ClearUsers() *AddressUpdateOne {
+	_u.mutation.ClearUsers()
+	return _u
 }
 
 // Where appends a list predicates to the AddressUpdate builder.
-func (auo *AddressUpdateOne) Where(ps ...predicate.Address) *AddressUpdateOne {
-	auo.mutation.Where(ps...)
-	return auo
+func (_u *AddressUpdateOne) Where(ps ...predicate.Address) *AddressUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (auo *AddressUpdateOne) Select(field string, fields ...string) *AddressUpdateOne {
-	auo.fields = append([]string{field}, fields...)
-	return auo
+func (_u *AddressUpdateOne) Select(field string, fields ...string) *AddressUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Address entity.
-func (auo *AddressUpdateOne) Save(ctx context.Context) (*Address, error) {
-	auo.defaults()
-	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
+func (_u *AddressUpdateOne) Save(ctx context.Context) (*Address, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (auo *AddressUpdateOne) SaveX(ctx context.Context) *Address {
-	node, err := auo.Save(ctx)
+func (_u *AddressUpdateOne) SaveX(ctx context.Context) *Address {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -563,60 +563,60 @@ func (auo *AddressUpdateOne) SaveX(ctx context.Context) *Address {
 }
 
 // Exec executes the query on the entity.
-func (auo *AddressUpdateOne) Exec(ctx context.Context) error {
-	_, err := auo.Save(ctx)
+func (_u *AddressUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (auo *AddressUpdateOne) ExecX(ctx context.Context) {
-	if err := auo.Exec(ctx); err != nil {
+func (_u *AddressUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (auo *AddressUpdateOne) defaults() {
-	if _, ok := auo.mutation.UpdatedAt(); !ok {
+func (_u *AddressUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := address.UpdateDefaultUpdatedAt()
-		auo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (auo *AddressUpdateOne) check() error {
-	if v, ok := auo.mutation.City(); ok {
+func (_u *AddressUpdateOne) check() error {
+	if v, ok := _u.mutation.City(); ok {
 		if err := address.CityValidator(v); err != nil {
 			return &ValidationError{Name: "city", err: fmt.Errorf(`ent: validator failed for field "Address.city": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.Country(); ok {
+	if v, ok := _u.mutation.Country(); ok {
 		if err := address.CountryValidator(v); err != nil {
 			return &ValidationError{Name: "country", err: fmt.Errorf(`ent: validator failed for field "Address.country": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.Street(); ok {
+	if v, ok := _u.mutation.Street(); ok {
 		if err := address.StreetValidator(v); err != nil {
 			return &ValidationError{Name: "street", err: fmt.Errorf(`ent: validator failed for field "Address.street": %w`, err)}
 		}
 	}
-	if auo.mutation.UsersCleared() && len(auo.mutation.UsersIDs()) > 0 {
+	if _u.mutation.UsersCleared() && len(_u.mutation.UsersIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Address.users"`)
 	}
 	return nil
 }
 
-func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err error) {
-	if err := auo.check(); err != nil {
+func (_u *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(address.Table, address.Columns, sqlgraph.NewFieldSpec(address.FieldID, field.TypeInt64))
-	id, ok := auo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Address.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := auo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, address.FieldID)
 		for _, f := range fields {
@@ -628,53 +628,53 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 			}
 		}
 	}
-	if ps := auo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := auo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(address.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := auo.mutation.City(); ok {
+	if value, ok := _u.mutation.City(); ok {
 		_spec.SetField(address.FieldCity, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Country(); ok {
+	if value, ok := _u.mutation.Country(); ok {
 		_spec.SetField(address.FieldCountry, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Flat(); ok {
+	if value, ok := _u.mutation.Flat(); ok {
 		_spec.SetField(address.FieldFlat, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.AddedFlat(); ok {
+	if value, ok := _u.mutation.AddedFlat(); ok {
 		_spec.AddField(address.FieldFlat, field.TypeInt, value)
 	}
-	if auo.mutation.FlatCleared() {
+	if _u.mutation.FlatCleared() {
 		_spec.ClearField(address.FieldFlat, field.TypeInt)
 	}
-	if value, ok := auo.mutation.House(); ok {
+	if value, ok := _u.mutation.House(); ok {
 		_spec.SetField(address.FieldHouse, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.AddedHouse(); ok {
+	if value, ok := _u.mutation.AddedHouse(); ok {
 		_spec.AddField(address.FieldHouse, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.Letter(); ok {
+	if value, ok := _u.mutation.Letter(); ok {
 		_spec.SetField(address.FieldLetter, field.TypeString, value)
 	}
-	if auo.mutation.LetterCleared() {
+	if _u.mutation.LetterCleared() {
 		_spec.ClearField(address.FieldLetter, field.TypeString)
 	}
-	if value, ok := auo.mutation.Postcode(); ok {
+	if value, ok := _u.mutation.Postcode(); ok {
 		_spec.SetField(address.FieldPostcode, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.AddedPostcode(); ok {
+	if value, ok := _u.mutation.AddedPostcode(); ok {
 		_spec.AddField(address.FieldPostcode, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.Street(); ok {
+	if value, ok := _u.mutation.Street(); ok {
 		_spec.SetField(address.FieldStreet, field.TypeString, value)
 	}
-	if auo.mutation.UsersCleared() {
+	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -687,7 +687,7 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -703,10 +703,10 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Address{config: auo.config}
+	_node = &Address{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, auo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{address.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -714,6 +714,6 @@ func (auo *AddressUpdateOne) sqlSave(ctx context.Context) (_node *Address, err e
 		}
 		return nil, err
 	}
-	auo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

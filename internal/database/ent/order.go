@@ -83,7 +83,7 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Order fields.
-func (o *Order) assignValues(columns []string, values []any) error {
+func (_m *Order) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -94,33 +94,33 @@ func (o *Order) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			o.ID = int64(value.Int64)
+			_m.ID = int64(value.Int64)
 		case order.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				o.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case order.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				o.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case order.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				o.UserID = value.Int64
+				_m.UserID = value.Int64
 			}
 		case order.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				o.Status = order.Status(value.String)
+				_m.Status = order.Status(value.String)
 			}
 		default:
-			o.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -128,54 +128,54 @@ func (o *Order) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Order.
 // This includes values selected through modifiers, order, etc.
-func (o *Order) Value(name string) (ent.Value, error) {
-	return o.selectValues.Get(name)
+func (_m *Order) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUsers queries the "users" edge of the Order entity.
-func (o *Order) QueryUsers() *UserQuery {
-	return NewOrderClient(o.config).QueryUsers(o)
+func (_m *Order) QueryUsers() *UserQuery {
+	return NewOrderClient(_m.config).QueryUsers(_m)
 }
 
 // QueryOrderProducts queries the "order_products" edge of the Order entity.
-func (o *Order) QueryOrderProducts() *OrderProductQuery {
-	return NewOrderClient(o.config).QueryOrderProducts(o)
+func (_m *Order) QueryOrderProducts() *OrderProductQuery {
+	return NewOrderClient(_m.config).QueryOrderProducts(_m)
 }
 
 // Update returns a builder for updating this Order.
 // Note that you need to call Order.Unwrap() before calling this method if this Order
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (o *Order) Update() *OrderUpdateOne {
-	return NewOrderClient(o.config).UpdateOne(o)
+func (_m *Order) Update() *OrderUpdateOne {
+	return NewOrderClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Order entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (o *Order) Unwrap() *Order {
-	_tx, ok := o.config.driver.(*txDriver)
+func (_m *Order) Unwrap() *Order {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Order is not a transactional entity")
 	}
-	o.config.driver = _tx.drv
-	return o
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (o *Order) String() string {
+func (_m *Order) String() string {
 	var builder strings.Builder
 	builder.WriteString("Order(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", o.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(o.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(o.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", o.UserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", o.Status))
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

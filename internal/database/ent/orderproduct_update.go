@@ -25,135 +25,135 @@ type OrderProductUpdate struct {
 }
 
 // Where appends a list predicates to the OrderProductUpdate builder.
-func (opu *OrderProductUpdate) Where(ps ...predicate.OrderProduct) *OrderProductUpdate {
-	opu.mutation.Where(ps...)
-	return opu
+func (_u *OrderProductUpdate) Where(ps ...predicate.OrderProduct) *OrderProductUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (opu *OrderProductUpdate) SetUpdatedAt(t time.Time) *OrderProductUpdate {
-	opu.mutation.SetUpdatedAt(t)
-	return opu
+func (_u *OrderProductUpdate) SetUpdatedAt(v time.Time) *OrderProductUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetOrderID sets the "order_id" field.
-func (opu *OrderProductUpdate) SetOrderID(i int64) *OrderProductUpdate {
-	opu.mutation.SetOrderID(i)
-	return opu
+func (_u *OrderProductUpdate) SetOrderID(v int64) *OrderProductUpdate {
+	_u.mutation.SetOrderID(v)
+	return _u
 }
 
 // SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (opu *OrderProductUpdate) SetNillableOrderID(i *int64) *OrderProductUpdate {
-	if i != nil {
-		opu.SetOrderID(*i)
+func (_u *OrderProductUpdate) SetNillableOrderID(v *int64) *OrderProductUpdate {
+	if v != nil {
+		_u.SetOrderID(*v)
 	}
-	return opu
+	return _u
 }
 
 // SetProductID sets the "product_id" field.
-func (opu *OrderProductUpdate) SetProductID(i int64) *OrderProductUpdate {
-	opu.mutation.SetProductID(i)
-	return opu
+func (_u *OrderProductUpdate) SetProductID(v int64) *OrderProductUpdate {
+	_u.mutation.SetProductID(v)
+	return _u
 }
 
 // SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (opu *OrderProductUpdate) SetNillableProductID(i *int64) *OrderProductUpdate {
-	if i != nil {
-		opu.SetProductID(*i)
+func (_u *OrderProductUpdate) SetNillableProductID(v *int64) *OrderProductUpdate {
+	if v != nil {
+		_u.SetProductID(*v)
 	}
-	return opu
+	return _u
 }
 
 // SetAmount sets the "amount" field.
-func (opu *OrderProductUpdate) SetAmount(i int64) *OrderProductUpdate {
-	opu.mutation.ResetAmount()
-	opu.mutation.SetAmount(i)
-	return opu
+func (_u *OrderProductUpdate) SetAmount(v int64) *OrderProductUpdate {
+	_u.mutation.ResetAmount()
+	_u.mutation.SetAmount(v)
+	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (opu *OrderProductUpdate) SetNillableAmount(i *int64) *OrderProductUpdate {
-	if i != nil {
-		opu.SetAmount(*i)
+func (_u *OrderProductUpdate) SetNillableAmount(v *int64) *OrderProductUpdate {
+	if v != nil {
+		_u.SetAmount(*v)
 	}
-	return opu
+	return _u
 }
 
-// AddAmount adds i to the "amount" field.
-func (opu *OrderProductUpdate) AddAmount(i int64) *OrderProductUpdate {
-	opu.mutation.AddAmount(i)
-	return opu
+// AddAmount adds value to the "amount" field.
+func (_u *OrderProductUpdate) AddAmount(v int64) *OrderProductUpdate {
+	_u.mutation.AddAmount(v)
+	return _u
 }
 
 // SetPrice sets the "price" field.
-func (opu *OrderProductUpdate) SetPrice(i int64) *OrderProductUpdate {
-	opu.mutation.ResetPrice()
-	opu.mutation.SetPrice(i)
-	return opu
+func (_u *OrderProductUpdate) SetPrice(v int64) *OrderProductUpdate {
+	_u.mutation.ResetPrice()
+	_u.mutation.SetPrice(v)
+	return _u
 }
 
 // SetNillablePrice sets the "price" field if the given value is not nil.
-func (opu *OrderProductUpdate) SetNillablePrice(i *int64) *OrderProductUpdate {
-	if i != nil {
-		opu.SetPrice(*i)
+func (_u *OrderProductUpdate) SetNillablePrice(v *int64) *OrderProductUpdate {
+	if v != nil {
+		_u.SetPrice(*v)
 	}
-	return opu
+	return _u
 }
 
-// AddPrice adds i to the "price" field.
-func (opu *OrderProductUpdate) AddPrice(i int64) *OrderProductUpdate {
-	opu.mutation.AddPrice(i)
-	return opu
+// AddPrice adds value to the "price" field.
+func (_u *OrderProductUpdate) AddPrice(v int64) *OrderProductUpdate {
+	_u.mutation.AddPrice(v)
+	return _u
 }
 
 // SetOrdersID sets the "orders" edge to the Order entity by ID.
-func (opu *OrderProductUpdate) SetOrdersID(id int64) *OrderProductUpdate {
-	opu.mutation.SetOrdersID(id)
-	return opu
+func (_u *OrderProductUpdate) SetOrdersID(id int64) *OrderProductUpdate {
+	_u.mutation.SetOrdersID(id)
+	return _u
 }
 
 // SetOrders sets the "orders" edge to the Order entity.
-func (opu *OrderProductUpdate) SetOrders(o *Order) *OrderProductUpdate {
-	return opu.SetOrdersID(o.ID)
+func (_u *OrderProductUpdate) SetOrders(v *Order) *OrderProductUpdate {
+	return _u.SetOrdersID(v.ID)
 }
 
 // SetProductsID sets the "products" edge to the Product entity by ID.
-func (opu *OrderProductUpdate) SetProductsID(id int64) *OrderProductUpdate {
-	opu.mutation.SetProductsID(id)
-	return opu
+func (_u *OrderProductUpdate) SetProductsID(id int64) *OrderProductUpdate {
+	_u.mutation.SetProductsID(id)
+	return _u
 }
 
 // SetProducts sets the "products" edge to the Product entity.
-func (opu *OrderProductUpdate) SetProducts(p *Product) *OrderProductUpdate {
-	return opu.SetProductsID(p.ID)
+func (_u *OrderProductUpdate) SetProducts(v *Product) *OrderProductUpdate {
+	return _u.SetProductsID(v.ID)
 }
 
 // Mutation returns the OrderProductMutation object of the builder.
-func (opu *OrderProductUpdate) Mutation() *OrderProductMutation {
-	return opu.mutation
+func (_u *OrderProductUpdate) Mutation() *OrderProductMutation {
+	return _u.mutation
 }
 
 // ClearOrders clears the "orders" edge to the Order entity.
-func (opu *OrderProductUpdate) ClearOrders() *OrderProductUpdate {
-	opu.mutation.ClearOrders()
-	return opu
+func (_u *OrderProductUpdate) ClearOrders() *OrderProductUpdate {
+	_u.mutation.ClearOrders()
+	return _u
 }
 
 // ClearProducts clears the "products" edge to the Product entity.
-func (opu *OrderProductUpdate) ClearProducts() *OrderProductUpdate {
-	opu.mutation.ClearProducts()
-	return opu
+func (_u *OrderProductUpdate) ClearProducts() *OrderProductUpdate {
+	_u.mutation.ClearProducts()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (opu *OrderProductUpdate) Save(ctx context.Context) (int, error) {
-	opu.defaults()
-	return withHooks(ctx, opu.sqlSave, opu.mutation, opu.hooks)
+func (_u *OrderProductUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (opu *OrderProductUpdate) SaveX(ctx context.Context) int {
-	affected, err := opu.Save(ctx)
+func (_u *OrderProductUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -161,75 +161,75 @@ func (opu *OrderProductUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (opu *OrderProductUpdate) Exec(ctx context.Context) error {
-	_, err := opu.Save(ctx)
+func (_u *OrderProductUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (opu *OrderProductUpdate) ExecX(ctx context.Context) {
-	if err := opu.Exec(ctx); err != nil {
+func (_u *OrderProductUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (opu *OrderProductUpdate) defaults() {
-	if _, ok := opu.mutation.UpdatedAt(); !ok {
+func (_u *OrderProductUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := orderproduct.UpdateDefaultUpdatedAt()
-		opu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (opu *OrderProductUpdate) check() error {
-	if v, ok := opu.mutation.Amount(); ok {
+func (_u *OrderProductUpdate) check() error {
+	if v, ok := _u.mutation.Amount(); ok {
 		if err := orderproduct.AmountValidator(v); err != nil {
 			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.amount": %w`, err)}
 		}
 	}
-	if v, ok := opu.mutation.Price(); ok {
+	if v, ok := _u.mutation.Price(); ok {
 		if err := orderproduct.PriceValidator(v); err != nil {
 			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.price": %w`, err)}
 		}
 	}
-	if opu.mutation.OrdersCleared() && len(opu.mutation.OrdersIDs()) > 0 {
+	if _u.mutation.OrdersCleared() && len(_u.mutation.OrdersIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "OrderProduct.orders"`)
 	}
-	if opu.mutation.ProductsCleared() && len(opu.mutation.ProductsIDs()) > 0 {
+	if _u.mutation.ProductsCleared() && len(_u.mutation.ProductsIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "OrderProduct.products"`)
 	}
 	return nil
 }
 
-func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := opu.check(); err != nil {
-		return n, err
+func (_u *OrderProductUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(orderproduct.Table, orderproduct.Columns, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
-	if ps := opu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := opu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := opu.mutation.Amount(); ok {
+	if value, ok := _u.mutation.Amount(); ok {
 		_spec.SetField(orderproduct.FieldAmount, field.TypeInt64, value)
 	}
-	if value, ok := opu.mutation.AddedAmount(); ok {
+	if value, ok := _u.mutation.AddedAmount(); ok {
 		_spec.AddField(orderproduct.FieldAmount, field.TypeInt64, value)
 	}
-	if value, ok := opu.mutation.Price(); ok {
+	if value, ok := _u.mutation.Price(); ok {
 		_spec.SetField(orderproduct.FieldPrice, field.TypeInt64, value)
 	}
-	if value, ok := opu.mutation.AddedPrice(); ok {
+	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(orderproduct.FieldPrice, field.TypeInt64, value)
 	}
-	if opu.mutation.OrdersCleared() {
+	if _u.mutation.OrdersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -242,7 +242,7 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := opu.mutation.OrdersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OrdersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -258,7 +258,7 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if opu.mutation.ProductsCleared() {
+	if _u.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -271,7 +271,7 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := opu.mutation.ProductsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -287,7 +287,7 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, opu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{orderproduct.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -295,8 +295,8 @@ func (opu *OrderProductUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	opu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // OrderProductUpdateOne is the builder for updating a single OrderProduct entity.
@@ -308,142 +308,142 @@ type OrderProductUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (opuo *OrderProductUpdateOne) SetUpdatedAt(t time.Time) *OrderProductUpdateOne {
-	opuo.mutation.SetUpdatedAt(t)
-	return opuo
+func (_u *OrderProductUpdateOne) SetUpdatedAt(v time.Time) *OrderProductUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetOrderID sets the "order_id" field.
-func (opuo *OrderProductUpdateOne) SetOrderID(i int64) *OrderProductUpdateOne {
-	opuo.mutation.SetOrderID(i)
-	return opuo
+func (_u *OrderProductUpdateOne) SetOrderID(v int64) *OrderProductUpdateOne {
+	_u.mutation.SetOrderID(v)
+	return _u
 }
 
 // SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (opuo *OrderProductUpdateOne) SetNillableOrderID(i *int64) *OrderProductUpdateOne {
-	if i != nil {
-		opuo.SetOrderID(*i)
+func (_u *OrderProductUpdateOne) SetNillableOrderID(v *int64) *OrderProductUpdateOne {
+	if v != nil {
+		_u.SetOrderID(*v)
 	}
-	return opuo
+	return _u
 }
 
 // SetProductID sets the "product_id" field.
-func (opuo *OrderProductUpdateOne) SetProductID(i int64) *OrderProductUpdateOne {
-	opuo.mutation.SetProductID(i)
-	return opuo
+func (_u *OrderProductUpdateOne) SetProductID(v int64) *OrderProductUpdateOne {
+	_u.mutation.SetProductID(v)
+	return _u
 }
 
 // SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (opuo *OrderProductUpdateOne) SetNillableProductID(i *int64) *OrderProductUpdateOne {
-	if i != nil {
-		opuo.SetProductID(*i)
+func (_u *OrderProductUpdateOne) SetNillableProductID(v *int64) *OrderProductUpdateOne {
+	if v != nil {
+		_u.SetProductID(*v)
 	}
-	return opuo
+	return _u
 }
 
 // SetAmount sets the "amount" field.
-func (opuo *OrderProductUpdateOne) SetAmount(i int64) *OrderProductUpdateOne {
-	opuo.mutation.ResetAmount()
-	opuo.mutation.SetAmount(i)
-	return opuo
+func (_u *OrderProductUpdateOne) SetAmount(v int64) *OrderProductUpdateOne {
+	_u.mutation.ResetAmount()
+	_u.mutation.SetAmount(v)
+	return _u
 }
 
 // SetNillableAmount sets the "amount" field if the given value is not nil.
-func (opuo *OrderProductUpdateOne) SetNillableAmount(i *int64) *OrderProductUpdateOne {
-	if i != nil {
-		opuo.SetAmount(*i)
+func (_u *OrderProductUpdateOne) SetNillableAmount(v *int64) *OrderProductUpdateOne {
+	if v != nil {
+		_u.SetAmount(*v)
 	}
-	return opuo
+	return _u
 }
 
-// AddAmount adds i to the "amount" field.
-func (opuo *OrderProductUpdateOne) AddAmount(i int64) *OrderProductUpdateOne {
-	opuo.mutation.AddAmount(i)
-	return opuo
+// AddAmount adds value to the "amount" field.
+func (_u *OrderProductUpdateOne) AddAmount(v int64) *OrderProductUpdateOne {
+	_u.mutation.AddAmount(v)
+	return _u
 }
 
 // SetPrice sets the "price" field.
-func (opuo *OrderProductUpdateOne) SetPrice(i int64) *OrderProductUpdateOne {
-	opuo.mutation.ResetPrice()
-	opuo.mutation.SetPrice(i)
-	return opuo
+func (_u *OrderProductUpdateOne) SetPrice(v int64) *OrderProductUpdateOne {
+	_u.mutation.ResetPrice()
+	_u.mutation.SetPrice(v)
+	return _u
 }
 
 // SetNillablePrice sets the "price" field if the given value is not nil.
-func (opuo *OrderProductUpdateOne) SetNillablePrice(i *int64) *OrderProductUpdateOne {
-	if i != nil {
-		opuo.SetPrice(*i)
+func (_u *OrderProductUpdateOne) SetNillablePrice(v *int64) *OrderProductUpdateOne {
+	if v != nil {
+		_u.SetPrice(*v)
 	}
-	return opuo
+	return _u
 }
 
-// AddPrice adds i to the "price" field.
-func (opuo *OrderProductUpdateOne) AddPrice(i int64) *OrderProductUpdateOne {
-	opuo.mutation.AddPrice(i)
-	return opuo
+// AddPrice adds value to the "price" field.
+func (_u *OrderProductUpdateOne) AddPrice(v int64) *OrderProductUpdateOne {
+	_u.mutation.AddPrice(v)
+	return _u
 }
 
 // SetOrdersID sets the "orders" edge to the Order entity by ID.
-func (opuo *OrderProductUpdateOne) SetOrdersID(id int64) *OrderProductUpdateOne {
-	opuo.mutation.SetOrdersID(id)
-	return opuo
+func (_u *OrderProductUpdateOne) SetOrdersID(id int64) *OrderProductUpdateOne {
+	_u.mutation.SetOrdersID(id)
+	return _u
 }
 
 // SetOrders sets the "orders" edge to the Order entity.
-func (opuo *OrderProductUpdateOne) SetOrders(o *Order) *OrderProductUpdateOne {
-	return opuo.SetOrdersID(o.ID)
+func (_u *OrderProductUpdateOne) SetOrders(v *Order) *OrderProductUpdateOne {
+	return _u.SetOrdersID(v.ID)
 }
 
 // SetProductsID sets the "products" edge to the Product entity by ID.
-func (opuo *OrderProductUpdateOne) SetProductsID(id int64) *OrderProductUpdateOne {
-	opuo.mutation.SetProductsID(id)
-	return opuo
+func (_u *OrderProductUpdateOne) SetProductsID(id int64) *OrderProductUpdateOne {
+	_u.mutation.SetProductsID(id)
+	return _u
 }
 
 // SetProducts sets the "products" edge to the Product entity.
-func (opuo *OrderProductUpdateOne) SetProducts(p *Product) *OrderProductUpdateOne {
-	return opuo.SetProductsID(p.ID)
+func (_u *OrderProductUpdateOne) SetProducts(v *Product) *OrderProductUpdateOne {
+	return _u.SetProductsID(v.ID)
 }
 
 // Mutation returns the OrderProductMutation object of the builder.
-func (opuo *OrderProductUpdateOne) Mutation() *OrderProductMutation {
-	return opuo.mutation
+func (_u *OrderProductUpdateOne) Mutation() *OrderProductMutation {
+	return _u.mutation
 }
 
 // ClearOrders clears the "orders" edge to the Order entity.
-func (opuo *OrderProductUpdateOne) ClearOrders() *OrderProductUpdateOne {
-	opuo.mutation.ClearOrders()
-	return opuo
+func (_u *OrderProductUpdateOne) ClearOrders() *OrderProductUpdateOne {
+	_u.mutation.ClearOrders()
+	return _u
 }
 
 // ClearProducts clears the "products" edge to the Product entity.
-func (opuo *OrderProductUpdateOne) ClearProducts() *OrderProductUpdateOne {
-	opuo.mutation.ClearProducts()
-	return opuo
+func (_u *OrderProductUpdateOne) ClearProducts() *OrderProductUpdateOne {
+	_u.mutation.ClearProducts()
+	return _u
 }
 
 // Where appends a list predicates to the OrderProductUpdate builder.
-func (opuo *OrderProductUpdateOne) Where(ps ...predicate.OrderProduct) *OrderProductUpdateOne {
-	opuo.mutation.Where(ps...)
-	return opuo
+func (_u *OrderProductUpdateOne) Where(ps ...predicate.OrderProduct) *OrderProductUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (opuo *OrderProductUpdateOne) Select(field string, fields ...string) *OrderProductUpdateOne {
-	opuo.fields = append([]string{field}, fields...)
-	return opuo
+func (_u *OrderProductUpdateOne) Select(field string, fields ...string) *OrderProductUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated OrderProduct entity.
-func (opuo *OrderProductUpdateOne) Save(ctx context.Context) (*OrderProduct, error) {
-	opuo.defaults()
-	return withHooks(ctx, opuo.sqlSave, opuo.mutation, opuo.hooks)
+func (_u *OrderProductUpdateOne) Save(ctx context.Context) (*OrderProduct, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (opuo *OrderProductUpdateOne) SaveX(ctx context.Context) *OrderProduct {
-	node, err := opuo.Save(ctx)
+func (_u *OrderProductUpdateOne) SaveX(ctx context.Context) *OrderProduct {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -451,58 +451,58 @@ func (opuo *OrderProductUpdateOne) SaveX(ctx context.Context) *OrderProduct {
 }
 
 // Exec executes the query on the entity.
-func (opuo *OrderProductUpdateOne) Exec(ctx context.Context) error {
-	_, err := opuo.Save(ctx)
+func (_u *OrderProductUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (opuo *OrderProductUpdateOne) ExecX(ctx context.Context) {
-	if err := opuo.Exec(ctx); err != nil {
+func (_u *OrderProductUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (opuo *OrderProductUpdateOne) defaults() {
-	if _, ok := opuo.mutation.UpdatedAt(); !ok {
+func (_u *OrderProductUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := orderproduct.UpdateDefaultUpdatedAt()
-		opuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (opuo *OrderProductUpdateOne) check() error {
-	if v, ok := opuo.mutation.Amount(); ok {
+func (_u *OrderProductUpdateOne) check() error {
+	if v, ok := _u.mutation.Amount(); ok {
 		if err := orderproduct.AmountValidator(v); err != nil {
 			return &ValidationError{Name: "amount", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.amount": %w`, err)}
 		}
 	}
-	if v, ok := opuo.mutation.Price(); ok {
+	if v, ok := _u.mutation.Price(); ok {
 		if err := orderproduct.PriceValidator(v); err != nil {
 			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "OrderProduct.price": %w`, err)}
 		}
 	}
-	if opuo.mutation.OrdersCleared() && len(opuo.mutation.OrdersIDs()) > 0 {
+	if _u.mutation.OrdersCleared() && len(_u.mutation.OrdersIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "OrderProduct.orders"`)
 	}
-	if opuo.mutation.ProductsCleared() && len(opuo.mutation.ProductsIDs()) > 0 {
+	if _u.mutation.ProductsCleared() && len(_u.mutation.ProductsIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "OrderProduct.products"`)
 	}
 	return nil
 }
 
-func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderProduct, err error) {
-	if err := opuo.check(); err != nil {
+func (_u *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderProduct, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(orderproduct.Table, orderproduct.Columns, sqlgraph.NewFieldSpec(orderproduct.FieldID, field.TypeInt64))
-	id, ok := opuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "OrderProduct.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := opuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, orderproduct.FieldID)
 		for _, f := range fields {
@@ -514,29 +514,29 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 			}
 		}
 	}
-	if ps := opuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := opuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(orderproduct.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := opuo.mutation.Amount(); ok {
+	if value, ok := _u.mutation.Amount(); ok {
 		_spec.SetField(orderproduct.FieldAmount, field.TypeInt64, value)
 	}
-	if value, ok := opuo.mutation.AddedAmount(); ok {
+	if value, ok := _u.mutation.AddedAmount(); ok {
 		_spec.AddField(orderproduct.FieldAmount, field.TypeInt64, value)
 	}
-	if value, ok := opuo.mutation.Price(); ok {
+	if value, ok := _u.mutation.Price(); ok {
 		_spec.SetField(orderproduct.FieldPrice, field.TypeInt64, value)
 	}
-	if value, ok := opuo.mutation.AddedPrice(); ok {
+	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(orderproduct.FieldPrice, field.TypeInt64, value)
 	}
-	if opuo.mutation.OrdersCleared() {
+	if _u.mutation.OrdersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -549,7 +549,7 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := opuo.mutation.OrdersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OrdersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -565,7 +565,7 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if opuo.mutation.ProductsCleared() {
+	if _u.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -578,7 +578,7 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := opuo.mutation.ProductsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -594,10 +594,10 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &OrderProduct{config: opuo.config}
+	_node = &OrderProduct{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, opuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{orderproduct.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -605,6 +605,6 @@ func (opuo *OrderProductUpdateOne) sqlSave(ctx context.Context) (_node *OrderPro
 		}
 		return nil, err
 	}
-	opuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -24,76 +24,76 @@ type ProductImageUpdate struct {
 }
 
 // Where appends a list predicates to the ProductImageUpdate builder.
-func (piu *ProductImageUpdate) Where(ps ...predicate.ProductImage) *ProductImageUpdate {
-	piu.mutation.Where(ps...)
-	return piu
+func (_u *ProductImageUpdate) Where(ps ...predicate.ProductImage) *ProductImageUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (piu *ProductImageUpdate) SetUpdatedAt(t time.Time) *ProductImageUpdate {
-	piu.mutation.SetUpdatedAt(t)
-	return piu
+func (_u *ProductImageUpdate) SetUpdatedAt(v time.Time) *ProductImageUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetProductID sets the "product_id" field.
-func (piu *ProductImageUpdate) SetProductID(i int64) *ProductImageUpdate {
-	piu.mutation.SetProductID(i)
-	return piu
+func (_u *ProductImageUpdate) SetProductID(v int64) *ProductImageUpdate {
+	_u.mutation.SetProductID(v)
+	return _u
 }
 
 // SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (piu *ProductImageUpdate) SetNillableProductID(i *int64) *ProductImageUpdate {
-	if i != nil {
-		piu.SetProductID(*i)
+func (_u *ProductImageUpdate) SetNillableProductID(v *int64) *ProductImageUpdate {
+	if v != nil {
+		_u.SetProductID(*v)
 	}
-	return piu
+	return _u
 }
 
 // SetName sets the "name" field.
-func (piu *ProductImageUpdate) SetName(s string) *ProductImageUpdate {
-	piu.mutation.SetName(s)
-	return piu
+func (_u *ProductImageUpdate) SetName(v string) *ProductImageUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (piu *ProductImageUpdate) SetNillableName(s *string) *ProductImageUpdate {
-	if s != nil {
-		piu.SetName(*s)
+func (_u *ProductImageUpdate) SetNillableName(v *string) *ProductImageUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return piu
+	return _u
 }
 
 // SetProductsID sets the "products" edge to the Product entity by ID.
-func (piu *ProductImageUpdate) SetProductsID(id int64) *ProductImageUpdate {
-	piu.mutation.SetProductsID(id)
-	return piu
+func (_u *ProductImageUpdate) SetProductsID(id int64) *ProductImageUpdate {
+	_u.mutation.SetProductsID(id)
+	return _u
 }
 
 // SetProducts sets the "products" edge to the Product entity.
-func (piu *ProductImageUpdate) SetProducts(p *Product) *ProductImageUpdate {
-	return piu.SetProductsID(p.ID)
+func (_u *ProductImageUpdate) SetProducts(v *Product) *ProductImageUpdate {
+	return _u.SetProductsID(v.ID)
 }
 
 // Mutation returns the ProductImageMutation object of the builder.
-func (piu *ProductImageUpdate) Mutation() *ProductImageMutation {
-	return piu.mutation
+func (_u *ProductImageUpdate) Mutation() *ProductImageMutation {
+	return _u.mutation
 }
 
 // ClearProducts clears the "products" edge to the Product entity.
-func (piu *ProductImageUpdate) ClearProducts() *ProductImageUpdate {
-	piu.mutation.ClearProducts()
-	return piu
+func (_u *ProductImageUpdate) ClearProducts() *ProductImageUpdate {
+	_u.mutation.ClearProducts()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (piu *ProductImageUpdate) Save(ctx context.Context) (int, error) {
-	piu.defaults()
-	return withHooks(ctx, piu.sqlSave, piu.mutation, piu.hooks)
+func (_u *ProductImageUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (piu *ProductImageUpdate) SaveX(ctx context.Context) int {
-	affected, err := piu.Save(ctx)
+func (_u *ProductImageUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -101,53 +101,53 @@ func (piu *ProductImageUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (piu *ProductImageUpdate) Exec(ctx context.Context) error {
-	_, err := piu.Save(ctx)
+func (_u *ProductImageUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (piu *ProductImageUpdate) ExecX(ctx context.Context) {
-	if err := piu.Exec(ctx); err != nil {
+func (_u *ProductImageUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (piu *ProductImageUpdate) defaults() {
-	if _, ok := piu.mutation.UpdatedAt(); !ok {
+func (_u *ProductImageUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := productimage.UpdateDefaultUpdatedAt()
-		piu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (piu *ProductImageUpdate) check() error {
-	if piu.mutation.ProductsCleared() && len(piu.mutation.ProductsIDs()) > 0 {
+func (_u *ProductImageUpdate) check() error {
+	if _u.mutation.ProductsCleared() && len(_u.mutation.ProductsIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ProductImage.products"`)
 	}
 	return nil
 }
 
-func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := piu.check(); err != nil {
-		return n, err
+func (_u *ProductImageUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(productimage.Table, productimage.Columns, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
-	if ps := piu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := piu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := piu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(productimage.FieldName, field.TypeString, value)
 	}
-	if piu.mutation.ProductsCleared() {
+	if _u.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -160,7 +160,7 @@ func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := piu.mutation.ProductsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -176,7 +176,7 @@ func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, piu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{productimage.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -184,8 +184,8 @@ func (piu *ProductImageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	piu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // ProductImageUpdateOne is the builder for updating a single ProductImage entity.
@@ -197,83 +197,83 @@ type ProductImageUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (piuo *ProductImageUpdateOne) SetUpdatedAt(t time.Time) *ProductImageUpdateOne {
-	piuo.mutation.SetUpdatedAt(t)
-	return piuo
+func (_u *ProductImageUpdateOne) SetUpdatedAt(v time.Time) *ProductImageUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetProductID sets the "product_id" field.
-func (piuo *ProductImageUpdateOne) SetProductID(i int64) *ProductImageUpdateOne {
-	piuo.mutation.SetProductID(i)
-	return piuo
+func (_u *ProductImageUpdateOne) SetProductID(v int64) *ProductImageUpdateOne {
+	_u.mutation.SetProductID(v)
+	return _u
 }
 
 // SetNillableProductID sets the "product_id" field if the given value is not nil.
-func (piuo *ProductImageUpdateOne) SetNillableProductID(i *int64) *ProductImageUpdateOne {
-	if i != nil {
-		piuo.SetProductID(*i)
+func (_u *ProductImageUpdateOne) SetNillableProductID(v *int64) *ProductImageUpdateOne {
+	if v != nil {
+		_u.SetProductID(*v)
 	}
-	return piuo
+	return _u
 }
 
 // SetName sets the "name" field.
-func (piuo *ProductImageUpdateOne) SetName(s string) *ProductImageUpdateOne {
-	piuo.mutation.SetName(s)
-	return piuo
+func (_u *ProductImageUpdateOne) SetName(v string) *ProductImageUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (piuo *ProductImageUpdateOne) SetNillableName(s *string) *ProductImageUpdateOne {
-	if s != nil {
-		piuo.SetName(*s)
+func (_u *ProductImageUpdateOne) SetNillableName(v *string) *ProductImageUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return piuo
+	return _u
 }
 
 // SetProductsID sets the "products" edge to the Product entity by ID.
-func (piuo *ProductImageUpdateOne) SetProductsID(id int64) *ProductImageUpdateOne {
-	piuo.mutation.SetProductsID(id)
-	return piuo
+func (_u *ProductImageUpdateOne) SetProductsID(id int64) *ProductImageUpdateOne {
+	_u.mutation.SetProductsID(id)
+	return _u
 }
 
 // SetProducts sets the "products" edge to the Product entity.
-func (piuo *ProductImageUpdateOne) SetProducts(p *Product) *ProductImageUpdateOne {
-	return piuo.SetProductsID(p.ID)
+func (_u *ProductImageUpdateOne) SetProducts(v *Product) *ProductImageUpdateOne {
+	return _u.SetProductsID(v.ID)
 }
 
 // Mutation returns the ProductImageMutation object of the builder.
-func (piuo *ProductImageUpdateOne) Mutation() *ProductImageMutation {
-	return piuo.mutation
+func (_u *ProductImageUpdateOne) Mutation() *ProductImageMutation {
+	return _u.mutation
 }
 
 // ClearProducts clears the "products" edge to the Product entity.
-func (piuo *ProductImageUpdateOne) ClearProducts() *ProductImageUpdateOne {
-	piuo.mutation.ClearProducts()
-	return piuo
+func (_u *ProductImageUpdateOne) ClearProducts() *ProductImageUpdateOne {
+	_u.mutation.ClearProducts()
+	return _u
 }
 
 // Where appends a list predicates to the ProductImageUpdate builder.
-func (piuo *ProductImageUpdateOne) Where(ps ...predicate.ProductImage) *ProductImageUpdateOne {
-	piuo.mutation.Where(ps...)
-	return piuo
+func (_u *ProductImageUpdateOne) Where(ps ...predicate.ProductImage) *ProductImageUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (piuo *ProductImageUpdateOne) Select(field string, fields ...string) *ProductImageUpdateOne {
-	piuo.fields = append([]string{field}, fields...)
-	return piuo
+func (_u *ProductImageUpdateOne) Select(field string, fields ...string) *ProductImageUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated ProductImage entity.
-func (piuo *ProductImageUpdateOne) Save(ctx context.Context) (*ProductImage, error) {
-	piuo.defaults()
-	return withHooks(ctx, piuo.sqlSave, piuo.mutation, piuo.hooks)
+func (_u *ProductImageUpdateOne) Save(ctx context.Context) (*ProductImage, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (piuo *ProductImageUpdateOne) SaveX(ctx context.Context) *ProductImage {
-	node, err := piuo.Save(ctx)
+func (_u *ProductImageUpdateOne) SaveX(ctx context.Context) *ProductImage {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -281,45 +281,45 @@ func (piuo *ProductImageUpdateOne) SaveX(ctx context.Context) *ProductImage {
 }
 
 // Exec executes the query on the entity.
-func (piuo *ProductImageUpdateOne) Exec(ctx context.Context) error {
-	_, err := piuo.Save(ctx)
+func (_u *ProductImageUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (piuo *ProductImageUpdateOne) ExecX(ctx context.Context) {
-	if err := piuo.Exec(ctx); err != nil {
+func (_u *ProductImageUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (piuo *ProductImageUpdateOne) defaults() {
-	if _, ok := piuo.mutation.UpdatedAt(); !ok {
+func (_u *ProductImageUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := productimage.UpdateDefaultUpdatedAt()
-		piuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (piuo *ProductImageUpdateOne) check() error {
-	if piuo.mutation.ProductsCleared() && len(piuo.mutation.ProductsIDs()) > 0 {
+func (_u *ProductImageUpdateOne) check() error {
+	if _u.mutation.ProductsCleared() && len(_u.mutation.ProductsIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ProductImage.products"`)
 	}
 	return nil
 }
 
-func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductImage, err error) {
-	if err := piuo.check(); err != nil {
+func (_u *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductImage, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(productimage.Table, productimage.Columns, sqlgraph.NewFieldSpec(productimage.FieldID, field.TypeInt64))
-	id, ok := piuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProductImage.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := piuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, productimage.FieldID)
 		for _, f := range fields {
@@ -331,20 +331,20 @@ func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductI
 			}
 		}
 	}
-	if ps := piuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := piuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(productimage.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := piuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(productimage.FieldName, field.TypeString, value)
 	}
-	if piuo.mutation.ProductsCleared() {
+	if _u.mutation.ProductsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -357,7 +357,7 @@ func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductI
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := piuo.mutation.ProductsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ProductsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -373,10 +373,10 @@ func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductI
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &ProductImage{config: piuo.config}
+	_node = &ProductImage{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, piuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{productimage.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -384,6 +384,6 @@ func (piuo *ProductImageUpdateOne) sqlSave(ctx context.Context) (_node *ProductI
 		}
 		return nil, err
 	}
-	piuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -39,44 +39,44 @@ type ProductQuery struct {
 }
 
 // Where adds a new predicate for the ProductQuery builder.
-func (pq *ProductQuery) Where(ps ...predicate.Product) *ProductQuery {
-	pq.predicates = append(pq.predicates, ps...)
-	return pq
+func (_q *ProductQuery) Where(ps ...predicate.Product) *ProductQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (pq *ProductQuery) Limit(limit int) *ProductQuery {
-	pq.ctx.Limit = &limit
-	return pq
+func (_q *ProductQuery) Limit(limit int) *ProductQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (pq *ProductQuery) Offset(offset int) *ProductQuery {
-	pq.ctx.Offset = &offset
-	return pq
+func (_q *ProductQuery) Offset(offset int) *ProductQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (pq *ProductQuery) Unique(unique bool) *ProductQuery {
-	pq.ctx.Unique = &unique
-	return pq
+func (_q *ProductQuery) Unique(unique bool) *ProductQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (pq *ProductQuery) Order(o ...product.OrderOption) *ProductQuery {
-	pq.order = append(pq.order, o...)
-	return pq
+func (_q *ProductQuery) Order(o ...product.OrderOption) *ProductQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryCategories chains the current query on the "categories" edge.
-func (pq *ProductQuery) QueryCategories() *CategoryQuery {
-	query := (&CategoryClient{config: pq.config}).Query()
+func (_q *ProductQuery) QueryCategories() *CategoryQuery {
+	query := (&CategoryClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := pq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -85,20 +85,20 @@ func (pq *ProductQuery) QueryCategories() *CategoryQuery {
 			sqlgraph.To(category.Table, category.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, product.CategoriesTable, product.CategoriesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryCarts chains the current query on the "carts" edge.
-func (pq *ProductQuery) QueryCarts() *CartQuery {
-	query := (&CartClient{config: pq.config}).Query()
+func (_q *ProductQuery) QueryCarts() *CartQuery {
+	query := (&CartClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := pq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -107,20 +107,20 @@ func (pq *ProductQuery) QueryCarts() *CartQuery {
 			sqlgraph.To(cart.Table, cart.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.CartsTable, product.CartsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryProductImages chains the current query on the "product_images" edge.
-func (pq *ProductQuery) QueryProductImages() *ProductImageQuery {
-	query := (&ProductImageClient{config: pq.config}).Query()
+func (_q *ProductQuery) QueryProductImages() *ProductImageQuery {
+	query := (&ProductImageClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := pq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -129,20 +129,20 @@ func (pq *ProductQuery) QueryProductImages() *ProductImageQuery {
 			sqlgraph.To(productimage.Table, productimage.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.ProductImagesTable, product.ProductImagesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryOrderProducts chains the current query on the "order_products" edge.
-func (pq *ProductQuery) QueryOrderProducts() *OrderProductQuery {
-	query := (&OrderProductClient{config: pq.config}).Query()
+func (_q *ProductQuery) QueryOrderProducts() *OrderProductQuery {
+	query := (&OrderProductClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := pq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -151,7 +151,7 @@ func (pq *ProductQuery) QueryOrderProducts() *OrderProductQuery {
 			sqlgraph.To(orderproduct.Table, orderproduct.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.OrderProductsTable, product.OrderProductsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -159,8 +159,8 @@ func (pq *ProductQuery) QueryOrderProducts() *OrderProductQuery {
 
 // First returns the first Product entity from the query.
 // Returns a *NotFoundError when no Product was found.
-func (pq *ProductQuery) First(ctx context.Context) (*Product, error) {
-	nodes, err := pq.Limit(1).All(setContextOp(ctx, pq.ctx, ent.OpQueryFirst))
+func (_q *ProductQuery) First(ctx context.Context) (*Product, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +171,8 @@ func (pq *ProductQuery) First(ctx context.Context) (*Product, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (pq *ProductQuery) FirstX(ctx context.Context) *Product {
-	node, err := pq.First(ctx)
+func (_q *ProductQuery) FirstX(ctx context.Context) *Product {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -181,9 +181,9 @@ func (pq *ProductQuery) FirstX(ctx context.Context) *Product {
 
 // FirstID returns the first Product ID from the query.
 // Returns a *NotFoundError when no Product ID was found.
-func (pq *ProductQuery) FirstID(ctx context.Context) (id int64, err error) {
+func (_q *ProductQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -194,8 +194,8 @@ func (pq *ProductQuery) FirstID(ctx context.Context) (id int64, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (pq *ProductQuery) FirstIDX(ctx context.Context) int64 {
-	id, err := pq.FirstID(ctx)
+func (_q *ProductQuery) FirstIDX(ctx context.Context) int64 {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -205,8 +205,8 @@ func (pq *ProductQuery) FirstIDX(ctx context.Context) int64 {
 // Only returns a single Product entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one Product entity is found.
 // Returns a *NotFoundError when no Product entities are found.
-func (pq *ProductQuery) Only(ctx context.Context) (*Product, error) {
-	nodes, err := pq.Limit(2).All(setContextOp(ctx, pq.ctx, ent.OpQueryOnly))
+func (_q *ProductQuery) Only(ctx context.Context) (*Product, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -221,8 +221,8 @@ func (pq *ProductQuery) Only(ctx context.Context) (*Product, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (pq *ProductQuery) OnlyX(ctx context.Context) *Product {
-	node, err := pq.Only(ctx)
+func (_q *ProductQuery) OnlyX(ctx context.Context) *Product {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -232,9 +232,9 @@ func (pq *ProductQuery) OnlyX(ctx context.Context) *Product {
 // OnlyID is like Only, but returns the only Product ID in the query.
 // Returns a *NotSingularError when more than one Product ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (pq *ProductQuery) OnlyID(ctx context.Context) (id int64, err error) {
+func (_q *ProductQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = pq.Limit(2).IDs(setContextOp(ctx, pq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -249,8 +249,8 @@ func (pq *ProductQuery) OnlyID(ctx context.Context) (id int64, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (pq *ProductQuery) OnlyIDX(ctx context.Context) int64 {
-	id, err := pq.OnlyID(ctx)
+func (_q *ProductQuery) OnlyIDX(ctx context.Context) int64 {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -258,18 +258,18 @@ func (pq *ProductQuery) OnlyIDX(ctx context.Context) int64 {
 }
 
 // All executes the query and returns a list of Products.
-func (pq *ProductQuery) All(ctx context.Context) ([]*Product, error) {
-	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryAll)
-	if err := pq.prepareQuery(ctx); err != nil {
+func (_q *ProductQuery) All(ctx context.Context) ([]*Product, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*Product, *ProductQuery]()
-	return withInterceptors[[]*Product](ctx, pq, qr, pq.inters)
+	return withInterceptors[[]*Product](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (pq *ProductQuery) AllX(ctx context.Context) []*Product {
-	nodes, err := pq.All(ctx)
+func (_q *ProductQuery) AllX(ctx context.Context) []*Product {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -277,20 +277,20 @@ func (pq *ProductQuery) AllX(ctx context.Context) []*Product {
 }
 
 // IDs executes the query and returns a list of Product IDs.
-func (pq *ProductQuery) IDs(ctx context.Context) (ids []int64, err error) {
-	if pq.ctx.Unique == nil && pq.path != nil {
-		pq.Unique(true)
+func (_q *ProductQuery) IDs(ctx context.Context) (ids []int64, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryIDs)
-	if err = pq.Select(product.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(product.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (pq *ProductQuery) IDsX(ctx context.Context) []int64 {
-	ids, err := pq.IDs(ctx)
+func (_q *ProductQuery) IDsX(ctx context.Context) []int64 {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -298,17 +298,17 @@ func (pq *ProductQuery) IDsX(ctx context.Context) []int64 {
 }
 
 // Count returns the count of the given query.
-func (pq *ProductQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryCount)
-	if err := pq.prepareQuery(ctx); err != nil {
+func (_q *ProductQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, pq, querierCount[*ProductQuery](), pq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*ProductQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (pq *ProductQuery) CountX(ctx context.Context) int {
-	count, err := pq.Count(ctx)
+func (_q *ProductQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -316,9 +316,9 @@ func (pq *ProductQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (pq *ProductQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, pq.ctx, ent.OpQueryExist)
-	switch _, err := pq.FirstID(ctx); {
+func (_q *ProductQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -329,8 +329,8 @@ func (pq *ProductQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (pq *ProductQuery) ExistX(ctx context.Context) bool {
-	exist, err := pq.Exist(ctx)
+func (_q *ProductQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -339,68 +339,68 @@ func (pq *ProductQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the ProductQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (pq *ProductQuery) Clone() *ProductQuery {
-	if pq == nil {
+func (_q *ProductQuery) Clone() *ProductQuery {
+	if _q == nil {
 		return nil
 	}
 	return &ProductQuery{
-		config:            pq.config,
-		ctx:               pq.ctx.Clone(),
-		order:             append([]product.OrderOption{}, pq.order...),
-		inters:            append([]Interceptor{}, pq.inters...),
-		predicates:        append([]predicate.Product{}, pq.predicates...),
-		withCategories:    pq.withCategories.Clone(),
-		withCarts:         pq.withCarts.Clone(),
-		withProductImages: pq.withProductImages.Clone(),
-		withOrderProducts: pq.withOrderProducts.Clone(),
+		config:            _q.config,
+		ctx:               _q.ctx.Clone(),
+		order:             append([]product.OrderOption{}, _q.order...),
+		inters:            append([]Interceptor{}, _q.inters...),
+		predicates:        append([]predicate.Product{}, _q.predicates...),
+		withCategories:    _q.withCategories.Clone(),
+		withCarts:         _q.withCarts.Clone(),
+		withProductImages: _q.withProductImages.Clone(),
+		withOrderProducts: _q.withOrderProducts.Clone(),
 		// clone intermediate query.
-		sql:  pq.sql.Clone(),
-		path: pq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithCategories tells the query-builder to eager-load the nodes that are connected to
 // the "categories" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProductQuery) WithCategories(opts ...func(*CategoryQuery)) *ProductQuery {
-	query := (&CategoryClient{config: pq.config}).Query()
+func (_q *ProductQuery) WithCategories(opts ...func(*CategoryQuery)) *ProductQuery {
+	query := (&CategoryClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withCategories = query
-	return pq
+	_q.withCategories = query
+	return _q
 }
 
 // WithCarts tells the query-builder to eager-load the nodes that are connected to
 // the "carts" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProductQuery) WithCarts(opts ...func(*CartQuery)) *ProductQuery {
-	query := (&CartClient{config: pq.config}).Query()
+func (_q *ProductQuery) WithCarts(opts ...func(*CartQuery)) *ProductQuery {
+	query := (&CartClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withCarts = query
-	return pq
+	_q.withCarts = query
+	return _q
 }
 
 // WithProductImages tells the query-builder to eager-load the nodes that are connected to
 // the "product_images" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProductQuery) WithProductImages(opts ...func(*ProductImageQuery)) *ProductQuery {
-	query := (&ProductImageClient{config: pq.config}).Query()
+func (_q *ProductQuery) WithProductImages(opts ...func(*ProductImageQuery)) *ProductQuery {
+	query := (&ProductImageClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withProductImages = query
-	return pq
+	_q.withProductImages = query
+	return _q
 }
 
 // WithOrderProducts tells the query-builder to eager-load the nodes that are connected to
 // the "order_products" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProductQuery) WithOrderProducts(opts ...func(*OrderProductQuery)) *ProductQuery {
-	query := (&OrderProductClient{config: pq.config}).Query()
+func (_q *ProductQuery) WithOrderProducts(opts ...func(*OrderProductQuery)) *ProductQuery {
+	query := (&OrderProductClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withOrderProducts = query
-	return pq
+	_q.withOrderProducts = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -417,10 +417,10 @@ func (pq *ProductQuery) WithOrderProducts(opts ...func(*OrderProductQuery)) *Pro
 //		GroupBy(product.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy {
-	pq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &ProductGroupBy{build: pq}
-	grbuild.flds = &pq.ctx.Fields
+func (_q *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &ProductGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = product.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -438,99 +438,99 @@ func (pq *ProductQuery) GroupBy(field string, fields ...string) *ProductGroupBy 
 //	client.Product.Query().
 //		Select(product.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (pq *ProductQuery) Select(fields ...string) *ProductSelect {
-	pq.ctx.Fields = append(pq.ctx.Fields, fields...)
-	sbuild := &ProductSelect{ProductQuery: pq}
+func (_q *ProductQuery) Select(fields ...string) *ProductSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &ProductSelect{ProductQuery: _q}
 	sbuild.label = product.Label
-	sbuild.flds, sbuild.scan = &pq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a ProductSelect configured with the given aggregations.
-func (pq *ProductQuery) Aggregate(fns ...AggregateFunc) *ProductSelect {
-	return pq.Select().Aggregate(fns...)
+func (_q *ProductQuery) Aggregate(fns ...AggregateFunc) *ProductSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (pq *ProductQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range pq.inters {
+func (_q *ProductQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, pq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range pq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !product.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if pq.path != nil {
-		prev, err := pq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		pq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Product, error) {
+func (_q *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Product, error) {
 	var (
 		nodes       = []*Product{}
-		_spec       = pq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [4]bool{
-			pq.withCategories != nil,
-			pq.withCarts != nil,
-			pq.withProductImages != nil,
-			pq.withOrderProducts != nil,
+			_q.withCategories != nil,
+			_q.withCarts != nil,
+			_q.withProductImages != nil,
+			_q.withOrderProducts != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Product).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Product{config: pq.config}
+		node := &Product{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(pq.modifiers) > 0 {
-		_spec.Modifiers = pq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, pq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := pq.withCategories; query != nil {
-		if err := pq.loadCategories(ctx, query, nodes, nil,
+	if query := _q.withCategories; query != nil {
+		if err := _q.loadCategories(ctx, query, nodes, nil,
 			func(n *Product, e *Category) { n.Edges.Categories = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := pq.withCarts; query != nil {
-		if err := pq.loadCarts(ctx, query, nodes,
+	if query := _q.withCarts; query != nil {
+		if err := _q.loadCarts(ctx, query, nodes,
 			func(n *Product) { n.Edges.Carts = []*Cart{} },
 			func(n *Product, e *Cart) { n.Edges.Carts = append(n.Edges.Carts, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := pq.withProductImages; query != nil {
-		if err := pq.loadProductImages(ctx, query, nodes,
+	if query := _q.withProductImages; query != nil {
+		if err := _q.loadProductImages(ctx, query, nodes,
 			func(n *Product) { n.Edges.ProductImages = []*ProductImage{} },
 			func(n *Product, e *ProductImage) { n.Edges.ProductImages = append(n.Edges.ProductImages, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := pq.withOrderProducts; query != nil {
-		if err := pq.loadOrderProducts(ctx, query, nodes,
+	if query := _q.withOrderProducts; query != nil {
+		if err := _q.loadOrderProducts(ctx, query, nodes,
 			func(n *Product) { n.Edges.OrderProducts = []*OrderProduct{} },
 			func(n *Product, e *OrderProduct) { n.Edges.OrderProducts = append(n.Edges.OrderProducts, e) }); err != nil {
 			return nil, err
@@ -539,7 +539,7 @@ func (pq *ProductQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Prod
 	return nodes, nil
 }
 
-func (pq *ProductQuery) loadCategories(ctx context.Context, query *CategoryQuery, nodes []*Product, init func(*Product), assign func(*Product, *Category)) error {
+func (_q *ProductQuery) loadCategories(ctx context.Context, query *CategoryQuery, nodes []*Product, init func(*Product), assign func(*Product, *Category)) error {
 	ids := make([]int64, 0, len(nodes))
 	nodeids := make(map[int64][]*Product)
 	for i := range nodes {
@@ -568,7 +568,7 @@ func (pq *ProductQuery) loadCategories(ctx context.Context, query *CategoryQuery
 	}
 	return nil
 }
-func (pq *ProductQuery) loadCarts(ctx context.Context, query *CartQuery, nodes []*Product, init func(*Product), assign func(*Product, *Cart)) error {
+func (_q *ProductQuery) loadCarts(ctx context.Context, query *CartQuery, nodes []*Product, init func(*Product), assign func(*Product, *Cart)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int64]*Product)
 	for i := range nodes {
@@ -598,7 +598,7 @@ func (pq *ProductQuery) loadCarts(ctx context.Context, query *CartQuery, nodes [
 	}
 	return nil
 }
-func (pq *ProductQuery) loadProductImages(ctx context.Context, query *ProductImageQuery, nodes []*Product, init func(*Product), assign func(*Product, *ProductImage)) error {
+func (_q *ProductQuery) loadProductImages(ctx context.Context, query *ProductImageQuery, nodes []*Product, init func(*Product), assign func(*Product, *ProductImage)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int64]*Product)
 	for i := range nodes {
@@ -628,7 +628,7 @@ func (pq *ProductQuery) loadProductImages(ctx context.Context, query *ProductIma
 	}
 	return nil
 }
-func (pq *ProductQuery) loadOrderProducts(ctx context.Context, query *OrderProductQuery, nodes []*Product, init func(*Product), assign func(*Product, *OrderProduct)) error {
+func (_q *ProductQuery) loadOrderProducts(ctx context.Context, query *OrderProductQuery, nodes []*Product, init func(*Product), assign func(*Product, *OrderProduct)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int64]*Product)
 	for i := range nodes {
@@ -659,27 +659,27 @@ func (pq *ProductQuery) loadOrderProducts(ctx context.Context, query *OrderProdu
 	return nil
 }
 
-func (pq *ProductQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := pq.querySpec()
-	if len(pq.modifiers) > 0 {
-		_spec.Modifiers = pq.modifiers
+func (_q *ProductQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = pq.ctx.Fields
-	if len(pq.ctx.Fields) > 0 {
-		_spec.Unique = pq.ctx.Unique != nil && *pq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, pq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (pq *ProductQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *ProductQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(product.Table, product.Columns, sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64))
-	_spec.From = pq.sql
-	if unique := pq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if pq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := pq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, product.FieldID)
 		for i := range fields {
@@ -687,24 +687,24 @@ func (pq *ProductQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if pq.withCategories != nil {
+		if _q.withCategories != nil {
 			_spec.Node.AddColumnOnce(product.FieldCategoryID)
 		}
 	}
-	if ps := pq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := pq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := pq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := pq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -714,36 +714,36 @@ func (pq *ProductQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (pq *ProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(pq.driver.Dialect())
+func (_q *ProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(product.Table)
-	columns := pq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = product.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if pq.sql != nil {
-		selector = pq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if pq.ctx.Unique != nil && *pq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range pq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range pq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range pq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := pq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := pq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -752,27 +752,27 @@ func (pq *ProductQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // ForUpdate locks the selected rows against concurrent updates, and prevent them from being
 // updated, deleted or "selected ... for update" by other sessions, until the transaction is
 // either committed or rolled-back.
-func (pq *ProductQuery) ForUpdate(opts ...sql.LockOption) *ProductQuery {
-	if pq.driver.Dialect() == dialect.Postgres {
-		pq.Unique(false)
+func (_q *ProductQuery) ForUpdate(opts ...sql.LockOption) *ProductQuery {
+	if _q.driver.Dialect() == dialect.Postgres {
+		_q.Unique(false)
 	}
-	pq.modifiers = append(pq.modifiers, func(s *sql.Selector) {
+	_q.modifiers = append(_q.modifiers, func(s *sql.Selector) {
 		s.ForUpdate(opts...)
 	})
-	return pq
+	return _q
 }
 
 // ForShare behaves similarly to ForUpdate, except that it acquires a shared mode lock
 // on any rows that are read. Other sessions can read the rows, but cannot modify them
 // until your transaction commits.
-func (pq *ProductQuery) ForShare(opts ...sql.LockOption) *ProductQuery {
-	if pq.driver.Dialect() == dialect.Postgres {
-		pq.Unique(false)
+func (_q *ProductQuery) ForShare(opts ...sql.LockOption) *ProductQuery {
+	if _q.driver.Dialect() == dialect.Postgres {
+		_q.Unique(false)
 	}
-	pq.modifiers = append(pq.modifiers, func(s *sql.Selector) {
+	_q.modifiers = append(_q.modifiers, func(s *sql.Selector) {
 		s.ForShare(opts...)
 	})
-	return pq
+	return _q
 }
 
 // ProductGroupBy is the group-by builder for Product entities.
@@ -782,41 +782,41 @@ type ProductGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (pgb *ProductGroupBy) Aggregate(fns ...AggregateFunc) *ProductGroupBy {
-	pgb.fns = append(pgb.fns, fns...)
-	return pgb
+func (_g *ProductGroupBy) Aggregate(fns ...AggregateFunc) *ProductGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (pgb *ProductGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, pgb.build.ctx, ent.OpQueryGroupBy)
-	if err := pgb.build.prepareQuery(ctx); err != nil {
+func (_g *ProductGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ProductQuery, *ProductGroupBy](ctx, pgb.build, pgb, pgb.build.inters, v)
+	return scanWithInterceptors[*ProductQuery, *ProductGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (pgb *ProductGroupBy) sqlScan(ctx context.Context, root *ProductQuery, v any) error {
+func (_g *ProductGroupBy) sqlScan(ctx context.Context, root *ProductQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(pgb.fns))
-	for _, fn := range pgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*pgb.flds)+len(pgb.fns))
-		for _, f := range *pgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*pgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := pgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -830,27 +830,27 @@ type ProductSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (ps *ProductSelect) Aggregate(fns ...AggregateFunc) *ProductSelect {
-	ps.fns = append(ps.fns, fns...)
-	return ps
+func (_s *ProductSelect) Aggregate(fns ...AggregateFunc) *ProductSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (ps *ProductSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ps.ctx, ent.OpQuerySelect)
-	if err := ps.prepareQuery(ctx); err != nil {
+func (_s *ProductSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ProductQuery, *ProductSelect](ctx, ps.ProductQuery, ps, ps.inters, v)
+	return scanWithInterceptors[*ProductQuery, *ProductSelect](ctx, _s.ProductQuery, _s, _s.inters, v)
 }
 
-func (ps *ProductSelect) sqlScan(ctx context.Context, root *ProductQuery, v any) error {
+func (_s *ProductSelect) sqlScan(ctx context.Context, root *ProductQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(ps.fns))
-	for _, fn := range ps.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*ps.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -858,7 +858,7 @@ func (ps *ProductSelect) sqlScan(ctx context.Context, root *ProductQuery, v any)
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := ps.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

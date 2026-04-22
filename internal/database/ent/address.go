@@ -84,7 +84,7 @@ func (*Address) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Address fields.
-func (a *Address) assignValues(columns []string, values []any) error {
+func (_m *Address) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -95,69 +95,69 @@ func (a *Address) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			a.ID = int64(value.Int64)
+			_m.ID = int64(value.Int64)
 		case address.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case address.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				a.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case address.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				a.UserID = value.Int64
+				_m.UserID = value.Int64
 			}
 		case address.FieldCity:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field city", values[i])
 			} else if value.Valid {
-				a.City = value.String
+				_m.City = value.String
 			}
 		case address.FieldCountry:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field country", values[i])
 			} else if value.Valid {
-				a.Country = value.String
+				_m.Country = value.String
 			}
 		case address.FieldFlat:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field flat", values[i])
 			} else if value.Valid {
-				a.Flat = int(value.Int64)
+				_m.Flat = int(value.Int64)
 			}
 		case address.FieldHouse:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field house", values[i])
 			} else if value.Valid {
-				a.House = int(value.Int64)
+				_m.House = int(value.Int64)
 			}
 		case address.FieldLetter:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field letter", values[i])
 			} else if value.Valid {
-				a.Letter = value.String
+				_m.Letter = value.String
 			}
 		case address.FieldPostcode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field postcode", values[i])
 			} else if value.Valid {
-				a.Postcode = int(value.Int64)
+				_m.Postcode = int(value.Int64)
 			}
 		case address.FieldStreet:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field street", values[i])
 			} else if value.Valid {
-				a.Street = value.String
+				_m.Street = value.String
 			}
 		default:
-			a.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -165,67 +165,67 @@ func (a *Address) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Address.
 // This includes values selected through modifiers, order, etc.
-func (a *Address) Value(name string) (ent.Value, error) {
-	return a.selectValues.Get(name)
+func (_m *Address) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUsers queries the "users" edge of the Address entity.
-func (a *Address) QueryUsers() *UserQuery {
-	return NewAddressClient(a.config).QueryUsers(a)
+func (_m *Address) QueryUsers() *UserQuery {
+	return NewAddressClient(_m.config).QueryUsers(_m)
 }
 
 // Update returns a builder for updating this Address.
 // Note that you need to call Address.Unwrap() before calling this method if this Address
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (a *Address) Update() *AddressUpdateOne {
-	return NewAddressClient(a.config).UpdateOne(a)
+func (_m *Address) Update() *AddressUpdateOne {
+	return NewAddressClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Address entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (a *Address) Unwrap() *Address {
-	_tx, ok := a.config.driver.(*txDriver)
+func (_m *Address) Unwrap() *Address {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Address is not a transactional entity")
 	}
-	a.config.driver = _tx.drv
-	return a
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (a *Address) String() string {
+func (_m *Address) String() string {
 	var builder strings.Builder
 	builder.WriteString("Address(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", a.UserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("city=")
-	builder.WriteString(a.City)
+	builder.WriteString(_m.City)
 	builder.WriteString(", ")
 	builder.WriteString("country=")
-	builder.WriteString(a.Country)
+	builder.WriteString(_m.Country)
 	builder.WriteString(", ")
 	builder.WriteString("flat=")
-	builder.WriteString(fmt.Sprintf("%v", a.Flat))
+	builder.WriteString(fmt.Sprintf("%v", _m.Flat))
 	builder.WriteString(", ")
 	builder.WriteString("house=")
-	builder.WriteString(fmt.Sprintf("%v", a.House))
+	builder.WriteString(fmt.Sprintf("%v", _m.House))
 	builder.WriteString(", ")
 	builder.WriteString("letter=")
-	builder.WriteString(a.Letter)
+	builder.WriteString(_m.Letter)
 	builder.WriteString(", ")
 	builder.WriteString("postcode=")
-	builder.WriteString(fmt.Sprintf("%v", a.Postcode))
+	builder.WriteString(fmt.Sprintf("%v", _m.Postcode))
 	builder.WriteString(", ")
 	builder.WriteString("street=")
-	builder.WriteString(a.Street)
+	builder.WriteString(_m.Street)
 	builder.WriteByte(')')
 	return builder.String()
 }

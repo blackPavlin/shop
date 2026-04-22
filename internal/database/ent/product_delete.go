@@ -20,56 +20,56 @@ type ProductDelete struct {
 }
 
 // Where appends a list predicates to the ProductDelete builder.
-func (pd *ProductDelete) Where(ps ...predicate.Product) *ProductDelete {
-	pd.mutation.Where(ps...)
-	return pd
+func (_d *ProductDelete) Where(ps ...predicate.Product) *ProductDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (pd *ProductDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, pd.sqlExec, pd.mutation, pd.hooks)
+func (_d *ProductDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pd *ProductDelete) ExecX(ctx context.Context) int {
-	n, err := pd.Exec(ctx)
+func (_d *ProductDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (pd *ProductDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *ProductDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(product.Table, sqlgraph.NewFieldSpec(product.FieldID, field.TypeInt64))
-	if ps := pd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, pd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	pd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // ProductDeleteOne is the builder for deleting a single Product entity.
 type ProductDeleteOne struct {
-	pd *ProductDelete
+	_d *ProductDelete
 }
 
 // Where appends a list predicates to the ProductDelete builder.
-func (pdo *ProductDeleteOne) Where(ps ...predicate.Product) *ProductDeleteOne {
-	pdo.pd.mutation.Where(ps...)
-	return pdo
+func (_d *ProductDeleteOne) Where(ps ...predicate.Product) *ProductDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (pdo *ProductDeleteOne) Exec(ctx context.Context) error {
-	n, err := pdo.pd.Exec(ctx)
+func (_d *ProductDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (pdo *ProductDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pdo *ProductDeleteOne) ExecX(ctx context.Context) {
-	if err := pdo.Exec(ctx); err != nil {
+func (_d *ProductDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

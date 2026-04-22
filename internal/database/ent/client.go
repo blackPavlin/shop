@@ -318,8 +318,8 @@ func (c *AddressClient) Update() *AddressUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *AddressClient) UpdateOne(a *Address) *AddressUpdateOne {
-	mutation := newAddressMutation(c.config, OpUpdateOne, withAddress(a))
+func (c *AddressClient) UpdateOne(_m *Address) *AddressUpdateOne {
+	mutation := newAddressMutation(c.config, OpUpdateOne, withAddress(_m))
 	return &AddressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -336,8 +336,8 @@ func (c *AddressClient) Delete() *AddressDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *AddressClient) DeleteOne(a *Address) *AddressDeleteOne {
-	return c.DeleteOneID(a.ID)
+func (c *AddressClient) DeleteOne(_m *Address) *AddressDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -372,16 +372,16 @@ func (c *AddressClient) GetX(ctx context.Context, id int64) *Address {
 }
 
 // QueryUsers queries the users edge of a Address.
-func (c *AddressClient) QueryUsers(a *Address) *UserQuery {
+func (c *AddressClient) QueryUsers(_m *Address) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(address.Table, address.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, address.UsersTable, address.UsersColumn),
 		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -467,8 +467,8 @@ func (c *CartClient) Update() *CartUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CartClient) UpdateOne(ca *Cart) *CartUpdateOne {
-	mutation := newCartMutation(c.config, OpUpdateOne, withCart(ca))
+func (c *CartClient) UpdateOne(_m *Cart) *CartUpdateOne {
+	mutation := newCartMutation(c.config, OpUpdateOne, withCart(_m))
 	return &CartUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -485,8 +485,8 @@ func (c *CartClient) Delete() *CartDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CartClient) DeleteOne(ca *Cart) *CartDeleteOne {
-	return c.DeleteOneID(ca.ID)
+func (c *CartClient) DeleteOne(_m *Cart) *CartDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -521,32 +521,32 @@ func (c *CartClient) GetX(ctx context.Context, id int64) *Cart {
 }
 
 // QueryUsers queries the users edge of a Cart.
-func (c *CartClient) QueryUsers(ca *Cart) *UserQuery {
+func (c *CartClient) QueryUsers(_m *Cart) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ca.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(cart.Table, cart.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, cart.UsersTable, cart.UsersColumn),
 		)
-		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryProducts queries the products edge of a Cart.
-func (c *CartClient) QueryProducts(ca *Cart) *ProductQuery {
+func (c *CartClient) QueryProducts(_m *Cart) *ProductQuery {
 	query := (&ProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ca.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(cart.Table, cart.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, cart.ProductsTable, cart.ProductsColumn),
 		)
-		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -632,8 +632,8 @@ func (c *CategoryClient) Update() *CategoryUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CategoryClient) UpdateOne(ca *Category) *CategoryUpdateOne {
-	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategory(ca))
+func (c *CategoryClient) UpdateOne(_m *Category) *CategoryUpdateOne {
+	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategory(_m))
 	return &CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -650,8 +650,8 @@ func (c *CategoryClient) Delete() *CategoryDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CategoryClient) DeleteOne(ca *Category) *CategoryDeleteOne {
-	return c.DeleteOneID(ca.ID)
+func (c *CategoryClient) DeleteOne(_m *Category) *CategoryDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -686,16 +686,16 @@ func (c *CategoryClient) GetX(ctx context.Context, id int64) *Category {
 }
 
 // QueryProducts queries the products edge of a Category.
-func (c *CategoryClient) QueryProducts(ca *Category) *ProductQuery {
+func (c *CategoryClient) QueryProducts(_m *Category) *ProductQuery {
 	query := (&ProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ca.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(category.Table, category.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, category.ProductsTable, category.ProductsColumn),
 		)
-		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -781,8 +781,8 @@ func (c *OrderClient) Update() *OrderUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *OrderClient) UpdateOne(o *Order) *OrderUpdateOne {
-	mutation := newOrderMutation(c.config, OpUpdateOne, withOrder(o))
+func (c *OrderClient) UpdateOne(_m *Order) *OrderUpdateOne {
+	mutation := newOrderMutation(c.config, OpUpdateOne, withOrder(_m))
 	return &OrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -799,8 +799,8 @@ func (c *OrderClient) Delete() *OrderDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *OrderClient) DeleteOne(o *Order) *OrderDeleteOne {
-	return c.DeleteOneID(o.ID)
+func (c *OrderClient) DeleteOne(_m *Order) *OrderDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -835,32 +835,32 @@ func (c *OrderClient) GetX(ctx context.Context, id int64) *Order {
 }
 
 // QueryUsers queries the users edge of a Order.
-func (c *OrderClient) QueryUsers(o *Order) *UserQuery {
+func (c *OrderClient) QueryUsers(_m *Order) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := o.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, order.UsersTable, order.UsersColumn),
 		)
-		fromV = sqlgraph.Neighbors(o.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryOrderProducts queries the order_products edge of a Order.
-func (c *OrderClient) QueryOrderProducts(o *Order) *OrderProductQuery {
+func (c *OrderClient) QueryOrderProducts(_m *Order) *OrderProductQuery {
 	query := (&OrderProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := o.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(order.Table, order.FieldID, id),
 			sqlgraph.To(orderproduct.Table, orderproduct.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, order.OrderProductsTable, order.OrderProductsColumn),
 		)
-		fromV = sqlgraph.Neighbors(o.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -946,8 +946,8 @@ func (c *OrderProductClient) Update() *OrderProductUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *OrderProductClient) UpdateOne(op *OrderProduct) *OrderProductUpdateOne {
-	mutation := newOrderProductMutation(c.config, OpUpdateOne, withOrderProduct(op))
+func (c *OrderProductClient) UpdateOne(_m *OrderProduct) *OrderProductUpdateOne {
+	mutation := newOrderProductMutation(c.config, OpUpdateOne, withOrderProduct(_m))
 	return &OrderProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -964,8 +964,8 @@ func (c *OrderProductClient) Delete() *OrderProductDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *OrderProductClient) DeleteOne(op *OrderProduct) *OrderProductDeleteOne {
-	return c.DeleteOneID(op.ID)
+func (c *OrderProductClient) DeleteOne(_m *OrderProduct) *OrderProductDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1000,32 +1000,32 @@ func (c *OrderProductClient) GetX(ctx context.Context, id int64) *OrderProduct {
 }
 
 // QueryOrders queries the orders edge of a OrderProduct.
-func (c *OrderProductClient) QueryOrders(op *OrderProduct) *OrderQuery {
+func (c *OrderProductClient) QueryOrders(_m *OrderProduct) *OrderQuery {
 	query := (&OrderClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := op.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(orderproduct.Table, orderproduct.FieldID, id),
 			sqlgraph.To(order.Table, order.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, orderproduct.OrdersTable, orderproduct.OrdersColumn),
 		)
-		fromV = sqlgraph.Neighbors(op.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryProducts queries the products edge of a OrderProduct.
-func (c *OrderProductClient) QueryProducts(op *OrderProduct) *ProductQuery {
+func (c *OrderProductClient) QueryProducts(_m *OrderProduct) *ProductQuery {
 	query := (&ProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := op.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(orderproduct.Table, orderproduct.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, orderproduct.ProductsTable, orderproduct.ProductsColumn),
 		)
-		fromV = sqlgraph.Neighbors(op.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1111,8 +1111,8 @@ func (c *ProductClient) Update() *ProductUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ProductClient) UpdateOne(pr *Product) *ProductUpdateOne {
-	mutation := newProductMutation(c.config, OpUpdateOne, withProduct(pr))
+func (c *ProductClient) UpdateOne(_m *Product) *ProductUpdateOne {
+	mutation := newProductMutation(c.config, OpUpdateOne, withProduct(_m))
 	return &ProductUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1129,8 +1129,8 @@ func (c *ProductClient) Delete() *ProductDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ProductClient) DeleteOne(pr *Product) *ProductDeleteOne {
-	return c.DeleteOneID(pr.ID)
+func (c *ProductClient) DeleteOne(_m *Product) *ProductDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1165,64 +1165,64 @@ func (c *ProductClient) GetX(ctx context.Context, id int64) *Product {
 }
 
 // QueryCategories queries the categories edge of a Product.
-func (c *ProductClient) QueryCategories(pr *Product) *CategoryQuery {
+func (c *ProductClient) QueryCategories(_m *Product) *CategoryQuery {
 	query := (&CategoryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(category.Table, category.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, product.CategoriesTable, product.CategoriesColumn),
 		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryCarts queries the carts edge of a Product.
-func (c *ProductClient) QueryCarts(pr *Product) *CartQuery {
+func (c *ProductClient) QueryCarts(_m *Product) *CartQuery {
 	query := (&CartClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(cart.Table, cart.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.CartsTable, product.CartsColumn),
 		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryProductImages queries the product_images edge of a Product.
-func (c *ProductClient) QueryProductImages(pr *Product) *ProductImageQuery {
+func (c *ProductClient) QueryProductImages(_m *Product) *ProductImageQuery {
 	query := (&ProductImageClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(productimage.Table, productimage.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.ProductImagesTable, product.ProductImagesColumn),
 		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryOrderProducts queries the order_products edge of a Product.
-func (c *ProductClient) QueryOrderProducts(pr *Product) *OrderProductQuery {
+func (c *ProductClient) QueryOrderProducts(_m *Product) *OrderProductQuery {
 	query := (&OrderProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(product.Table, product.FieldID, id),
 			sqlgraph.To(orderproduct.Table, orderproduct.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, product.OrderProductsTable, product.OrderProductsColumn),
 		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1308,8 +1308,8 @@ func (c *ProductImageClient) Update() *ProductImageUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ProductImageClient) UpdateOne(pi *ProductImage) *ProductImageUpdateOne {
-	mutation := newProductImageMutation(c.config, OpUpdateOne, withProductImage(pi))
+func (c *ProductImageClient) UpdateOne(_m *ProductImage) *ProductImageUpdateOne {
+	mutation := newProductImageMutation(c.config, OpUpdateOne, withProductImage(_m))
 	return &ProductImageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1326,8 +1326,8 @@ func (c *ProductImageClient) Delete() *ProductImageDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ProductImageClient) DeleteOne(pi *ProductImage) *ProductImageDeleteOne {
-	return c.DeleteOneID(pi.ID)
+func (c *ProductImageClient) DeleteOne(_m *ProductImage) *ProductImageDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1362,16 +1362,16 @@ func (c *ProductImageClient) GetX(ctx context.Context, id int64) *ProductImage {
 }
 
 // QueryProducts queries the products edge of a ProductImage.
-func (c *ProductImageClient) QueryProducts(pi *ProductImage) *ProductQuery {
+func (c *ProductImageClient) QueryProducts(_m *ProductImage) *ProductQuery {
 	query := (&ProductClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pi.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(productimage.Table, productimage.FieldID, id),
 			sqlgraph.To(product.Table, product.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, productimage.ProductsTable, productimage.ProductsColumn),
 		)
-		fromV = sqlgraph.Neighbors(pi.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1457,8 +1457,8 @@ func (c *UserClient) Update() *UserUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUser(u))
+func (c *UserClient) UpdateOne(_m *User) *UserUpdateOne {
+	mutation := newUserMutation(c.config, OpUpdateOne, withUser(_m))
 	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1475,8 +1475,8 @@ func (c *UserClient) Delete() *UserDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
-	return c.DeleteOneID(u.ID)
+func (c *UserClient) DeleteOne(_m *User) *UserDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1511,48 +1511,48 @@ func (c *UserClient) GetX(ctx context.Context, id int64) *User {
 }
 
 // QueryAddresses queries the addresses edge of a User.
-func (c *UserClient) QueryAddresses(u *User) *AddressQuery {
+func (c *UserClient) QueryAddresses(_m *User) *AddressQuery {
 	query := (&AddressClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(address.Table, address.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.AddressesTable, user.AddressesColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryCarts queries the carts edge of a User.
-func (c *UserClient) QueryCarts(u *User) *CartQuery {
+func (c *UserClient) QueryCarts(_m *User) *CartQuery {
 	query := (&CartClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(cart.Table, cart.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.CartsTable, user.CartsColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryOrders queries the orders edge of a User.
-func (c *UserClient) QueryOrders(u *User) *OrderQuery {
+func (c *UserClient) QueryOrders(_m *User) *OrderQuery {
 	query := (&OrderClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(order.Table, order.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.OrdersTable, user.OrdersColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query

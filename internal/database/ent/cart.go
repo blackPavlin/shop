@@ -86,7 +86,7 @@ func (*Cart) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Cart fields.
-func (c *Cart) assignValues(columns []string, values []any) error {
+func (_m *Cart) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -97,39 +97,39 @@ func (c *Cart) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			c.ID = int64(value.Int64)
+			_m.ID = int64(value.Int64)
 		case cart.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				c.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case cart.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				c.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case cart.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				c.UserID = value.Int64
+				_m.UserID = value.Int64
 			}
 		case cart.FieldProductID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field product_id", values[i])
 			} else if value.Valid {
-				c.ProductID = value.Int64
+				_m.ProductID = value.Int64
 			}
 		case cart.FieldAmount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				c.Amount = value.Int64
+				_m.Amount = value.Int64
 			}
 		default:
-			c.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -137,57 +137,57 @@ func (c *Cart) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Cart.
 // This includes values selected through modifiers, order, etc.
-func (c *Cart) Value(name string) (ent.Value, error) {
-	return c.selectValues.Get(name)
+func (_m *Cart) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUsers queries the "users" edge of the Cart entity.
-func (c *Cart) QueryUsers() *UserQuery {
-	return NewCartClient(c.config).QueryUsers(c)
+func (_m *Cart) QueryUsers() *UserQuery {
+	return NewCartClient(_m.config).QueryUsers(_m)
 }
 
 // QueryProducts queries the "products" edge of the Cart entity.
-func (c *Cart) QueryProducts() *ProductQuery {
-	return NewCartClient(c.config).QueryProducts(c)
+func (_m *Cart) QueryProducts() *ProductQuery {
+	return NewCartClient(_m.config).QueryProducts(_m)
 }
 
 // Update returns a builder for updating this Cart.
 // Note that you need to call Cart.Unwrap() before calling this method if this Cart
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (c *Cart) Update() *CartUpdateOne {
-	return NewCartClient(c.config).UpdateOne(c)
+func (_m *Cart) Update() *CartUpdateOne {
+	return NewCartClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Cart entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (c *Cart) Unwrap() *Cart {
-	_tx, ok := c.config.driver.(*txDriver)
+func (_m *Cart) Unwrap() *Cart {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Cart is not a transactional entity")
 	}
-	c.config.driver = _tx.drv
-	return c
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (c *Cart) String() string {
+func (_m *Cart) String() string {
 	var builder strings.Builder
 	builder.WriteString("Cart(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("product_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.ProductID))
+	builder.WriteString(fmt.Sprintf("%v", _m.ProductID))
 	builder.WriteString(", ")
 	builder.WriteString("amount=")
-	builder.WriteString(fmt.Sprintf("%v", c.Amount))
+	builder.WriteString(fmt.Sprintf("%v", _m.Amount))
 	builder.WriteByte(')')
 	return builder.String()
 }
